@@ -33,10 +33,9 @@ volatile Event_t current_main_event = 0;
 Int16S roulis;
 Int16S tangage;
 Int16S lacet;
-Int16U direction;
 Int16U speed;
 Int32U pression;
-Int16U temperature;
+Int16S temperature;
 Int16U altitude;
 
 
@@ -53,7 +52,6 @@ int main(void)
 	roulis		= 0;
 	tangage		= 0;
 	lacet		= 0;
-	direction	= 0;
 	speed		= 0;
 	pression	= 0;
 	temperature = 0;
@@ -66,8 +64,8 @@ int main(void)
 	DrvUartInit();
 	
 	// ********************* PID init *************************************************
-	SrvPIDInit(0,5,0,-3); //roulis
-	SrvPIDInit(1,5,0,-3); //tangage
+	SrvPIDInit(0,3,0,0); //roulis
+	SrvPIDInit(1,3,0,0); //tangage
 	SrvPIDInit(2,2,0,0);  //lacet
 	
 	// ********************* Interrupt Enable *****************************************

@@ -108,15 +108,11 @@ static void SrvCommRepportData( void )
 	Char o_message[ 40U ];
 	Int8U lenght = 0;
 	lenght = sprintf(	o_message	
-						,"%d, %d, %d, %d, %d, %d, %d, %d\n"
+						,"%d, %d, %d, %d\n"
 						,roulis
 						,tangage
 						,lacet
-						,direction
 						,speed - 1000
-						,(Int16U)(pression / 10)
-						,temperature
-						,altitude
 					);
 	DrvUart0SendDirectMessage( o_message , lenght );
 }

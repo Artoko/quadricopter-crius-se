@@ -67,10 +67,9 @@ extern Int16S roulis;
 extern Int16S tangage;
 extern Int16S lacet;
 extern Int16U speed;
-extern Int16U direction;
 extern Int16U altitude;
 extern Int32U pression;
-extern Int16U temperature;
+extern Int16S temperature;
 
 
 
