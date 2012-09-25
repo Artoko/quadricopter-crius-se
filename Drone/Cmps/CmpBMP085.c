@@ -148,7 +148,7 @@ static void CmpBMP085ReadUP( void )
 	s_barometer.up.raw[2] = buffer[ 0U ];
 	s_barometer.up.raw[1] = buffer[ 1U ];
 	s_barometer.up.raw[0] = buffer[ 2U ];
-	pression = s_barometer.up.val;
+	pression = s_barometer.up.val/1000;
 }
 
 // read uncompensated temperature value: read result bytes
@@ -159,7 +159,7 @@ static void CmpBMP085ReadUT( void )
 	DrvTwiReadRegBuf(BMP085_ADDRESS, CONTROL_OUTPUT, buffer, 2U);
 	s_barometer.ut.raw[1] = buffer[ 0U ];
 	s_barometer.ut.raw[0] = buffer[ 1U ];
-	temperature = s_barometer.ut.val;
+	temperature = (Int16S)(s_barometer.ut.val/100);
 }
 
 static void CmpBMP085Compute( void ) 

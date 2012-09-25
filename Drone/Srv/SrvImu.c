@@ -31,11 +31,14 @@ static float accYangle;
 static float gyroXAngle;
 static float gyroYAngle;
 static float gyroZAngle;
+static Int16U direction;
 static Int16S pid_angle_roulis;
 static Int16S pid_angle_tangage;
 static Int16S pid_angle_lacet;
 static Int32U currentTime;
 static Int32U cycleTime;
+
+
 //initialistaion des composants
 void SrvImuInit( void )
 {
@@ -47,6 +50,7 @@ void SrvImuInit( void )
 	pid_angle_lacet = 0;
 	currentTime = 0;
 	cycleTime = 0;
+	direction = 0;
 	
 	CmpHMC5883Init();
 	CmpBMA180Init();
@@ -72,7 +76,6 @@ void SrvImuDispatcher (Event_t in_event)
 		roulis  = SrvKalmanFilterX(accXangle, gyroXAngle, cycleTime );
 		tangage = SrvKalmanFilterY(accYangle, gyroYAngle, cycleTime );
 		lacet   = SrvKalmanFilterZ(direction, gyroZAngle, cycleTime );
-		//lacet	= gyroZAngle;
 		LED_TOGGLE();
 	}		
 		
