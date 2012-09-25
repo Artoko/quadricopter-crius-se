@@ -64,8 +64,8 @@ int main(void)
 	DrvUartInit();
 	
 	// ********************* PID init *************************************************
-	SrvPIDInit(0,3,0,0); //roulis
-	SrvPIDInit(1,3,0,0); //tangage
+	SrvPIDInit(0,7,0,-90); //roulis
+	SrvPIDInit(1,7,0,-90); //tangage
 	SrvPIDInit(2,2,0,0);  //lacet
 	
 	// ********************* Interrupt Enable *****************************************

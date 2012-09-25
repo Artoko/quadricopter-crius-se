@@ -77,7 +77,6 @@ void SrvImuDispatcher (Event_t in_event)
 		tangage = SrvKalmanFilterY(accYangle, gyroYAngle, cycleTime );
 		lacet   = SrvKalmanFilterZ(direction, gyroZAngle, cycleTime );
 		LED_TOGGLE();
-	}		
 		
 	// ********************* PID **********************************************
 	pid_angle_roulis	= SrvPIDCompute(0,0, roulis);
@@ -87,6 +86,8 @@ void SrvImuDispatcher (Event_t in_event)
 	// ********************* Motors *******************************************
 	SrvMotorUpdate(pid_angle_roulis, pid_angle_tangage, pid_angle_lacet);
 	speed = SrvMotorGetSpeed();
+	
+	}		
 }
 
 void SrvImuSensorsCalibration( void )
