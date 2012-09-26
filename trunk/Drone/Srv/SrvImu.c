@@ -5,6 +5,7 @@
  *  Author: berryer
  */ 
 
+/////////////////////////////////////////////INCLUDES/////////////////////////////////////////////
 #include "Conf/conf_hard.h"
 
 #include "SrvImu.h"
@@ -26,25 +27,36 @@
 static void SrvImuComputeSensors(Int32U interval);
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
+
+//angle donne par les capteurs accelerometre et gyroscope
 static float accXangle;
 static float accYangle;
 static float gyroXAngle;
 static float gyroYAngle;
 static float gyroZAngle;
+
+//direction par rapport au nord
 static Int16U direction;
+
+//erreur retournee par le calcul du PID
 static Int16S pid_angle_roulis;
 static Int16S pid_angle_tangage;
 static Int16S pid_angle_lacet;
+
+//variables de timming
 static Int32U currentTime;
 static Int32U cycleTime;
 
 
-//initialistaion des composants
+//initialisation des composants
 void SrvImuInit( void )
 {
-	roulis = 0;
-	tangage = 0;
-	lacet = 0;
+	//init des variables privés
+	accXangle = 0;
+	accYangle = 0;
+	gyroXAngle = 0;
+	gyroYAngle = 0;
+	gyroZAngle = 0;
 	pid_angle_roulis = 0;
 	pid_angle_tangage = 0;
 	pid_angle_lacet = 0;
@@ -52,6 +64,7 @@ void SrvImuInit( void )
 	cycleTime = 0;
 	direction = 0;
 	
+	//init des composants
 	CmpHMC5883Init();
 	CmpBMA180Init();
 	CmpITG3205Init();
@@ -61,35 +74,34 @@ void SrvImuInit( void )
 //dispatcher d'evenements
 void SrvImuDispatcher (Event_t in_event)
 {
-	//BARO
-	altitude = CmpBMP085Update();
 	
-	if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_20MS))
+	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_20MS ) == TRUE)
 	{
+		// ********************* Calcul du temps de cycle *************************
 		cycleTime = DrvTimerGetTime() - currentTime;
 		currentTime = DrvTimerGetTime();
 		
 		// ********************* Mix sensors **************************************
-		SrvImuComputeSensors(cycleTime);
+		SrvImuComputeSensors( cycleTime );
 		
 		// ********************* kalman filter ************************************
-		roulis  = SrvKalmanFilterX(accXangle, gyroXAngle, cycleTime );
-		tangage = SrvKalmanFilterY(accYangle, gyroYAngle, cycleTime );
-		lacet   = SrvKalmanFilterZ(direction, gyroZAngle, cycleTime );
+		angle_reel.roulis  = SrvKalmanFilterX( accXangle, gyroXAngle, cycleTime );
+		angle_reel.tangage = SrvKalmanFilterY( accYangle, gyroYAngle, cycleTime );
+		angle_reel.lacet   = SrvKalmanFilterZ( direction, gyroZAngle, cycleTime );
+		
+		// ********************* PID **********************************************
+		pid_angle_roulis	= SrvPIDCompute( 0, angle_desire.roulis	, angle_reel.roulis);
+		pid_angle_tangage	= SrvPIDCompute( 1, angle_desire.tangage, angle_reel.tangage);
+		pid_angle_lacet		= SrvPIDCompute( 2, angle_reel.lacet + angle_desire.tangage, angle_reel.lacet);
+		
+		// ********************* Motors *******************************************
+		SrvMotorUpdate(pid_angle_roulis, pid_angle_tangage, pid_angle_lacet);
+		speed = SrvMotorGetSpeed();
 		LED_TOGGLE();
-		
-	// ********************* PID **********************************************
-	pid_angle_roulis	= SrvPIDCompute(0,0, roulis);
-	pid_angle_tangage	= SrvPIDCompute(1,0, tangage);
-	pid_angle_lacet		= SrvPIDCompute(2,lacet, lacet);
-		
-	// ********************* Motors *******************************************
-	SrvMotorUpdate(pid_angle_roulis, pid_angle_tangage, pid_angle_lacet);
-	speed = SrvMotorGetSpeed();
-	
 	}		
 }
 
+//Calibration des capteurs
 void SrvImuSensorsCalibration( void )
 {
 	S_Gyr_Angle rotation;
@@ -122,6 +134,7 @@ void SrvImuSensorsCalibration( void )
 	} while (!calibrate);
 }
 
+//on met a jours les angles
 void SrvImuComputeSensors(Int32U interval)
 {
 	float gyroRate = 0;	
@@ -212,5 +225,8 @@ void SrvImuComputeSensors(Int32U interval)
 			direction = ToDeg(heading);
 		}	
 	}
+	//BARO
+	altitude = CmpBMP085Update();
+	
 }
 

@@ -59,13 +59,18 @@
 #define		COMM_BAROMETRE		3
 #define		COMM_PID			4
 #define		COMM_MOTOR			5
-#define		COMM_DEBUG			6
+#define		COMM_ANGLE			6
+#define		COMM_DEBUG			7
 //-----------------------------------------------------------------------------------------------//
+typedef struct SSangles
+{
+	Int16S roulis;
+	Int16S tangage;
+	Int16S lacet;
+}Sangles;
 
-
-extern Int16S roulis;
-extern Int16S tangage;
-extern Int16S lacet;
+extern Sangles angle_desire;
+extern Sangles angle_reel;
 extern Int16U speed;
 extern Int16U altitude;
 extern Int32U pression;

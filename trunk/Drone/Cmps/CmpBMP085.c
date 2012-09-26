@@ -12,9 +12,7 @@
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
 
-#define UPDATE_INTERVAL 25000    // 40hz update rate (20hz LPF on acc)
-#define INIT_DELAY      4000000  // 4 sec initialization delay
-#define BARO_TAB_SIZE   40
+#define NB_SAMPLE_MAX  5
 
 /////////////////////////////////////////PRIVATE STRUCTIURES///////////////////////////////////////
 static struct SS_BMP085
@@ -49,6 +47,9 @@ static void CmpBMP085ReadUP( void );
 /////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 static Int32U pressure;
 static Int32U BaroAlt;
+
+static Int8U index_alt = 0U;
+static Int32U alti = 0U;
 
 //Initialisation du barometre
 Boolean CmpBMP085Init( void )
@@ -102,9 +103,17 @@ Int32U CmpBMP085Update( void )
 			{
 				CmpBMP085ReadUP();
 				CmpBMP085Compute();
-				BaroAlt = (1.0f - pow(pressure/101325.0f, 0.190295f)) * 4433000.0f; //centimeter
 				s_barometer.state = 0;
 				s_barometer.deadline += 500;
+				
+				alti += (1.0f - pow(pressure/101325.0f, 0.190295f)) * 4433000.0f; //centimeter;
+				index_alt++;
+				if(index_alt == NB_SAMPLE_MAX)
+				{
+					index_alt = 0;
+					BaroAlt = alti / NB_SAMPLE_MAX;
+					alti = 0;
+				}
 			}
 			break;
 		}

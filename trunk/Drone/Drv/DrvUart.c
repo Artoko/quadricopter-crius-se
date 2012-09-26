@@ -171,11 +171,6 @@ ISR(USART_RX_vect)
 			ctr_buff_uart_0++;	
 			if(( buff_uart_0[ctr_buff_uart_0 - 1U] == '#' ) && ( buff_uart_0[ctr_buff_uart_0 - 2U] == '#' ))
 			{
-				//on charge le message
-				for ( Int8U loop_send = 0U ; loop_send < ctr_buff_uart_0 ; loop_send++)
-				{
-					in_message_0[ loop_send ] = buff_uart_0[ loop_send ];
-				} 
 				//on stock la taille
 				in_message_len_0 = ctr_buff_uart_0;
 				//on attend le start frame

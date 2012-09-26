@@ -23,16 +23,13 @@
 #include "Srv/SrvMotor.h"
 
 
-
-
-
 ////////////////////////////////////////PRIVATE VARIABLES////////////////////////////////////////
 //event main
 volatile Event_t current_main_event = 0;
 
-Int16S roulis;
-Int16S tangage;
-Int16S lacet;
+Sangles angle_desire;
+Sangles angle_reel;
+
 Int16U speed;
 Int32U pression;
 Int16S temperature;
@@ -49,9 +46,12 @@ int main(void)
 	CONFIGURE_LED_PIN();
 	//start Initialisation
 	LED_ON();
-	roulis		= 0;
-	tangage		= 0;
-	lacet		= 0;
+	angle_desire.roulis	= 0;
+	angle_desire.tangage= 0;
+	angle_desire.lacet	= 0;
+	angle_reel.roulis	= 0;
+	angle_reel.tangage	= 0;
+	angle_reel.lacet	= 0;
 	speed		= 0;
 	pression	= 0;
 	temperature = 0;
@@ -66,7 +66,7 @@ int main(void)
 	// ********************* PID init *************************************************
 	SrvPIDInit(0,7,0,-90); //roulis
 	SrvPIDInit(1,7,0,-90); //tangage
-	SrvPIDInit(2,2,0,0);  //lacet
+	SrvPIDInit(2,10,0,0);  //lacet
 	
 	// ********************* Interrupt Enable *****************************************
 	DrvInterruptSetAllInterrupts();
