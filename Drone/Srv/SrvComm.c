@@ -140,7 +140,7 @@ static void SrvCommRepportData( void )
 						,/*(Int16U)(pression/10)//*/angle_reel.roulis
 						,/*(Int16U)(temperature/10)//*/angle_reel.tangage
 						,angle_reel.lacet	
-						,/*(Int16U)(altitude/10)//*/speed - 1000
+						,angle_reel.altitude
 					);
 	DrvUart0SendDirectMessage( o_message , lenght );
 }

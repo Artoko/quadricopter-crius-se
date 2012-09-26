@@ -67,12 +67,12 @@ typedef struct SSangles
 	Int16S roulis;
 	Int16S tangage;
 	Int16S lacet;
+	Int16U altitude;
 }Sangles;
 
 extern Sangles angle_desire;
 extern Sangles angle_reel;
 extern Int16U speed;
-extern Int16U altitude;
 extern Int32U pression;
 extern Int16S temperature;
 

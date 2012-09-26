@@ -49,7 +49,7 @@
 
 //fonction init du capteur
 Boolean CmpBMP085Init( void );
-Int32U CmpBMP085Update( void );
+Int32U CmpBMP085StateMachine( void );
 
 #endif /*BMA180_H_*/
 

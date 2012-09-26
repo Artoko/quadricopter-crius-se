@@ -15,5 +15,5 @@
 double SrvKalmanFilterX(double newAngle, double newRate, double dtime) ;
 double SrvKalmanFilterY(double newAngle, double newRate, double dtime) ;
 double SrvKalmanFilterZ(double newAngle, double newRate, double dtime) ;
-
+double SrvKalmanFilterAlt(double newAngle, double newRate, double dtime) ;
 #endif /* SRVKALMAN_H_ */

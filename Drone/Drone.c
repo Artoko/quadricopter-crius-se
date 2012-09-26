@@ -33,7 +33,6 @@ Sangles angle_reel;
 Int16U speed;
 Int32U pression;
 Int16S temperature;
-Int16U altitude;
 
 
 int main(void)
@@ -49,13 +48,14 @@ int main(void)
 	angle_desire.roulis	= 0;
 	angle_desire.tangage= 0;
 	angle_desire.lacet	= 0;
+	angle_reel.altitude	= 0;
 	angle_reel.roulis	= 0;
 	angle_reel.tangage	= 0;
 	angle_reel.lacet	= 0;
+	angle_reel.altitude	= 0;
 	speed		= 0;
 	pression	= 0;
 	temperature = 0;
-	altitude	= 0;
 	
 	// ********************* Drivers init *********************************************
 	DrvEventInit();
