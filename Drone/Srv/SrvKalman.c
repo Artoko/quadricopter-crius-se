@@ -5,20 +5,13 @@
  *  Author: berryer
  */ 
 
-/*
-		// ********************* kalman filter ****************************************
-		ActXAngle = SrvKalmanFilterX(imu.accXangle,imu.gyroXAngle , last_loop_time );
-		ActYAngle = SrvKalmanFilterY(imu.accYangle,imu.gyroYAngle , last_loop_time );
-		
-		//pour l'axe on ne fait pas de relation avec l'accelerometre
-		if(( imu.gyroZAngle > 0.01 ) || ( imu.gyroZAngle < -0.01 ))
-		{
-			ActZAngle += imu.gyroZAngle;
-		}
-*/
+/////////////////////////////////////////////INCLUDES/////////////////////////////////////////////
+#include "Conf/conf_hard.h"
 		
 #include "SrvKalman.h"
 
+
+////////////////////////////////////////PRIVATE VARIABLES////////////////////////////////////////
 /* Kalman filter variables and constants */
 const double Q_angleX = 0.001; // Process noise covariance for the accelerometer - Sw
 const double Q_gyroX = 0.003; // Process noise covariance for the gyro - Sw
@@ -30,6 +23,7 @@ double PX_00 = 0, PX_01 = 0, PX_10 = 0, PX_11 = 0;
 double dtX, yX, SX;
 double KX_0, KX_1;
 
+////////////////////////////////////////PUBLIC FONCTIONS////////////////////////////////////////
 double SrvKalmanFilterX(double newAngle, double newRate, double dtime)
 {
 	dtX = dtime / 1000; // Convert from microseconds to seconds
@@ -112,9 +106,9 @@ double SrvKalmanFilterY(double newAngle, double newRate, double dtime)
 
 
 /* Kalman filter variables and constants */
-const double Q_angleZ = 0.001; // Process noise covariance for the accelerometer - Sw
-const double Q_gZroZ = 0.003; // Process noise covariance for the gZro - Sw
-const double R_angleZ = 0.03;//0.00001; // Measurement noise covariance - Sv
+const double Q_angleZ = 0.001; // Process noise covariance for the magnetometer - Sw
+const double Q_gZroZ = 0.03; // Process noise covariance for the gZro - Sw
+const double R_angleZ = 0.3; // Measurement noise covariance - Sv
 
 double angleZ = 0; // The angle output from the Kalman filter
 double biasZ = 0; // The gZro bias calculated bZ the Kalman filter
