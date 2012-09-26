@@ -57,7 +57,7 @@ Boolean CmpBMP085Init( void )
 	Boolean o_success = FALSE;
 	pressure = 0U;
 	BaroAlt = 0U;
-	DrvTimerDelayMs(10);
+	DrvTimerDelayMs(1000);
 	CmpBMP085ReadCalibration();
 	CmpBMP085StartUT();
 	DrvTimerDelayMs(5);
@@ -67,7 +67,7 @@ Boolean CmpBMP085Init( void )
 }
 
 //on update la temerature et la pression
-Int32U CmpBMP085Update( void )
+Int32U CmpBMP085StateMachine( void )
 {
 	Int32U currentTime = DrvTimerGetTime();
 	if (currentTime < s_barometer.deadline) 
@@ -106,7 +106,7 @@ Int32U CmpBMP085Update( void )
 				s_barometer.state = 0;
 				s_barometer.deadline += 500;
 				
-				alti += (1.0f - pow(pressure/101325.0f, 0.190295f)) * 4433000.0f; //centimeter;
+				alti += ((1.0f - pow(pressure/101325.0F, 0.190295F)) * 4433000.0F)/10; //centimeter;
 				index_alt++;
 				if(index_alt == NB_SAMPLE_MAX)
 				{

@@ -31,6 +31,7 @@ static void SrvImuComputeSensors(Int32U interval);
 //angle donne par les capteurs accelerometre et gyroscope
 static float accXangle;
 static float accYangle;
+static float accZangle;
 static float gyroXAngle;
 static float gyroYAngle;
 static float gyroZAngle;
@@ -44,25 +45,33 @@ static Int16S pid_angle_tangage;
 static Int16S pid_angle_lacet;
 
 //variables de timming
-static Int32U currentTime;
-static Int32U cycleTime;
+static Int32U temp_actuel;
+static Int32U temp_dernier_cycle;
+static Int32U temp_max_cycle;
 
-
+//maintient de l'alitude
+static Boolean maintient_altitude;
+static Int16U altitude;
+	
 //initialisation des composants
 void SrvImuInit( void )
 {
 	//init des variables privés
 	accXangle = 0;
 	accYangle = 0;
+	accZangle = 0;
 	gyroXAngle = 0;
 	gyroYAngle = 0;
 	gyroZAngle = 0;
 	pid_angle_roulis = 0;
 	pid_angle_tangage = 0;
 	pid_angle_lacet = 0;
-	currentTime = 0;
-	cycleTime = 0;
+	temp_actuel = 0;
+	temp_dernier_cycle = 0;
+	temp_max_cycle = 0;
 	direction = 0;
+	maintient_altitude = FALSE;
+	altitude = 0;
 	
 	//init des composants
 	CmpHMC5883Init();
@@ -78,27 +87,47 @@ void SrvImuDispatcher (Event_t in_event)
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_20MS ) == TRUE)
 	{
 		// ********************* Calcul du temps de cycle *************************
-		cycleTime = DrvTimerGetTime() - currentTime;
-		currentTime = DrvTimerGetTime();
+		temp_dernier_cycle = DrvTimerGetTime() - temp_actuel;
+		temp_actuel = DrvTimerGetTime();
 		
-		// ********************* Mix sensors **************************************
-		SrvImuComputeSensors( cycleTime );
+		// ********************* Mesure des capteurs ******************************
+		SrvImuComputeSensors( temp_dernier_cycle );
 		
-		// ********************* kalman filter ************************************
-		angle_reel.roulis  = SrvKalmanFilterX( accXangle, gyroXAngle, cycleTime );
-		angle_reel.tangage = SrvKalmanFilterY( accYangle, gyroYAngle, cycleTime );
-		angle_reel.lacet   = SrvKalmanFilterZ( direction, gyroZAngle, cycleTime );
+		// ********************* Fusion des capteurs ******************************
+		angle_reel.roulis  = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle );
+		angle_reel.tangage = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle );
+		angle_reel.lacet   = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
+		angle_reel.altitude= SrvKalmanFilterAlt( altitude, accZangle, temp_dernier_cycle );
+		// ********************* Altitude *****************************************
+		if(maintient_altitude == TRUE)
+		{
+		}
 		
 		// ********************* PID **********************************************
 		pid_angle_roulis	= SrvPIDCompute( 0, angle_desire.roulis	, angle_reel.roulis);
 		pid_angle_tangage	= SrvPIDCompute( 1, angle_desire.tangage, angle_reel.tangage);
 		pid_angle_lacet		= SrvPIDCompute( 2, angle_reel.lacet + angle_desire.tangage, angle_reel.lacet);
 		
-		// ********************* Motors *******************************************
+		// ********************* Moteurs ******************************************
 		SrvMotorUpdate(pid_angle_roulis, pid_angle_tangage, pid_angle_lacet);
 		speed = SrvMotorGetSpeed();
+		
+		//heartbeat
 		LED_TOGGLE();
 	}		
+}
+
+//Enregistre l altitude de depart
+void SrvImuSensorsSetAltitudeDepart( void )
+{
+	altitude = angle_reel.altitude;
+}
+
+//Enregistre l altitude de maintient
+void SrvImuSensorsSetAltitudeMaintient( Int8U altitude )
+{
+	maintient_altitude = TRUE;
+	angle_desire.altitude = altitude;
 }
 
 //Calibration des capteurs
@@ -165,6 +194,7 @@ void SrvImuComputeSensors(Int32U interval)
 	
 		accXangle = ToDeg(accXangle);
 		accYangle = ToDeg(accYangle);
+		accZangle = acceleration.z;		
 	}
 			
 	//GYR
@@ -226,7 +256,7 @@ void SrvImuComputeSensors(Int32U interval)
 		}	
 	}
 	//BARO
-	altitude = CmpBMP085Update();
+	altitude = CmpBMP085StateMachine();
 	
 }
 
