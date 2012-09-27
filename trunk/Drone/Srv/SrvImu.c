@@ -22,7 +22,7 @@
 
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-#define NB_SAMPLE_MAX  130
+#define NB_SAMPLE_MAX  20
 
 ////////////////////////////////////////PRIVATE STRUCTIURES///////////////////////////////////////
 
@@ -127,15 +127,6 @@ void SrvImuDispatcher (Event_t in_event)
 		LED_TOGGLE();
 	}	
 	
-	//BARO
-	for(Int8U loop = 0; loop < NB_SAMPLE_MAX - 1 ; loop++)
-	{
-		alti_tab[loop] = alti_tab[loop + 1];
-		altitude_moyenne += alti_tab[loop];
-	}
-	alti_tab[NB_SAMPLE_MAX - 1 ] = CmpBMP085StateMachine();
-	altitude_moyenne += alti_tab[NB_SAMPLE_MAX - 1 ];
-	altitude_moyenne /= NB_SAMPLE_MAX;
 }
 
 //Enregistre l altitude de depart
@@ -284,5 +275,14 @@ void SrvImuComputeSensors(Int32U interval)
 			direction = ToDeg(heading);
 		}	
 	}
+	//BARO
+	for(Int8U loop = 0; loop < NB_SAMPLE_MAX - 1 ; loop++)
+	{
+		alti_tab[loop] = alti_tab[loop + 1];
+		altitude_moyenne += alti_tab[loop];
+	}
+	alti_tab[NB_SAMPLE_MAX - 1 ] = CmpBMP085StateMachine();
+	altitude_moyenne += alti_tab[NB_SAMPLE_MAX - 1 ];
+	altitude_moyenne /= NB_SAMPLE_MAX;
 }
 
