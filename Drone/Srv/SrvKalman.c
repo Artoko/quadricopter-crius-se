@@ -107,7 +107,7 @@ double SrvKalmanFilterY(double newAngle, double newRate, double dtime)
 
 /* Kalman filter variables and constants */
 const double Q_angleZ = 0.001; // Process noise covariance for the magnetometer - Sw
-const double Q_gZroZ = 0.03; // Process noise covariance for the gyro - Sw
+const double Q_gyroZ = 0.03; // Process noise covariance for the gyro - Sw
 const double R_angleZ = 0.3; // Measurement noise covariance - Sv
 
 double angleZ = 0; // The angle output from the Kalman filter
@@ -128,7 +128,7 @@ double SrvKalmanFilterZ(double newAngle, double newRate, double dtime)
 	PZ_00 += -dtZ * (PZ_10 + PZ_01) + Q_angleZ * dtZ;
 	PZ_01 += -dtZ * PZ_11;
 	PZ_10 += -dtZ * PZ_11;
-	PZ_11 += +Q_gZroZ * dtZ;
+	PZ_11 += +Q_gyroZ * dtZ;
 
 	// Discrete Kalman filter measurement update equations - Measurement Update ("Correct")
 	// Calculate Kalman gain - Compute the Kalman gain
@@ -152,8 +152,8 @@ double SrvKalmanFilterZ(double newAngle, double newRate, double dtime)
 
 
 /* Kalman filter variables and constants */
-const double Q_angleALT = 0.001; // Process noise covariance for the barometer - Sw
-const double Q_gyroALT = 0.03; // Process noise covariance for the accelerometer - Sw
+const double Q_baroALT = 0.001; // Process noise covariance for the barometer - Sw
+const double Q_accelALT = 0.003; // Process noise covariance for the accelerometer - Sw
 const double R_angleALT = 0.003; // Measurement noise covariance - Sv
 
 double angleALT = 0; // The angle output from the Kalman filter
@@ -171,10 +171,10 @@ double SrvKalmanFilterAlt(double newAngle, double newRate, double dtime)
 	angleALT += dtALT * (newRate - biasALT);
 
 	// Update estimation error covariance - Project the error covariance ahead
-	PALT_00 += -dtALT * (PALT_10 + PALT_01) + Q_angleALT * dtALT;
+	PALT_00 += -dtALT * (PALT_10 + PALT_01) + Q_baroALT * dtALT;
 	PALT_01 += -dtALT * PALT_11;
 	PALT_10 += -dtALT * PALT_11;
-	PALT_11 += +Q_gyroALT * dtALT;
+	PALT_11 += +Q_accelALT * dtALT;
 
 	// Discrete Kalman filter measurement update equations - Measurement Update ("Correct")
 	// Calculate Kalman gain - Compute the Kalman gain

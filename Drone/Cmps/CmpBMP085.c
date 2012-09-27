@@ -12,28 +12,27 @@
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
 
-#define NB_SAMPLE_MAX  5
 
 /////////////////////////////////////////PRIVATE STRUCTIURES///////////////////////////////////////
 static struct SS_BMP085
 {
-	int16_t  ac1, ac2, ac3;
-	uint16_t ac4, ac5, ac6;
-	int16_t  b1, b2, mb, mc, md;
+	Int16S  ac1, ac2, ac3;
+	Int16U ac4, ac5, ac6;
+	Int16S  b1, b2, mb, mc, md;
 	union 
 	{
-		uint16_t val;
-		uint8_t raw[2]; 
+		Int16U val;
+		Int8U raw[2U]; 
 	} 
 	ut; //uncompensated T
 	union 
 	{
-		uint32_t val;
-		uint8_t raw[4];
+		Int32U val;
+		Int8U raw[4U];
 	} 
 	up; //uncompensated P
-	uint8_t  state;
-	uint32_t deadline;
+	Int8U  state;
+	Int32U timeout;
 } s_barometer;  
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
@@ -47,9 +46,9 @@ static void CmpBMP085ReadUP( void );
 /////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 static Int32U pressure;
 static Int32U BaroAlt;
+static Int32U BaroAltmin;
+static Int32U BaroAltmax;
 
-static Int8U index_alt = 0U;
-static Int32U alti = 0U;
 
 //Initialisation du barometre
 Boolean CmpBMP085Init( void )
@@ -57,6 +56,9 @@ Boolean CmpBMP085Init( void )
 	Boolean o_success = FALSE;
 	pressure = 0U;
 	BaroAlt = 0U;
+	BaroAltmin = 0U;
+	BaroAltmax = 0U;
+	//on laisse un delai pour l'init du barometre
 	DrvTimerDelayMs(1000);
 	CmpBMP085ReadCalibration();
 	CmpBMP085StartUT();
@@ -70,20 +72,20 @@ Boolean CmpBMP085Init( void )
 Int32U CmpBMP085StateMachine( void )
 {
 	Int32U currentTime = DrvTimerGetTime();
-	if (currentTime < s_barometer.deadline) 
+	if (currentTime < s_barometer.timeout) 
 	{
 		return BaroAlt;
 	}
 	else
 	{	
-		s_barometer.deadline = currentTime;
+		s_barometer.timeout = currentTime;
 		switch (s_barometer.state)
 		{
 			case 0:
 			{
 				CmpBMP085StartUT();
 				s_barometer.state++;
-				s_barometer.deadline += 460;
+				s_barometer.timeout += 460; //4.6 ms
 				break;
 			}
 			case 1:
@@ -96,7 +98,7 @@ Int32U CmpBMP085StateMachine( void )
 			{
 				CmpBMP085StartUP();
 				s_barometer.state++;
-				s_barometer.deadline += 1400;
+				s_barometer.timeout += 1400; //14 ms
 				break;
 			}
 			case 3:
@@ -104,16 +106,8 @@ Int32U CmpBMP085StateMachine( void )
 				CmpBMP085ReadUP();
 				CmpBMP085Compute();
 				s_barometer.state = 0;
-				s_barometer.deadline += 500;
-				
-				alti += ((1.0f - pow(pressure/101325.0F, 0.190295F)) * 4433000.0F)/10; //centimeter;
-				index_alt++;
-				if(index_alt == NB_SAMPLE_MAX)
-				{
-					index_alt = 0;
-					BaroAlt = alti / NB_SAMPLE_MAX;
-					alti = 0;
-				}
+				s_barometer.timeout += 1000; //1ms
+				BaroAlt = ((1.0f - pow(pressure/101325.0F, 0.190295F)) * 4433000.0F); //centimeter;
 			}
 			break;
 		}

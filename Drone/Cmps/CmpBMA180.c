@@ -25,6 +25,7 @@ static Int16S accel_calib[3] = {0,0,0};
 Boolean CmpBMA180Init(void)
 {
 	Int8U control;
+	Boolean conf;
 	Boolean o_success = FALSE;
 	if(BMA180_CHIP_ID == DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_CHIP_ID))
 	{
@@ -52,10 +53,20 @@ Boolean CmpBMA180Init(void)
 		DrvTimerDelay10Us(20);
 		
 		//Calibration du capteur
-		loop_calibration_bma180 = NB_SAMPLE_TO_CALIB_BMA180;
-		accel_calib[0] = 0;
-		accel_calib[1] = 0;
-		accel_calib[2] = 0;
+		//si l'eeprom est configué
+		conf = DrvEepromIsConfigured();
+		if(conf == FALSE)	
+		{
+			loop_calibration_bma180 = NB_SAMPLE_TO_CALIB_BMA180;
+			accel_calib[0] = 0;
+			accel_calib[1] = 0;
+			accel_calib[2] = 0;
+		}	
+		else
+		{
+			loop_calibration_bma180 = 0;
+			DrvEepromReadAcc(accel_calib);
+		}	
 		o_success = TRUE;
 	}
 	return o_success;
@@ -65,6 +76,7 @@ Boolean CmpBMA180IsCalibrate(void)
 {
 	if(loop_calibration_bma180 == 0)
 	{
+		DrvEepromWriteAcc(accel_calib);
 		return TRUE;
 	}
 	return FALSE;

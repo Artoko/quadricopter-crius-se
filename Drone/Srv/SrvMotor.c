@@ -51,14 +51,20 @@ void SrvMotorUpdate(Int16S roulis, Int16S tangage,Int16S lacet)
 	DrvServoMoveToPosition(3,(frontMotor_L-OFFCOMMAND)/10);
 }	
 
-//recupere une vittesse des moteurs
+//recupere une vitesse des moteurs
 Int16U SrvMotorGetSpeed( void ) 
 {
 	return throttle;
 }
 
-//applique une vittesse aux moteurs
-void SrvMotorApplySpeed(Int8U speed)
+//applique une vitesse aux moteurs
+void SrvMotorApplyAbsoluteSpeed(Int8U speed)
 {
 	throttle = (speed * 10U) + OFFCOMMAND;
+}
+
+//applique une vitesse aux moteurs
+void SrvMotorApplyRelativeSpeed(Int8U speed)
+{
+	throttle += speed;
 }

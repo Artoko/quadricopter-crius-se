@@ -44,7 +44,7 @@ void SrvStartEngineDispatcher (Event_t in_event)
 				speed_moteur = LIMIT_MOTORS_START;
 				allumage = FALSE;
 			}
-			SrvMotorApplySpeed(speed_moteur);
+			SrvMotorApplyAbsoluteSpeed(speed_moteur);
 		}
 		else
 		{
