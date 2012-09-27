@@ -31,7 +31,7 @@ static void SrvCommReceiveMessage (SCommTrame *ma_trame_recu) ;
 //on repporte les donnees
 static void SrvCommRepportData(void);
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
-static Char message[ 100U ];
+static Char message[ 30U ];
 static Int8U lenght = 0;
 Int16S x=0,y=0,z=0;
 Boolean write_serial = FALSE;
@@ -69,7 +69,7 @@ static void SrvCommExecute (SCommTrame trame)
 	if(trame.param[WHO].val == COMM_MOTOR )
 	{ 
 		//applique la vitesse au moteurs
-		SrvMotorApplySpeed(trame.param[PARAM_1].val);
+		SrvMotorApplyAbsoluteSpeed(trame.param[PARAM_1].val);
 	}
 	else if(trame.param[WHO].val == COMM_ANGLE )
 	{ 
@@ -77,6 +77,14 @@ static void SrvCommExecute (SCommTrame trame)
 		angle_desire.roulis = trame.param[PARAM_1].val;
 		angle_desire.tangage = trame.param[PARAM_2].val;
 		angle_desire.lacet = trame.param[PARAM_3].val;
+	}
+	else if(trame.param[WHO].val == COMM_ALTITUDE )
+	{ 
+		//on enregistre l'altitude de depart
+		SrvImuSensorsSetAltitudeDepart();
+		
+		//on enregistre l'altitude relative a la position de depart
+		SrvImuSensorsSetAltitudeMaintient(trame.param[PARAM_1].val);
 	}
 	
 	//on ecrit si besoin

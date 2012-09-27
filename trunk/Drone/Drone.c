@@ -14,6 +14,7 @@
 #include "Drv/DrvTwi.h"
 #include "Drv/DrvUart.h"
 #include "Drv/DrvEvent.h"
+#include "Drv/DrvEeprom.h"
 #include "Drv/DrvInterrupt.h"
 
 #include "Srv/SrvImu.h"
@@ -62,11 +63,13 @@ int main(void)
 	DrvTickInit();
 	DrvTwiInit();
 	DrvUartInit();
+	DrvEepromInit();
 	
 	// ********************* PID init *************************************************
 	SrvPIDInit(0,7,0,-90); //roulis
 	SrvPIDInit(1,7,0,-90); //tangage
 	SrvPIDInit(2,10,0,0);  //lacet
+	SrvPIDInit(3,1,0,0);   //altitude
 	
 	// ********************* Interrupt Enable *****************************************
 	DrvInterruptSetAllInterrupts();

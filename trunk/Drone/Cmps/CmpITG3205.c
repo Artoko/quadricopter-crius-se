@@ -24,6 +24,7 @@ static Int16S gyro_calib[3] = {0,0,0};
 //fonction init du capteur
 Boolean CmpITG3205Init(void)
 {
+	Boolean conf;
 	if (DrvTwiReadReg(ITG3205_TWI_ADDRESS,ITG3205_RA_WHO_AM_I) == ITG3205_RA_I_AM)
 	{
 		DrvTwiWriteReg(ITG3205_TWI_ADDRESS, ITG3205_RA_PWR_MGM, ITG3205_PWR_H_RESET_BIT);
@@ -32,11 +33,22 @@ Boolean CmpITG3205Init(void)
 		DrvTimerDelay10Us(20);
 		DrvTwiWriteReg(ITG3205_TWI_ADDRESS, ITG3205_RA_PWR_MGM, PLL_ZGYRO_REF );
 		DrvTimerDelay10Us(100);
+		
 		//Calibration du capteur
-		loop_calibration_ITG3205 = NB_SAMPLE_TO_CALIB_ITG3205;
-		gyro_calib[0] = 0;
-		gyro_calib[1] = 0;
-		gyro_calib[2] = 0;
+		//si l'eeprom est configué
+		conf = DrvEepromIsConfigured();
+		if(conf == FALSE)
+		{
+				loop_calibration_ITG3205 = NB_SAMPLE_TO_CALIB_ITG3205;
+				gyro_calib[0] = 0;
+				gyro_calib[1] = 0;
+				gyro_calib[2] = 0;
+		}
+		else
+		{
+			loop_calibration_ITG3205 = 0;
+			DrvEepromReadGyro(gyro_calib);
+		}
 		return TRUE;
 	}		
 	else
@@ -50,6 +62,7 @@ Boolean CmpITG3205IsCalibrate(void)
 {
 	if(loop_calibration_ITG3205 == 0)
 	{
+		DrvEepromWriteGyro(gyro_calib);
 		return TRUE;
 	}
 	return FALSE;

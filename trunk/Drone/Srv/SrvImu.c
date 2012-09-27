@@ -21,7 +21,10 @@
 #include "Cmps/CmpBMP085.h"
 
 
-////////////////////////////////////////PRIVATE STRUCTIURES////////////////////////////////////////
+////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
+#define NB_SAMPLE_MAX  130
+
+////////////////////////////////////////PRIVATE STRUCTIURES///////////////////////////////////////
 
 ////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
 static void SrvImuComputeSensors(Int32U interval);
@@ -40,9 +43,10 @@ static float gyroZAngle;
 static Int16U direction;
 
 //erreur retournee par le calcul du PID
-static Int16S pid_angle_roulis;
-static Int16S pid_angle_tangage;
-static Int16S pid_angle_lacet;
+static Int16S pid_erreur_roulis;
+static Int16S pid_erreur_tangage;
+static Int16S pid_erreur_lacet;
+static Int16S pid_erreur_altitude;
 
 //variables de timming
 static Int32U temp_actuel;
@@ -51,39 +55,44 @@ static Int32U temp_max_cycle;
 
 //maintient de l'alitude
 static Boolean maintient_altitude;
-static Int16U altitude;
+static Int16U altitude_depart;
 	
+static Int16U alti_tab[NB_SAMPLE_MAX];
+static Int32U altitude_moyenne;
+
 //initialisation des composants
 void SrvImuInit( void )
 {
-	//init des variables privés
+	//init des variables privées
 	accXangle = 0;
 	accYangle = 0;
 	accZangle = 0;
 	gyroXAngle = 0;
 	gyroYAngle = 0;
 	gyroZAngle = 0;
-	pid_angle_roulis = 0;
-	pid_angle_tangage = 0;
-	pid_angle_lacet = 0;
+	pid_erreur_roulis = 0;
+	pid_erreur_tangage = 0;
+	pid_erreur_lacet = 0;
+	pid_erreur_altitude = 0;
 	temp_actuel = 0;
 	temp_dernier_cycle = 0;
 	temp_max_cycle = 0;
 	direction = 0;
 	maintient_altitude = FALSE;
-	altitude = 0;
+	altitude_depart = 0;
 	
-	//init des composants
+	//init des composants	
 	CmpHMC5883Init();
 	CmpBMA180Init();
 	CmpITG3205Init();
 	CmpBMP085Init();
+	
 }
 
 //dispatcher d'evenements
 void SrvImuDispatcher (Event_t in_event)
 {
-	
+	//on calcul toutes les 20 millisecondes
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_20MS ) == TRUE)
 	{
 		// ********************* Calcul du temps de cycle *************************
@@ -97,37 +106,56 @@ void SrvImuDispatcher (Event_t in_event)
 		angle_reel.roulis  = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle );
 		angle_reel.tangage = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle );
 		angle_reel.lacet   = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
-		angle_reel.altitude= SrvKalmanFilterAlt( altitude, accZangle, temp_dernier_cycle );
-		// ********************* Altitude *****************************************
-		if(maintient_altitude == TRUE)
-		{
-		}
+		angle_reel.altitude= altitude_moyenne;
+		
 		
 		// ********************* PID **********************************************
-		pid_angle_roulis	= SrvPIDCompute( 0, angle_desire.roulis	, angle_reel.roulis);
-		pid_angle_tangage	= SrvPIDCompute( 1, angle_desire.tangage, angle_reel.tangage);
-		pid_angle_lacet		= SrvPIDCompute( 2, angle_reel.lacet + angle_desire.tangage, angle_reel.lacet);
+		pid_erreur_roulis	= SrvPIDCompute( 0, angle_desire.roulis						, angle_reel.roulis);
+		pid_erreur_tangage	= SrvPIDCompute( 1, angle_desire.tangage					, angle_reel.tangage);
+		pid_erreur_lacet	= SrvPIDCompute( 2, angle_reel.lacet + angle_desire.tangage	, angle_reel.lacet);
+		if(maintient_altitude == TRUE)
+		{
+			pid_erreur_altitude	= SrvPIDCompute( 3, angle_desire.altitude, angle_reel.altitude);
+			SrvMotorApplyRelativeSpeed(pid_erreur_altitude);
+		}
 		
 		// ********************* Moteurs ******************************************
-		SrvMotorUpdate(pid_angle_roulis, pid_angle_tangage, pid_angle_lacet);
+		SrvMotorUpdate(pid_erreur_roulis, pid_erreur_tangage, pid_erreur_lacet);
 		speed = SrvMotorGetSpeed();
 		
 		//heartbeat
 		LED_TOGGLE();
-	}		
+	}	
+	
+	//BARO
+	for(Int8U loop = 0; loop < NB_SAMPLE_MAX - 1 ; loop++)
+	{
+		alti_tab[loop] = alti_tab[loop + 1];
+		altitude_moyenne += alti_tab[loop];
+	}
+	alti_tab[NB_SAMPLE_MAX - 1 ] = CmpBMP085StateMachine();
+	altitude_moyenne += alti_tab[NB_SAMPLE_MAX - 1 ];
+	altitude_moyenne /= NB_SAMPLE_MAX;
 }
 
 //Enregistre l altitude de depart
 void SrvImuSensorsSetAltitudeDepart( void )
 {
-	altitude = angle_reel.altitude;
+	altitude_depart = angle_reel.altitude;
 }
 
 //Enregistre l altitude de maintient
 void SrvImuSensorsSetAltitudeMaintient( Int8U altitude )
 {
-	maintient_altitude = TRUE;
-	angle_desire.altitude = altitude;
+	if(altitude != 0U)
+	{
+		maintient_altitude = TRUE;
+		angle_desire.altitude = altitude_depart + altitude;
+	}
+	else
+	{
+		maintient_altitude = FALSE;
+	}
 }
 
 //Calibration des capteurs
@@ -155,6 +183,7 @@ void SrvImuSensorsCalibration( void )
 		if(	sens == 7 )
 		{
 			calibrate = TRUE;
+			DrvEepromConfigure();
 		}
 		else
 		{
@@ -255,8 +284,5 @@ void SrvImuComputeSensors(Int32U interval)
 			direction = ToDeg(heading);
 		}	
 	}
-	//BARO
-	altitude = CmpBMP085StateMachine();
-	
 }
 

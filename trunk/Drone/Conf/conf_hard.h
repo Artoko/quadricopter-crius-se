@@ -10,7 +10,8 @@
 #define CONF_HARD_H_
 
 #include <util/atomic.h>
-#include <avr/io.h>
+#include <avr/io.h> 
+#include <avr/eeprom.h> 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -53,14 +54,9 @@
 #define		USE_UART_0		
 
 ////////////////////////////////////////////PUBLIC COMM////////////////////////////////////////////
-#define		COMM_ACCELEROMETRE	0
-#define		COMM_GYROSCOPE		1
-#define		COMM_MAGNETOMETRE	2
-#define		COMM_BAROMETRE		3
-#define		COMM_PID			4
-#define		COMM_MOTOR			5
-#define		COMM_ANGLE			6
-#define		COMM_DEBUG			7
+#define		COMM_MOTOR			0
+#define		COMM_ANGLE			1
+#define		COMM_ALTITUDE		2
 //-----------------------------------------------------------------------------------------------//
 typedef struct SSangles
 {
