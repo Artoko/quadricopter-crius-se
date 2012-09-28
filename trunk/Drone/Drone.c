@@ -66,8 +66,8 @@ int main(void)
 	DrvEepromInit();
 	
 	// ********************* PID init *************************************************
-	SrvPIDInit(0,7,0,-90); //roulis
-	SrvPIDInit(1,7,0,-90); //tangage
+	SrvPIDInit(0,7,0.03,-9); //roulis
+	SrvPIDInit(1,7,0.03,-9); //tangage
 	SrvPIDInit(2,10,0,0);  //lacet
 	SrvPIDInit(3,1,0,0);   //altitude
 	

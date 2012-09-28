@@ -15,12 +15,21 @@
 
 
 ////////////////////////////////////////////PUBLIC DEFINES/////////////////////////////////////////
+#define PARAM_0	0U
+#define PARAM_1	1U
+#define PARAM_2	2U
+#define PARAM_3	3U
+#define PARAM_4	4U
 
+/////////////////////////////////////////PUBLIC STRUCTURES/////////////////////////////////////////
+typedef struct SSTrame
+{
+	Int16U param[5U];
+}STrame;
 ////////////////////////////////////////////PUBLIC ENUMS///////////////////////////////////////////
 
 //////////////////////////////////////////PUBLIC PTR FCTS//////////////////////////////////////////
 
-/////////////////////////////////////////PUBLIC STRUCTURES/////////////////////////////////////////
 
 
 
@@ -56,10 +65,8 @@ void DrvUart1SendMessage( Char *i_message, Int8U i_message_len ) ;
 // Access:    public 
 // Returns:   void
 // Qualifier: on recupere le message
-// Parameter: Int8U i_message[50U]		//message a recuperer
-// Parameter: Int8U byte_to_send		//taille du message a recuperer 
-//************************************
-Int8U DrvUart0ReadMessage( Char *i_message) ;
+//**********************************
+void DrvUart0ReadMessage( STrame *trame );
 
 //************************************
 // Method:    DrvUart1ReadMessage

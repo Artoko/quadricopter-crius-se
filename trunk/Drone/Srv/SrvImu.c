@@ -28,6 +28,8 @@
 
 ////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
 static void SrvImuComputeSensors(Int32U interval);
+//altitude
+static void SrvImuSensorsGetAltitude( void );
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 
@@ -56,9 +58,12 @@ static Int32U temp_max_cycle;
 //maintient de l'alitude
 static Boolean maintient_altitude;
 static Int16U altitude_depart;
-	
-static Int16U alti_tab[NB_SAMPLE_MAX];
-static Int32U altitude_moyenne;
+static Int16U altitude;
+static Int16U BaroHistTab[NB_SAMPLE_MAX];
+static Int8U BaroHistIdx;
+
+
+static double angles[3U];
 
 //initialisation des composants
 void SrvImuInit( void )
@@ -99,15 +104,20 @@ void SrvImuDispatcher (Event_t in_event)
 		temp_dernier_cycle = DrvTimerGetTime() - temp_actuel;
 		temp_actuel = DrvTimerGetTime();
 		
+		//Get max cycle
+		if(temp_dernier_cycle > temp_max_cycle)
+		{
+			temp_max_cycle = temp_dernier_cycle;
+		}
+		
 		// ********************* Mesure des capteurs ******************************
 		SrvImuComputeSensors( temp_dernier_cycle );
 		
 		// ********************* Fusion des capteurs ******************************
-		angle_reel.roulis  = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle );
-		angle_reel.tangage = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle );
-		angle_reel.lacet   = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
-		angle_reel.altitude= altitude_moyenne;
-		
+		angle_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle ) * 10U;
+		angle_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle ) * 10U;
+		angle_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
+		angle_reel.altitude = altitude;
 		
 		// ********************* PID **********************************************
 		pid_erreur_roulis	= SrvPIDCompute( 0, angle_desire.roulis						, angle_reel.roulis);
@@ -126,6 +136,14 @@ void SrvImuDispatcher (Event_t in_event)
 		//heartbeat
 		LED_TOGGLE();
 	}	
+	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
+	{
+		//on start la capture du barometre toutes les 100ms
+		CmpBMP085StartCapture();
+	}
+	//BARO
+	SrvImuSensorsGetAltitude();
+	
 	
 }
 
@@ -183,8 +201,9 @@ void SrvImuSensorsCalibration( void )
 	} while (!calibrate);
 }
 
+////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
 //on met a jours les angles
-void SrvImuComputeSensors(Int32U interval)
+static void SrvImuComputeSensors(Int32U interval)
 {
 	float gyroRate = 0;	
 	
@@ -275,14 +294,20 @@ void SrvImuComputeSensors(Int32U interval)
 			direction = ToDeg(heading);
 		}	
 	}
-	//BARO
-	for(Int8U loop = 0; loop < NB_SAMPLE_MAX - 1 ; loop++)
-	{
-		alti_tab[loop] = alti_tab[loop + 1];
-		altitude_moyenne += alti_tab[loop];
-	}
-	alti_tab[NB_SAMPLE_MAX - 1 ] = CmpBMP085StateMachine();
-	altitude_moyenne += alti_tab[NB_SAMPLE_MAX - 1 ];
-	altitude_moyenne /= NB_SAMPLE_MAX;
 }
 
+//Get altitude
+static void SrvImuSensorsGetAltitude( void )
+{	 
+	Int32U alti_moy = 0;
+	BaroHistTab[BaroHistIdx++] = CmpBMP085StateMachine() / 10;
+	if (BaroHistIdx == NB_SAMPLE_MAX)
+	{
+		for ( Int8U loop= 0 ; loop < NB_SAMPLE_MAX ; loop++)
+		{
+			alti_moy += BaroHistTab[ loop ];
+		}	
+		altitude = alti_moy / NB_SAMPLE_MAX;
+		BaroHistIdx = 0;
+	}		
+}	

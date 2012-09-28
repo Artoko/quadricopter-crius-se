@@ -19,12 +19,12 @@
 	//UART 0
 	//-------
 	//message stocke
-	volatile Int8U in_message_0[100U];
+	volatile Int8U in_message_0[50U];
 	volatile Int8U in_message_sent = 0U;
 	volatile Int8U in_message_len_0 = 0U;
 	
 	//buffer de reception de message uart 0
-	volatile Int8U buff_uart_0[100U];
+	volatile Int8U buff_uart_0[50U];
 	volatile Int8U ctr_buff_uart_0 = 0U;
 	volatile Boolean start_frame_uart_0 = FALSE;
 #endif
@@ -41,6 +41,7 @@
 	volatile Boolean start_frame_uart_1 = FALSE;
 #endif
 
+STrame ma_trame;
   
 /////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 // Init du Drv Uart 
@@ -65,21 +66,28 @@ void DrvUartInit( )
 		UCSR1C|= (1<<UCSZ10); 	//8 bits, no parity, 1 stop 
 		UCSR1C|= (1<<UCSZ11);  
 	#endif
+		
+	ma_trame.param[PARAM_0] = 0;
+	ma_trame.param[PARAM_1] = 0;
+	ma_trame.param[PARAM_2] = 0;			
+	ma_trame.param[PARAM_3] = 0;
+	ma_trame.param[PARAM_4] = 0;
 }
 
 //on recupere le message
-Int8U DrvUart0ReadMessage( Char *i_message )
+void DrvUart0ReadMessage( STrame *trame )
 {
-	Int8U temp_in_message_len_0 = 0;
-	//on enregistre le message 
-	for ( Int8U loop_send = 0U ; loop_send < in_message_len_0 ; loop_send++)
-	{
-		i_message[ loop_send ] = buff_uart_0[ loop_send ];
-		buff_uart_0[ loop_send ] = 0U;
-	} 
-	temp_in_message_len_0 = in_message_len_0;
-	in_message_len_0 = 0U;
-	return temp_in_message_len_0;
+	trame->param[PARAM_0] = ma_trame.param[PARAM_0] ;
+	trame->param[PARAM_1] = ma_trame.param[PARAM_1] ;
+	trame->param[PARAM_2] = ma_trame.param[PARAM_2] ;
+	trame->param[PARAM_3] = ma_trame.param[PARAM_3] ;
+	trame->param[PARAM_4] = ma_trame.param[PARAM_4] ;
+		
+	ma_trame.param[PARAM_0] = 0;
+	ma_trame.param[PARAM_1] = 0;
+	ma_trame.param[PARAM_2] = 0;			
+	ma_trame.param[PARAM_3] = 0;
+	ma_trame.param[PARAM_4] = 0;
 }
 //on recupere le message
 void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
@@ -145,7 +153,9 @@ void DrvUart1SendMessage(Char *i_message,Int8U i_message_len )
 /////////////////////////////////////ISR PRIVATE FUNCTIONS////////////////////////////////////////
 //UART0
 //-------------------
-//ISR uart octet recu 
+//ISR uart octet recu
+Int8U decade = 1U;
+Int8U index_param = 0U;
 ISR(USART_RX_vect)
 {
 	#ifdef USE_UART_0	
@@ -169,15 +179,32 @@ ISR(USART_RX_vect)
 			//on charge le message dans le buff_uart_0
 			buff_uart_0[ctr_buff_uart_0] = rcv_byte;
 			ctr_buff_uart_0++;	
-			if(( buff_uart_0[ctr_buff_uart_0 - 1U] == '#' ) && ( buff_uart_0[ctr_buff_uart_0 - 2U] == '#' ))
+			
+			
+			if( buff_uart_0[ctr_buff_uart_0 - 1U] == '#' )
 			{
-				//on stock la taille
-				in_message_len_0 = ctr_buff_uart_0;
 				//on attend le start frame
-				start_frame_uart_0 = FALSE;				
+				start_frame_uart_0 = FALSE;
+				index_param = 0;
+				decade = 1U;
 				//on lance l'event
 				DrvEventAddEvent( CONF_EVENT_MSG_RCV );
-			}			
+			}
+			else
+			{
+				//on discossie les params
+				if( buff_uart_0[ctr_buff_uart_0 - 1U] == '-' )
+				{
+					index_param++;
+					decade = 1U;
+				}
+				else
+				{
+					ma_trame.param[index_param] *= decade;
+					ma_trame.param[index_param] += buff_uart_0[ctr_buff_uart_0 - 1U] - 0x30;
+					decade = 10;
+				}
+			}		
 		}		
 	#endif
 }

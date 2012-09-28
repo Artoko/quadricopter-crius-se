@@ -12,14 +12,14 @@
 ////////////////////////////////////////PRIVATE STRUCTURES/////////////////////////////////////////
 typedef struct
 {
-	Int16S P, I, D;
-	Int16S lastPosition;
-	Int16S integratedError;
+	float P, I, D;
+	float lastPosition;
+	float integratedError;
 }S_IMU_PID;
 
 static S_IMU_PID pid[ 4U ] ;
 
-void SrvPIDInit (Int8U index,Int8S P, Int8S I, Int8S D)
+void SrvPIDInit (Int8U index,float P, float I, float D)
 {
 	pid[index].P = P;
 	pid[index].I = I;
@@ -28,10 +28,10 @@ void SrvPIDInit (Int8U index,Int8S P, Int8S I, Int8S D)
 	pid[index].integratedError = 0;
 }
 
-Int16S SrvPIDCompute(Int8U index,Int16S targetPosition, Int16S currentPosition )
+float SrvPIDCompute(Int8U index, float targetPosition, float currentPosition )
 {
-	Int16S error = targetPosition - currentPosition;
-
+	float error = targetPosition - currentPosition;
+	
 	pid[index].integratedError += error;
 
 	// Limit the integrated error by the windupGuard
@@ -45,4 +45,3 @@ Int16S SrvPIDCompute(Int8U index,Int16S targetPosition, Int16S currentPosition )
 	pid[index].lastPosition = currentPosition;
 	return ((pid[index].P * error) / 10) + ((pid[index].I * pid[index].integratedError) / 10) + dTerm;
 }
-

@@ -14,22 +14,7 @@
 
 #include "Drv/DrvEvent.h"
 
-#define WHO		0U
-#define PARAM_1	1U
-#define PARAM_2	2U
-#define PARAM_3	3U
-#define PARAM_4	4U
 
-typedef struct SSCommParam
-{
-	Int16U val;
-}SCommParam;
-
-
-typedef struct SSCommTrame
-{
-	SCommParam param[5U];
-}SCommTrame;
 
 
 //init des moteurs

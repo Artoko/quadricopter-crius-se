@@ -14,6 +14,7 @@ volatile Int32U drv_timer_start_delay = 0;
 volatile Int32U drv_timer_tick_counter_10us = 0;
 
 volatile Int16U tick_counter_20ms = 0U;
+volatile Int16U tick_counter_50ms = 0U;
 volatile Int8U tick_counter_100ms = 0U;
 volatile Int8U tick_counter_1s = 0U;
 volatile Int8U tick_counter_5s = 0U;
@@ -38,13 +39,14 @@ void DrvTickInit(void)
 void DrvTickReset(void)
 {
 	cli();
-	drv_timer_start_delay = 0;
-	drv_timer_tick_counter_10us = 0;
-	tick_counter_20ms = 0U;
-	tick_counter_100ms = 0U;
-	tick_counter_1s = 0U;
-	tick_counter_5s = 0U;
-	tick_counter_10s = 0U;
+		drv_timer_start_delay = 0;
+		drv_timer_tick_counter_10us = 0;
+		tick_counter_20ms = 0U;
+		tick_counter_50ms = 0U;
+		tick_counter_100ms = 0U;
+		tick_counter_1s = 0U;
+		tick_counter_5s = 0U;
+		tick_counter_10s = 0U;
 	sei();
 }	
 
@@ -81,8 +83,8 @@ ISR(TIMER0_COMPA_vect)
 	if(tick_counter_20ms++ == 1999)
 	{
 		tick_counter_20ms = 0;
-		DrvEventAddEvent(CONF_EVENT_TIMER_20MS);	
-		if(tick_counter_100ms++ == 4)
+		DrvEventAddEvent(CONF_EVENT_TIMER_20MS);
+		if(tick_counter_100ms++ == 2)
 		{
 			tick_counter_100ms = 0;
 			DrvEventAddEvent(CONF_EVENT_TIMER_100MS);

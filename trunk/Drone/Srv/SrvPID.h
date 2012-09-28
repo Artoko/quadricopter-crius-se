@@ -13,15 +13,10 @@
 
 #include "Tools/tools_typedefs.h"
 
-
-
-
-
-
 //init des valeurs du PID
-void SrvPIDInit (Int8U index,Int8S P, Int8S I, Int8S D);
+void SrvPIDInit (Int8U index,float P, float I, float D);
 //calculs les angles target
-Int16S SrvPIDCompute(Int8U index,Int16S targetPosition, Int16S currentPosition );
+float SrvPIDCompute(Int8U index,float targetPosition, float currentPosition );
 
 
 
