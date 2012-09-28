@@ -29,15 +29,15 @@ Boolean DrvEepromIsConfigured ( void ) ;
 void DrvEepromConfigure ( void );
 
 //retourne les config de l'accelerometre
-void DrvEepromReadAcc ( Int16U calib[ 3U ] );
+void DrvEepromReadAcc ( Int16S calib[ 3U ] );
 
 //enregistre les config de l'accelerometre
-void DrvEepromWriteAcc ( Int16U calib[ 3U ] );
+void DrvEepromWriteAcc ( Int16S calib[ 3U ] );
 
 //retourne les config du gyroscope
-void DrvEepromReadGyro ( Int16U calib[ 3U ] );
+void DrvEepromReadGyro ( Int16S calib[ 3U ] );
 
 //enregistre les config du gyroscope
-void DrvEepromWriteGyro ( Int16U calib[ 3U ] );
+void DrvEepromWriteGyro ( Int16S calib[ 3U ] );
 
 #endif /* DRV_EEPROM_H_ */

@@ -36,7 +36,6 @@ static Boolean eeprom_est_configure;
 Boolean DrvEepromInit ( void )
 {
 	Boolean o_success = FALSE;
-	DrvEepromWriteByte(ADDR_EEPROM_CHECK_EEPROM,VAL_EEPROM_CHECK_NOK);
 	Int8U val = DrvEepromReadByte(ADDR_EEPROM_CHECK_EEPROM);
 	if( val == VAL_EEPROM_CHECK_OK )
 	{
@@ -53,7 +52,7 @@ Boolean DrvEepromInit ( void )
 //ecrit l'etat de config de l'eeprom
 void DrvEepromConfigure ( void )
 {
-	//DrvEepromWriteByte(ADDR_EEPROM_CHECK_EEPROM,VAL_EEPROM_CHECK_OK);
+	DrvEepromWriteByte(ADDR_EEPROM_CHECK_EEPROM,VAL_EEPROM_CHECK_OK);
 }
 
 //retourne l'etat de config de l'eeprom
@@ -63,7 +62,7 @@ Boolean DrvEepromIsConfigured ( void )
 }
 
 //retourne les config de l'accelerometre
-void DrvEepromReadAcc ( Int16U calib[ 3U ] )
+void DrvEepromReadAcc ( Int16S calib[ 3U ] )
 {
 	calib[ 0U ] = DrvEepromReadShort(ADDR_EEPROM_ACC_CALIB_X);
 	calib[ 1U ] = DrvEepromReadShort(ADDR_EEPROM_ACC_CALIB_Y);
@@ -71,7 +70,7 @@ void DrvEepromReadAcc ( Int16U calib[ 3U ] )
 }
 
 //enregistre les config de l'accelerometre
-void DrvEepromWriteAcc ( Int16U calib[ 3U ] )
+void DrvEepromWriteAcc ( Int16S calib[ 3U ] )
 {
 	DrvEepromWriteShort(ADDR_EEPROM_ACC_CALIB_X,calib[ 0U ]);
 	DrvEepromWriteShort(ADDR_EEPROM_ACC_CALIB_Y,calib[ 1U ]);
@@ -79,7 +78,7 @@ void DrvEepromWriteAcc ( Int16U calib[ 3U ] )
 }
 
 //retourne les config du gyroscope
-void DrvEepromReadGyro ( Int16U calib[ 3U ] )
+void DrvEepromReadGyro ( Int16S calib[ 3U ] )
 {
 	calib[ 0U ] = DrvEepromReadShort(ADDR_EEPROM_GYRO_CALIB_X);
 	calib[ 1U ] = DrvEepromReadShort(ADDR_EEPROM_GYRO_CALIB_Y);
@@ -87,7 +86,7 @@ void DrvEepromReadGyro ( Int16U calib[ 3U ] )
 }
 
 //enregistre les config du gyroscope
-void DrvEepromWriteGyro ( Int16U calib[ 3U ] )
+void DrvEepromWriteGyro ( Int16S calib[ 3U ] )
 {
 	DrvEepromWriteShort(ADDR_EEPROM_GYRO_CALIB_X,calib[ 0U ]);
 	DrvEepromWriteShort(ADDR_EEPROM_GYRO_CALIB_Y,calib[ 1U ]);
@@ -98,28 +97,28 @@ void DrvEepromWriteGyro ( Int16U calib[ 3U ] )
 //Fonction de lecture eeprom
 static Int8U DrvEepromReadByte ( Int8U addr )
 {
-	return eeprom_read_byte(addr);
+	return eeprom_read_byte((Int8U*)addr);
 }
 
 //Fonction d ecriture eeprom
 static void DrvEepromWriteByte ( Int8U addr, Int8U byte)
 {
-	eeprom_write_byte(addr,byte);
+	eeprom_write_byte((Int8U*)addr,byte);
 }
 
 //Fonction de lecture eeprom
 static Int16U DrvEepromReadShort( Int8U addr )
 {
 	Int16U ret = 0;
-	ret = eeprom_read_byte(addr) ;
+	ret = eeprom_read_byte((Int8U*)addr) ;
 	ret = ret << 8U ;
-	ret |= eeprom_read_byte(addr + 1);
+	ret |= eeprom_read_byte((Int8U*)(addr + 1));
 	return ret;
 }
 	
 //Fonction d ecriture eeprom
 static void DrvEepromWriteShort ( Int8U addr, Int16U byte)
 {
-	eeprom_write_byte(addr, (Int8U)(byte >> 8U) );
-	eeprom_write_byte(addr + 1 ,(Int8U)(byte));
+	eeprom_write_byte((Int8U*)(addr), (Int8U)(byte >> 8U) );
+	eeprom_write_byte((Int8U*)(addr + 1) ,(Int8U)(byte));
 }

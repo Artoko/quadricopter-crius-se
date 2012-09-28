@@ -9,6 +9,7 @@
  
 #include "Drv/DrvTwi.h"
 #include "Drv/DrvTick.h"
+#include "Drv/DrvEeprom.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
 #define NB_SAMPLE_TO_CALIB_ITG3205	100

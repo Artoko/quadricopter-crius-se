@@ -48,12 +48,14 @@ static Int32U pressure;
 static Int32U BaroAlt;
 static Int32U BaroAltmin;
 static Int32U BaroAltmax;
+static Boolean StartBaro;
 
 
 //Initialisation du barometre
 Boolean CmpBMP085Init( void )
 {
 	Boolean o_success = FALSE;
+	StartBaro = FALSE;
 	pressure = 0U;
 	BaroAlt = 0U;
 	BaroAltmin = 0U;
@@ -68,49 +70,59 @@ Boolean CmpBMP085Init( void )
 	return o_success;
 }
 
+//
+void CmpBMP085StartCapture( void )
+{
+	StartBaro = TRUE;
+}
+
 //on update la temerature et la pression
 Int32U CmpBMP085StateMachine( void )
 {
-	Int32U currentTime = DrvTimerGetTime();
-	if (currentTime < s_barometer.timeout) 
+	if(StartBaro == TRUE)
 	{
-		return BaroAlt;
-	}
-	else
-	{	
-		s_barometer.timeout = currentTime;
-		switch (s_barometer.state)
+		Int32U currentTime = DrvTimerGetTime();
+		if (currentTime < s_barometer.timeout) 
 		{
-			case 0:
-			{
-				CmpBMP085StartUT();
-				s_barometer.state++;
-				s_barometer.timeout += 460; //4.6 ms
-				break;
-			}
-			case 1:
-			{
-				CmpBMP085ReadUT();
-				s_barometer.state++;
-				break;
-			}
-			case 2:
-			{
-				CmpBMP085StartUP();
-				s_barometer.state++;
-				s_barometer.timeout += 1400; //14 ms
-				break;
-			}
-			case 3:
-			{
-				CmpBMP085ReadUP();
-				CmpBMP085Compute();
-				s_barometer.state = 0;
-				s_barometer.timeout += 1000; //1ms
-				BaroAlt = ((1.0f - pow(pressure/101325.0F, 0.190295F)) * 4433000.0F); //centimeter;
-			}
-			break;
+			return BaroAlt;
 		}
+		else
+		{	
+			s_barometer.timeout = currentTime;
+			switch (s_barometer.state)
+			{
+				case 0:
+				{
+					CmpBMP085StartUT();
+					s_barometer.state++;
+					s_barometer.timeout += 460; //4.6 ms
+					break;
+				}
+				case 1:
+				{
+					CmpBMP085ReadUT();
+					s_barometer.state++;
+					break;
+				}
+				case 2:
+				{
+					CmpBMP085StartUP();
+					s_barometer.state++;
+					s_barometer.timeout += 1400; //14 ms
+					break;
+				}
+				case 3:
+				{
+					CmpBMP085ReadUP();
+					CmpBMP085Compute();
+					s_barometer.state = 0;
+					s_barometer.timeout += 1000; //1ms
+					BaroAlt = ((1.0f - pow(pressure/101325.0F, 0.190295F)) * 4433000.0F); //centimeter;
+					StartBaro = FALSE;
+				}
+				break;
+			}
+		}	
 	}	
 	return BaroAlt;
 }

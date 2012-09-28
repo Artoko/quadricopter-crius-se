@@ -24,19 +24,12 @@
 
 ////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
 
-static void SrvCommExecute (SCommTrame trame);
-//message
-static void SrvCommReceiveMessage (SCommTrame *ma_trame_recu) ;
+static void SrvCommExecute (STrame trame);
 
 //on repporte les donnees
 static void SrvCommRepportData(void);
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
-static Char message[ 30U ];
-static Int8U lenght = 0;
-Int16S x=0,y=0,z=0;
-Boolean write_serial = FALSE;
-Int32S last_press = 0;
-Int32S last_alt = 0;
+
 
 
 //init de la communication exterieur
@@ -50,9 +43,9 @@ void SrvCommDispatcher (Event_t in_event)
 {
 	if( DrvEventTestEvent(in_event, CONF_EVENT_MSG_RCV))
 	{
-		SCommTrame ma_trame_comm;
+		STrame ma_trame_comm;
 		//reception de la trame
-		SrvCommReceiveMessage(&ma_trame_comm);
+		DrvUart0ReadMessage(&ma_trame_comm);
 		//dispatche trame
 		SrvCommExecute(ma_trame_comm);
 	}
@@ -64,79 +57,30 @@ void SrvCommDispatcher (Event_t in_event)
 }
 
 //execute message
-static void SrvCommExecute (SCommTrame trame)
+static void SrvCommExecute (STrame trame)
 {
-	if(trame.param[WHO].val == COMM_MOTOR )
+	if(trame.param[PARAM_0] == COMM_MOTOR )
 	{ 
 		//applique la vitesse au moteurs
-		SrvMotorApplyAbsoluteSpeed(trame.param[PARAM_1].val);
+		SrvMotorApplyAbsoluteSpeed(trame.param[PARAM_1]);
 	}
-	else if(trame.param[WHO].val == COMM_ANGLE )
+	else if(trame.param[PARAM_0] == COMM_ANGLE )
 	{ 
 		//applique les angle souhaité
-		angle_desire.roulis = trame.param[PARAM_1].val;
-		angle_desire.tangage = trame.param[PARAM_2].val;
-		angle_desire.lacet = trame.param[PARAM_3].val;
+		angle_desire.roulis = trame.param[PARAM_1];
+		angle_desire.tangage = trame.param[PARAM_2];
+		angle_desire.lacet = trame.param[PARAM_3];
 	}
-	else if(trame.param[WHO].val == COMM_ALTITUDE )
+	else if(trame.param[PARAM_0] == COMM_ALTITUDE )
 	{ 
 		//on enregistre l'altitude de depart
 		SrvImuSensorsSetAltitudeDepart();
 		
 		//on enregistre l'altitude relative a la position de depart
-		SrvImuSensorsSetAltitudeMaintient(trame.param[PARAM_1].val);
-	}
-	
-	//on ecrit si besoin
-	if(write_serial == TRUE)
-	{	
-		lenght = strlen(message);
-		DrvUart0SendMessage( message , lenght );
+		SrvImuSensorsSetAltitudeMaintient(trame.param[PARAM_1]);
 	}
 }	
 
-//on traite le message recu et on le transforme en SCommTrame
-static void SrvCommReceiveMessage (SCommTrame *ma_trame_recu)
-{
-	Char i_message[ NB_CHAR_MAX ];
-	Int8U i_message_lenght = 0U;
-	Int8U index_param = 0U;
-	Int8U decade = 1U;
-	
-	ma_trame_recu->param[WHO].val = 0U;
-	ma_trame_recu->param[PARAM_1].val = 0U;
-	ma_trame_recu->param[PARAM_2].val = 0U;
-	ma_trame_recu->param[PARAM_3].val = 0U;
-	ma_trame_recu->param[PARAM_4].val = 0U;
-	//on recupere le message entrant
-	i_message_lenght = DrvUart0ReadMessage(i_message);
-	
-	//on enleve les ## de la fin de la trame
-	i_message_lenght -= 2U; 
-	
-	Int8U loop = 1U;
-	for(loop = 1U; loop < i_message_lenght ; loop++)
-	{
-		if( i_message[ loop ] == '-' )
-		{
-			index_param++;		
-			decade = 1U;	
-		}
-		else
-		{
-			ma_trame_recu->param[index_param].val *= decade;	
-			ma_trame_recu->param[index_param].val += i_message[ loop ] - 0x30;
-			decade *= 10;	
-		}		
-	}
-	
-	//on prend les data du message
-	/*if(i_message_lenght < 20U)
-	{
-		ma_trame_recu->param[0U].val = (i_message[1U] - 0x30);
-		ma_trame_recu->param[1U].val = (((i_message[3U] - 0x30) * 10 )+ (i_message[4U] - 0x30));
-	}*/
-}
 
 //on repporte les donnees
 static void SrvCommRepportData( void )
@@ -145,10 +89,10 @@ static void SrvCommRepportData( void )
 	Int8U lenght = 0;
 	lenght = sprintf(	o_message	
 						,"%i, %i, %i, %i\n"
-						,/*(Int16U)(pression/10)//*/angle_reel.roulis
-						,/*(Int16U)(temperature/10)//*/angle_reel.tangage
+						,angle_reel.roulis
+						,angle_reel.tangage
 						,angle_reel.lacet	
 						,angle_reel.altitude
 					);
-	DrvUart0SendDirectMessage( o_message , lenght );
+	DrvUart0SendMessage( o_message , lenght );
 }
