@@ -28,7 +28,7 @@ void SrvPIDInit (Int8U index,float P, float I, float D)
 	pid[index].integratedError = 0;
 }
 
-float SrvPIDCompute(Int8U index, float targetPosition, float currentPosition )
+Int16S SrvPIDCompute(Int8U index, float targetPosition, float currentPosition )
 {
 	float error = targetPosition - currentPosition;
 	
@@ -43,5 +43,5 @@ float SrvPIDCompute(Int8U index, float targetPosition, float currentPosition )
 	
 	int dTerm = (pid[index].D * (currentPosition - pid[index].lastPosition)) / 10;
 	pid[index].lastPosition = currentPosition;
-	return ((pid[index].P * error) / 10) + ((pid[index].I * pid[index].integratedError) / 10) + dTerm;
+	return (Int16S)(((pid[index].P * error) / 10) + ((pid[index].I * pid[index].integratedError) / 10) + dTerm);
 }

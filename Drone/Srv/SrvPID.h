@@ -16,7 +16,7 @@
 //init des valeurs du PID
 void SrvPIDInit (Int8U index,float P, float I, float D);
 //calculs les angles target
-float SrvPIDCompute(Int8U index,float targetPosition, float currentPosition );
+Int16S SrvPIDCompute(Int8U index,float targetPosition, float currentPosition );
 
 
 

@@ -36,6 +36,7 @@ static Boolean eeprom_est_configure;
 Boolean DrvEepromInit ( void )
 {
 	Boolean o_success = FALSE;
+	DrvEepromWriteByte(ADDR_EEPROM_CHECK_EEPROM,VAL_EEPROM_CHECK_NOK);
 	Int8U val = DrvEepromReadByte(ADDR_EEPROM_CHECK_EEPROM);
 	if( val == VAL_EEPROM_CHECK_OK )
 	{
