@@ -114,15 +114,15 @@ void SrvImuDispatcher (Event_t in_event)
 		SrvImuComputeSensors( temp_dernier_cycle );
 		
 		// ********************* Fusion des capteurs ******************************
-		angle_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle ) * 10U;
-		angle_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle ) * 10U;
+		angle_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle );
+		angle_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle );
 		angle_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
 		angle_reel.altitude = altitude;
 		
 		// ********************* PID **********************************************
 		pid_erreur_roulis	= SrvPIDCompute( 0, angle_desire.roulis						, angle_reel.roulis);
 		pid_erreur_tangage	= SrvPIDCompute( 1, angle_desire.tangage					, angle_reel.tangage);
-		pid_erreur_lacet	= SrvPIDCompute( 2, angle_reel.lacet + angle_desire.tangage	, angle_reel.lacet);
+		pid_erreur_lacet	= SrvPIDCompute( 2, angle_reel.lacet + angle_desire.lacet	, angle_reel.lacet);
 		if(maintient_altitude == TRUE)
 		{
 			pid_erreur_altitude	= SrvPIDCompute( 3, angle_desire.altitude, angle_reel.altitude);
