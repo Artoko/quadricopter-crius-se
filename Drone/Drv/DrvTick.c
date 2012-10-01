@@ -91,11 +91,11 @@ ISR(TIMER0_COMPA_vect)
 			if(tick_counter_1s++ == 9)
 			{
 				tick_counter_1s = 0;
-				DrvEventAddEvent(CONF_EVENT_TIMER_1S);
+				//DrvEventAddEvent(CONF_EVENT_TIMER_1S);
 				if(tick_counter_5s++ == 4)
 				{
 					tick_counter_5s = 0;
-					DrvEventAddEvent(CONF_EVENT_TIMER_5S);
+					//DrvEventAddEvent(CONF_EVENT_TIMER_5S);
 					if(tick_counter_10s++ == 1)
 					{
 						tick_counter_10s = 0;

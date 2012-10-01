@@ -29,13 +29,18 @@ static void SrvCommExecute (STrame trame);
 //on repporte les donnees
 static void SrvCommRepportData(void);
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
-
+//passage des params de la trame
+static STrame ma_trame_comm;
 
 
 //init de la communication exterieur
 void SrvCommInit (void) 
 {
-
+	ma_trame_comm.param[PARAM_0] = 0U;
+	ma_trame_comm.param[PARAM_1] = 0U;
+	ma_trame_comm.param[PARAM_2] = 0U;
+	ma_trame_comm.param[PARAM_3] = 0U;
+	ma_trame_comm.param[PARAM_4] = 0U;
 }	
 
 //dispatcher d'evenements
@@ -43,11 +48,12 @@ void SrvCommDispatcher (Event_t in_event)
 {
 	if( DrvEventTestEvent(in_event, CONF_EVENT_MSG_RCV))
 	{
-		STrame ma_trame_comm;
 		//reception de la trame
 		DrvUart0ReadMessage(&ma_trame_comm);
 		//dispatche trame
 		SrvCommExecute(ma_trame_comm);
+		
+		DrvUart0SendMessage("OK\n",4U);
 	}
 	
 	if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_100MS))
@@ -67,9 +73,9 @@ static void SrvCommExecute (STrame trame)
 	else if(trame.param[PARAM_0] == COMM_ANGLE )
 	{ 
 		//applique les angle souhaité
-		angle_desire.roulis = trame.param[PARAM_1];
-		angle_desire.tangage = trame.param[PARAM_2];
-		angle_desire.lacet = trame.param[PARAM_3];
+		imu_desire.roulis = trame.param[PARAM_1];
+		imu_desire.tangage = trame.param[PARAM_2];
+		imu_desire.lacet = trame.param[PARAM_3];
 	}
 	else if(trame.param[PARAM_0] == COMM_ALTITUDE )
 	{ 
@@ -89,10 +95,10 @@ static void SrvCommRepportData( void )
 	Int8U lenght = 0;
 	lenght = sprintf(	o_message	
 						,"%i, %i, %i, %i\n"
-						,angle_reel.roulis
-						,angle_reel.tangage
-						,angle_reel.lacet	
-						,angle_reel.altitude
+						,imu_reel.roulis
+						,imu_reel.tangage
+						,imu_reel.lacet	
+						,imu_reel.altitude
 					);
 	DrvUart0SendMessage( o_message , lenght );
 }

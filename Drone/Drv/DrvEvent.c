@@ -13,7 +13,7 @@
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 
 
-static Event_t event_flags = 0;
+static Event_t event_flags = 0U;
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
   
@@ -21,23 +21,20 @@ static Event_t event_flags = 0;
 // Init du Drv Event 
 void DrvEventInit( void )
 {
-	event_flags = 0;
+	event_flags = 0U;
 }
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
 //
-inline void DrvEventKillEvent(Event_t in_event) 
+inline Event_t DrvEventGetEvent(Event_t in_event)
 {
-	ATOMIC(
+	ATOMIC
+	(
+		//on kill l'ancien event
 		event_flags = ~(in_event | ~event_flags);
 	)
-}
-
-//
-inline Event_t DrvEventGetEvent(void)
-{
-  return event_flags;
+	return event_flags;
 }
 
 //

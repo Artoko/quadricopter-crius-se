@@ -51,6 +51,7 @@
 Boolean CmpBMP085Init( void );
 void CmpBMP085StartCapture( void );
 Int32U CmpBMP085StateMachine( void );
+Int16S CmpBMP085GetAltitude( void );
 
 #endif /*BMA180_H_*/
 

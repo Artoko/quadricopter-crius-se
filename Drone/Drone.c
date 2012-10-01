@@ -28,8 +28,8 @@
 //event main
 volatile Event_t current_main_event = 0;
 
-Sangles angle_desire;
-Sangles angle_reel;
+Simu imu_desire;
+Simu imu_reel;
 
 Int16U speed;
 Int32U pression;
@@ -46,22 +46,23 @@ int main(void)
 	CONFIGURE_LED_PIN();
 	//start Initialisation
 	LED_ON();
-	angle_desire.roulis	= 0;
-	angle_desire.tangage= 0;
-	angle_desire.lacet	= 0;
-	angle_reel.altitude	= 0;
-	angle_reel.roulis	= 0;
-	angle_reel.tangage	= 0;
-	angle_reel.lacet	= 0;
-	angle_reel.altitude	= 0;
-	speed		= 0;
-	pression	= 0;
-	temperature = 0;
+	imu_desire.roulis	= 0;
+	imu_desire.tangage  = 0;
+	imu_desire.lacet	= 0;
+	imu_reel.altitude	= 0;
+	imu_reel.roulis	    = 0;
+	imu_reel.tangage	= 0;
+	imu_reel.lacet	    = 0;
+	imu_reel.altitude	= 0;
+	speed				= 0;
+	pression			= 0;
+	temperature			= 0;
 	
 	// ********************* Drivers init *********************************************
 	DrvEventInit();
 	DrvTickInit();
 	DrvTwiInit();
+	DrvAdcInit();
 	DrvUartInit();
 	DrvEepromInit();
 	
@@ -99,7 +100,7 @@ int main(void)
 	
     while(TRUE)
     {			
-		current_main_event = DrvEventGetEvent();
+		current_main_event = DrvEventGetEvent( current_main_event );
 		
 		// ********************* Compute sensors **************************************
 		SrvImuDispatcher(current_main_event);
@@ -109,10 +110,6 @@ int main(void)
 		
 		// *********************Allumage progressif ***********************************
 		//SrvStartEngineDispatcher(current_main_event);
-						
-		// ********************* Kill event *******************************************	
-		//on kill les event avant la nouvelle boucle
-		DrvEventKillEvent(current_main_event);
 	}		
 }
 

@@ -192,18 +192,29 @@ ISR(USART_RX_vect)
 			}
 			else
 			{
-				//on discossie les params
-				if( buff_uart_0[ctr_buff_uart_0 - 1U] == '-' )
+				//si on a pas recu de nouvelle '*'
+				if(rcv_byte == '*' )
 				{
-					index_param++;
+					//on attend le start frame
+					start_frame_uart_0 = FALSE;
+					index_param = 0;
 					decade = 1U;
 				}
 				else
 				{
-					ma_trame.param[index_param] *= decade;
-					ma_trame.param[index_param] += buff_uart_0[ctr_buff_uart_0 - 1U] - 0x30;
-					decade = 10;
-				}
+					//on discossie les params
+					if( buff_uart_0[ctr_buff_uart_0 - 1U] == '-' )
+					{
+						index_param++;
+						decade = 1U;
+					}
+					else
+					{
+						ma_trame.param[index_param] *= decade;
+						ma_trame.param[index_param] += (buff_uart_0[ctr_buff_uart_0 - 1U] - 0x30);
+						decade = 10;
+					}
+				}				
 			}		
 		}		
 	#endif
