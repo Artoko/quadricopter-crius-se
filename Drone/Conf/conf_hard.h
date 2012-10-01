@@ -21,10 +21,10 @@
 
 //-----------------------------------------------------------------------------------------------//
 
-#define LED_ON()			(PORTB	|=	0x20U)
-#define LED_OFF()			(PORTB	&=~	0x20U)
-#define LED_TOGGLE()		(PORTB	^=	0x20U)
-#define CONFIGURE_LED_PIN() (DDRB	|=	0x20U)
+#define LED_ON()			(PORTB	|=	(1 << PORTB5))
+#define LED_OFF()			(PORTB	&=~	(1 << PORTB5))
+#define LED_TOGGLE()		(PORTB	^=	(1 << PORTB5))
+#define CONFIGURE_LED_PIN() (DDRB	|=	(1 << PORTB5))
 
 ////////////////////////////////////////PUBLIC FREQUENCE OSC///////////////////////////////////////
 #define		CONF_FOSC_HZ				16000000UL
@@ -64,6 +64,7 @@ typedef struct SSangles
 	Int16S tangage;
 	Int16S lacet;
 	Int16U altitude;
+	Int16U adc_conv;
 }Simu;
 
 extern Simu imu_desire;

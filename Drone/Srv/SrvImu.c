@@ -129,7 +129,7 @@ void SrvImuDispatcher (Event_t in_event)
 		speed = SrvMotorGetSpeed();
 		
 		//heartbeat
-		LED_TOGGLE();
+		//LED_TOGGLE();
 	}	
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
