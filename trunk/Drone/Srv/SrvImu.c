@@ -14,6 +14,7 @@
 #include "Srv/SrvPID.h"
 
 #include "Drv/DrvTick.h"
+#include "Drv/DrvEeprom.h"
 
 #include "Cmps/CmpBMA180.h"
 #include "Cmps/CmpITG3205.h"
@@ -22,14 +23,11 @@
 
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-#define NB_SAMPLE_MAX  20
 
 ////////////////////////////////////////PRIVATE STRUCTIURES///////////////////////////////////////
 
 ////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
-static void SrvImuComputeSensors(Int32U interval);
-//altitude
-static void SrvImuSensorsGetAltitude( void );
+static void SrvImuComputeSensors( Int32U interval );
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 
@@ -59,11 +57,6 @@ static Int32U temp_max_cycle;
 static Boolean maintient_altitude;
 static Int16U altitude_depart;
 static Int16U altitude;
-static Int16U BaroHistTab[NB_SAMPLE_MAX];
-static Int8U BaroHistIdx;
-
-
-static double angles[3U];
 
 //initialisation des composants
 void SrvImuInit( void )
@@ -85,6 +78,7 @@ void SrvImuInit( void )
 	direction = 0;
 	maintient_altitude = FALSE;
 	altitude_depart = 0;
+	altitude = 0;
 	
 	//init des composants	
 	CmpHMC5883Init();
@@ -114,18 +108,19 @@ void SrvImuDispatcher (Event_t in_event)
 		SrvImuComputeSensors( temp_dernier_cycle );
 		
 		// ********************* Fusion des capteurs ******************************
-		angle_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle );
-		angle_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle );
-		angle_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
-		angle_reel.altitude = altitude;
+		imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle );
+		imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle );
+		imu_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
+		imu_reel.altitude = SrvKalmanFilterAlt( altitude, -accZangle , temp_dernier_cycle );
+		//angle_reel.altitude = altitude;
 		
 		// ********************* PID **********************************************
-		pid_erreur_roulis	= SrvPIDCompute( 0, angle_desire.roulis						, angle_reel.roulis);
-		pid_erreur_tangage	= SrvPIDCompute( 1, angle_desire.tangage					, angle_reel.tangage);
-		pid_erreur_lacet	= SrvPIDCompute( 2, angle_reel.lacet + angle_desire.lacet	, angle_reel.lacet);
+		pid_erreur_roulis	= SrvPIDCompute( 0, imu_desire.roulis					, imu_reel.roulis);
+		pid_erreur_tangage	= SrvPIDCompute( 1, imu_desire.tangage					, imu_reel.tangage);
+		pid_erreur_lacet	= SrvPIDCompute( 2, imu_reel.lacet + imu_desire.lacet	, imu_reel.lacet);
 		if(maintient_altitude == TRUE)
 		{
-			pid_erreur_altitude	= SrvPIDCompute( 3, angle_desire.altitude, angle_reel.altitude);
+			pid_erreur_altitude	= SrvPIDCompute( 3, imu_desire.altitude, imu_reel.altitude);
 			SrvMotorApplyRelativeSpeed(pid_erreur_altitude);
 		}
 		
@@ -142,15 +137,24 @@ void SrvImuDispatcher (Event_t in_event)
 		CmpBMP085StartCapture();
 	}
 	//BARO
-	SrvImuSensorsGetAltitude();
+	altitude = CmpBMP085GetAltitude();
 	
+	// a 10 sec on enregistre l'altitude
+	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_10S ) == TRUE)
+	{
+		//si c'est la premiere init
+		if( altitude_depart == 0 )
+		{
+			altitude_depart = imu_reel.altitude; 
+		}			
+	}		
 	
 }
 
 //Enregistre l altitude de depart
 void SrvImuSensorsSetAltitudeDepart( void )
 {
-	altitude_depart = angle_reel.altitude;
+	altitude_depart = imu_reel.altitude;
 }
 
 //Enregistre l altitude de maintient
@@ -159,7 +163,7 @@ void SrvImuSensorsSetAltitudeMaintient( Int8U altitude )
 	if(altitude != 0U)
 	{
 		maintient_altitude = TRUE;
-		angle_desire.altitude = altitude_depart + altitude;
+		imu_desire.altitude = altitude_depart + altitude;
 	}
 	else
 	{
@@ -296,18 +300,3 @@ static void SrvImuComputeSensors(Int32U interval)
 	}
 }
 
-//Get altitude
-static void SrvImuSensorsGetAltitude( void )
-{	 
-	Int32U alti_moy = 0;
-	BaroHistTab[BaroHistIdx++] = CmpBMP085StateMachine() / 10;
-	if (BaroHistIdx == NB_SAMPLE_MAX)
-	{
-		for ( Int8U loop= 0 ; loop < NB_SAMPLE_MAX ; loop++)
-		{
-			alti_moy += BaroHistTab[ loop ];
-		}	
-		altitude = alti_moy / NB_SAMPLE_MAX;
-		BaroHistIdx = 0;
-	}		
-}	

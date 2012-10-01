@@ -11,7 +11,7 @@
 #include "Drv/DrvTick.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-
+#define NB_SAMPLE_MAX  150U
 
 /////////////////////////////////////////PRIVATE STRUCTIURES///////////////////////////////////////
 static struct SS_BMP085
@@ -49,6 +49,8 @@ static Int32U BaroAlt;
 static Int32U BaroAltmin;
 static Int32U BaroAltmax;
 static Boolean StartBaro;
+static Int16U altitude;
+static Int16U baro_tab[ NB_SAMPLE_MAX ];
 
 
 //Initialisation du barometre
@@ -75,6 +77,21 @@ void CmpBMP085StartCapture( void )
 {
 	StartBaro = TRUE;
 }
+
+//Get altitude du barometre
+Int16S CmpBMP085GetAltitude( void )
+{	 
+	Int32U alti_moy = 0U;
+	baro_tab[ NB_SAMPLE_MAX - 1U ] = (Int16U)(CmpBMP085StateMachine() / 10U);
+	alti_moy = 0U;	
+	for ( Int8U loop = 0U ; loop < (NB_SAMPLE_MAX - 1U) ; loop++)
+	{
+		baro_tab[ loop ] = baro_tab[ loop + 1 ];
+		alti_moy += baro_tab[ loop ];
+	}
+	return (Int16S)(alti_moy / (NB_SAMPLE_MAX - 1U));	
+}	
+
 
 //on update la temerature et la pression
 Int32U CmpBMP085StateMachine( void )

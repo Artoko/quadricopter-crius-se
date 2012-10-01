@@ -26,10 +26,9 @@ typedef Int16U Event_t;
 
 // Init du Drv Event 
 void DrvEventInit( void ) ;
-Event_t DrvEventGetEvent(void) ;
+Event_t DrvEventGetEvent(Event_t in_event) ;
 Boolean DrvEventTestEvent(Event_t in_event,Int8U conf_event ) ;
 Boolean DrvEventEventExist(Event_t event) ;
 Boolean DrvEventAddEvent(Event_t event) ;
-void DrvEventKillEvent(Event_t in_event) ;
 
 #endif /* DRV_EVENT_H_ */
