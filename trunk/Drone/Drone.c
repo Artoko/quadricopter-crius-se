@@ -13,6 +13,7 @@
 #include "Drv/DrvTick.h"
 #include "Drv/DrvTwi.h"
 #include "Drv/DrvUart.h"
+#include "Drv/DrvAdc.h"
 #include "Drv/DrvEvent.h"
 #include "Drv/DrvEeprom.h"
 #include "Drv/DrvInterrupt.h"
@@ -104,7 +105,7 @@ int main(void)
 		
 		// ********************* Compute sensors **************************************
 		SrvImuDispatcher(current_main_event);
-		
+		DrvAdcDispatcher(current_main_event);
 		// ********************* Receive UART data ************************************
 		SrvCommDispatcher(current_main_event);
 		

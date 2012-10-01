@@ -98,7 +98,7 @@ static void SrvCommRepportData( void )
 						,imu_reel.roulis
 						,imu_reel.tangage
 						,imu_reel.lacet	
-						,imu_reel.altitude
+						,imu_reel.adc_conv//imu_reel.altitude
 					);
 	DrvUart0SendMessage( o_message , lenght );
 }
