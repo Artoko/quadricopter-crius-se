@@ -112,7 +112,7 @@ void SrvImuDispatcher (Event_t in_event)
 		imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle );
 		imu_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
 		imu_reel.altitude = SrvKalmanFilterAlt( altitude, -accZangle , temp_dernier_cycle );
-		//angle_reel.altitude = altitude;
+		imu_reel.altitude -= altitude_depart;
 		
 		// ********************* PID **********************************************
 		pid_erreur_roulis	= SrvPIDCompute( 0, imu_desire.roulis					, imu_reel.roulis);
@@ -129,7 +129,7 @@ void SrvImuDispatcher (Event_t in_event)
 		speed = SrvMotorGetSpeed();
 		
 		//heartbeat
-		//LED_TOGGLE();
+		LED_TOGGLE();
 	}	
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
@@ -145,7 +145,7 @@ void SrvImuDispatcher (Event_t in_event)
 		//si c'est la premiere init
 		if( altitude_depart == 0 )
 		{
-			altitude_depart = imu_reel.altitude; 
+			SrvImuSensorsSetAltitudeDepart();
 		}			
 	}		
 	
