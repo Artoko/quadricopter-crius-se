@@ -102,10 +102,10 @@ int main(void)
     while(TRUE)
     {			
 		current_main_event = DrvEventGetEvent( current_main_event );
-		
 		// ********************* Compute sensors **************************************
 		SrvImuDispatcher(current_main_event);
-		DrvAdcDispatcher(current_main_event);
+		SrvPIDDispatcher(current_main_event);
+		//DrvAdcDispatcher(current_main_event);
 		// ********************* Receive UART data ************************************
 		SrvCommDispatcher(current_main_event);
 		

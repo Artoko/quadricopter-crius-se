@@ -33,12 +33,12 @@
 
 
 ////////////////////////////////////////////PUBLIC EVENT///////////////////////////////////////////
-#define		CONF_EVENT_TIMER_20MS		0U
-#define		CONF_EVENT_TIMER_100MS		CONF_EVENT_TIMER_20MS	+ 1U
-#define		CONF_EVENT_TIMER_1S			CONF_EVENT_TIMER_100MS	+ 1U
-#define		CONF_EVENT_TIMER_5S			CONF_EVENT_TIMER_1S		+ 1U
-#define		CONF_EVENT_TIMER_10S		CONF_EVENT_TIMER_5S		+ 1U
-#define		CONF_EVENT_MSG_RCV			CONF_EVENT_TIMER_10S	+ 1U
+#define		CONF_EVENT_TIMER_20MS		( 1 << 0U )
+#define		CONF_EVENT_TIMER_100MS		( 1 << 1U )
+#define		CONF_EVENT_TIMER_1S			( 1 << 2U )
+#define		CONF_EVENT_TIMER_5S			( 1 << 3U )
+#define		CONF_EVENT_TIMER_10S		( 1 << 4U )
+#define		CONF_EVENT_MSG_RCV			( 1 << 5U )
 
 //PINOUT CRIUS
 // A0	PC0
@@ -65,6 +65,7 @@ typedef struct SSangles
 	Int16S lacet;
 	Int16U altitude;
 	Int16U adc_conv;
+	Boolean maintient_altitude;
 }Simu;
 
 extern Simu imu_desire;

@@ -40,7 +40,7 @@ inline Event_t DrvEventGetEvent(Event_t in_event)
 //
 inline Boolean DrvEventTestEvent(Event_t in_event,Int8U conf_event ) 
 {
-	if (( in_event & ( 1 << conf_event)) > 0 )
+	if (( in_event & conf_event) > 0 )
 	{
 		return TRUE;
 	}
@@ -53,7 +53,7 @@ inline Boolean DrvEventTestEvent(Event_t in_event,Int8U conf_event )
 //
 inline Boolean DrvEventAddEvent(Event_t event)
 {
-	event_flags |= (1<<event) ;
+	event_flags |= event ;
 	return TRUE;
 }
 
