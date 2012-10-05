@@ -9,9 +9,7 @@
 #include "Conf/conf_hard.h"
 
 #include "SrvImu.h"
-#include "SrvMotor.h"
 #include "SrvKalman.h"
-#include "Srv/SrvPID.h"
 
 #include "Drv/DrvTick.h"
 #include "Drv/DrvEeprom.h"
@@ -23,6 +21,7 @@
 
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
+#define NB_SAMPLE_MAX  10U
 
 ////////////////////////////////////////PRIVATE STRUCTIURES///////////////////////////////////////
 
@@ -42,11 +41,6 @@ static float gyroZAngle;
 //direction par rapport au nord
 static Int16U direction;
 
-//erreur retournee par le calcul du PID
-static Int16S pid_erreur_roulis;
-static Int16S pid_erreur_tangage;
-static Int16S pid_erreur_lacet;
-static Int16S pid_erreur_altitude;
 
 //variables de timming
 static Int32U temp_actuel;
@@ -54,9 +48,11 @@ static Int32U temp_dernier_cycle;
 static Int32U temp_max_cycle;
 
 //maintient de l'alitude
-static Boolean maintient_altitude;
 static Int16U altitude_depart;
 static Int16U altitude;
+static Int16U baro_start;
+static Int16U baro_tab[ NB_SAMPLE_MAX ];
+static Int32U alti_moy;
 
 //initialisation des composants
 void SrvImuInit( void )
@@ -68,17 +64,14 @@ void SrvImuInit( void )
 	gyroXAngle = 0;
 	gyroYAngle = 0;
 	gyroZAngle = 0;
-	pid_erreur_roulis = 0;
-	pid_erreur_tangage = 0;
-	pid_erreur_lacet = 0;
-	pid_erreur_altitude = 0;
 	temp_actuel = 0;
 	temp_dernier_cycle = 0;
 	temp_max_cycle = 0;
 	direction = 0;
-	maintient_altitude = FALSE;
 	altitude_depart = 0;
 	altitude = 0;
+	baro_start = 0;
+	alti_moy = 0U;
 	
 	//init des composants	
 	CmpHMC5883Init();
@@ -111,33 +104,35 @@ void SrvImuDispatcher (Event_t in_event)
 		imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle );
 		imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle );
 		imu_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
-		imu_reel.altitude = SrvKalmanFilterAlt( altitude, -accZangle , temp_dernier_cycle );
+		//imu_reel.altitude = SrvKalmanFilterAlt( alti_moy, (accZangle - BMA180_ACC_1G) , temp_dernier_cycle );
+		imu_reel.altitude = alti_moy;
 		imu_reel.altitude -= altitude_depart;
-		
-		// ********************* PID **********************************************
-		pid_erreur_roulis	= SrvPIDCompute( 0, imu_desire.roulis					, imu_reel.roulis);
-		pid_erreur_tangage	= SrvPIDCompute( 1, imu_desire.tangage					, imu_reel.tangage);
-		pid_erreur_lacet	= SrvPIDCompute( 2, imu_reel.lacet + imu_desire.lacet	, imu_reel.lacet);
-		if(maintient_altitude == TRUE)
-		{
-			pid_erreur_altitude	= SrvPIDCompute( 3, imu_desire.altitude, imu_reel.altitude);
-			SrvMotorApplyRelativeSpeed(pid_erreur_altitude);
-		}
-		
-		// ********************* Moteurs ******************************************
-		SrvMotorUpdate(pid_erreur_roulis, pid_erreur_tangage, pid_erreur_lacet);
-		speed = SrvMotorGetSpeed();
 		
 		//heartbeat
 		LED_TOGGLE();
 	}	
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
-		//on start la capture du barometre toutes les 100ms
-		CmpBMP085StartCapture();
+		//on start la capture du barometre toutes les 300ms
+		if( baro_start++ == 5U )
+		{
+			CmpBMP085StartCapture();
+			baro_start = 0U;
+		}
+		
+		baro_tab[ NB_SAMPLE_MAX - 1U ] = altitude / 10U;
+		alti_moy = 0U;
+		for ( Int8U loop = 0U ; loop < (NB_SAMPLE_MAX - 1U) ; loop++)
+		{
+			baro_tab[ loop ] = baro_tab[ loop + 1 ];
+			alti_moy += baro_tab[ loop ];
+		}
+		alti_moy = alti_moy / (NB_SAMPLE_MAX - 1U);
 	}
+	
 	//BARO
 	altitude = CmpBMP085GetAltitude();
+	
 	
 	// a 10 sec on enregistre l'altitude
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_10S ) == TRUE)
@@ -162,12 +157,12 @@ void SrvImuSensorsSetAltitudeMaintient( Int8U altitude )
 {
 	if(altitude != 0U)
 	{
-		maintient_altitude = TRUE;
+		imu_reel.maintient_altitude = TRUE;
 		imu_desire.altitude = altitude_depart + altitude;
 	}
 	else
 	{
-		maintient_altitude = FALSE;
+		imu_reel.maintient_altitude = FALSE;
 	}
 }
 

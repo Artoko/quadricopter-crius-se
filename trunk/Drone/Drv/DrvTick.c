@@ -84,6 +84,7 @@ ISR(TIMER0_COMPA_vect)
 	{
 		tick_counter_20ms = 0;
 		DrvEventAddEvent(CONF_EVENT_TIMER_20MS);
+		//LED_ON();
 		if(tick_counter_100ms++ == 2)
 		{
 			tick_counter_100ms = 0;
@@ -91,7 +92,7 @@ ISR(TIMER0_COMPA_vect)
 			if(tick_counter_1s++ == 9)
 			{
 				tick_counter_1s = 0;
-				//DrvEventAddEvent(CONF_EVENT_TIMER_1S);
+				DrvEventAddEvent(CONF_EVENT_TIMER_1S);
 				if(tick_counter_5s++ == 4)
 				{
 					tick_counter_5s = 0;
