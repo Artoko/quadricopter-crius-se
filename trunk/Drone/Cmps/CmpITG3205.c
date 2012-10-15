@@ -29,11 +29,11 @@ Boolean CmpITG3205Init(void)
 	if (DrvTwiReadReg(ITG3205_TWI_ADDRESS,ITG3205_RA_WHO_AM_I) == ITG3205_RA_I_AM)
 	{
 		DrvTwiWriteReg(ITG3205_TWI_ADDRESS, ITG3205_RA_PWR_MGM, ITG3205_PWR_H_RESET_BIT);
-		DrvTimerDelay10Us(20);
+		DrvTimerDelayUs(200);
 		DrvTwiWriteReg(ITG3205_TWI_ADDRESS, ITG3205_RA_DLPF_FS, FS_RANGE_2000 | LPFBW_98HZ );
-		DrvTimerDelay10Us(20);
+		DrvTimerDelayUs(200);
 		DrvTwiWriteReg(ITG3205_TWI_ADDRESS, ITG3205_RA_PWR_MGM, PLL_ZGYRO_REF );
-		DrvTimerDelay10Us(100);
+		DrvTimerDelayMs(1);
 		
 		//Calibration du capteur
 		//si l'eeprom est configué

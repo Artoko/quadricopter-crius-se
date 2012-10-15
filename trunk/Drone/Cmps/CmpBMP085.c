@@ -98,7 +98,7 @@ void CmpBMP085StateMachine( void )
 				{
 					CmpBMP085StartUT();
 					s_barometer.state++;
-					s_barometer.timeout += 460; //4.6 ms
+					s_barometer.timeout += 4600; //4.6 ms
 					break;
 				}
 				case 1:
@@ -111,7 +111,7 @@ void CmpBMP085StateMachine( void )
 				{
 					CmpBMP085StartUP();
 					s_barometer.state++;
-					s_barometer.timeout += 1400; //14 ms
+					s_barometer.timeout += 14000; //14 ms
 					break;
 				}
 				case 3:
@@ -119,7 +119,6 @@ void CmpBMP085StateMachine( void )
 					CmpBMP085ReadUP();
 					CmpBMP085Compute();
 					s_barometer.state = 0;
-					s_barometer.timeout += 1000; //1ms
 					BaroAlt = ((1.0f - pow(pressure/101325.0F, 0.190295F)) * 4433000.0F); //centimeter;
 					StartBaro = FALSE;
 				}
@@ -165,7 +164,6 @@ static void CmpBMP085ReadUP( void )
 	s_barometer.up.raw[2] = buffer[ 0U ];
 	s_barometer.up.raw[1] = buffer[ 1U ];
 	s_barometer.up.raw[0] = buffer[ 2U ];
-	pression = s_barometer.up.val/1000;
 }
 
 // read uncompensated temperature value: read result bytes
@@ -174,9 +172,7 @@ static void CmpBMP085ReadUT( void )
 {
 	Int8U buffer[ 2U ] = {0U, 0U};
 	DrvTwiReadRegBuf(BMP085_ADDRESS, CONTROL_OUTPUT, buffer, 2U);
-	s_barometer.ut.raw[1] = buffer[ 0U ];
-	s_barometer.ut.raw[0] = buffer[ 1U ];
-	temperature = (Int16S)(s_barometer.ut.val/100);
+	s_barometer.ut.val = (Int16U)(buffer[ 0U ] << 8U | buffer[ 1U ]);
 }
 
 static void CmpBMP085Compute( void ) 
@@ -187,6 +183,7 @@ static void CmpBMP085Compute( void )
   x1 = ((int32_t)s_barometer.ut.val - s_barometer.ac6) * s_barometer.ac5 >> 15;
   x2 = ((int32_t)s_barometer.mc << 11) / (x1 + s_barometer.md);
   b5 = x1 + x2;
+  temperature = (b5 + 8)>>4;
   // Pressure calculations
   b6 = b5 - 4000;
   x1 = (s_barometer.b2 * (b6 * b6 >> 12)) >> 11; 
@@ -205,6 +202,7 @@ static void CmpBMP085Compute( void )
   x1 = (x1 * 3038) >> 16;
   x2 = (-7357 * p) >> 16;
   pressure = p + ((x1 + x2 + 3791) >> 4);
+  pression =pressure;
 }
 
 

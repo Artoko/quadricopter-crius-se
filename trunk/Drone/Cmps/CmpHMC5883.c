@@ -26,13 +26,13 @@ Boolean CmpHMC5883Init(void)
 {
 	Boolean o_success = FALSE;
 	DrvTwiWriteReg(HMC5883_ADDRESS,HMC5883_CONFIG_A,HMC5883_15HZ);
-	DrvTimerDelay10Us(20);
+	DrvTimerDelayUs(200);
 	DrvTwiWriteReg(HMC5883_ADDRESS,HMC5883_CONFIG_B,HMC5883_1_3GA);
-	DrvTimerDelay10Us(20);
+	DrvTimerDelayUs(200);
 	DrvTwiWriteReg(HMC5883_ADDRESS,HMC5883_MODE,HMC5883_CONTINUOUS);
-	DrvTimerDelay10Us(20);
+	DrvTimerDelayUs(200);
 	loop_calibration_hmc5883 = NB_SAMPLE_TO_CALIB_HMC5883;
-	DrvTimerDelay10Us(500);
+	DrvTimerDelayMs(5);
 	o_success = TRUE;
 	return o_success;
 }

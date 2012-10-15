@@ -36,7 +36,6 @@ Int16U speed;
 Int32U pression;
 Int16S temperature;
 
-
 int main(void)
 {
 	
@@ -97,10 +96,11 @@ int main(void)
 	LED_OFF();
 	
 	// ********************* Reset time ***********************************************
-	DrvTickReset();
+	DrvEventTickReset();
 	
     while(TRUE)
     {			
+		
 		current_main_event = DrvEventGetEvent( current_main_event );
 		// ********************* Compute sensors **************************************
 		SrvImuDispatcher(current_main_event);
@@ -111,6 +111,8 @@ int main(void)
 		
 		// *********************Allumage progressif ***********************************
 		//SrvStartEngineDispatcher(current_main_event);
+		
+		
 	}		
 }
 
