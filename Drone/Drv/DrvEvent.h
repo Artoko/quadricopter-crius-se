@@ -30,5 +30,6 @@ Event_t DrvEventGetEvent(Event_t in_event) ;
 Boolean DrvEventTestEvent(Event_t in_event,Int8U conf_event ) ;
 Boolean DrvEventEventExist(Event_t event) ;
 Boolean DrvEventAddEvent(Event_t event) ;
+void DrvEventTickReset(void);
 
 #endif /* DRV_EVENT_H_ */

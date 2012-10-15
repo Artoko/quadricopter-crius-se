@@ -30,28 +30,28 @@ Boolean CmpBMA180Init(void)
 	Boolean o_success = FALSE;
 	if(BMA180_CHIP_ID == DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_CHIP_ID))
 	{
-		DrvTimerDelay10Us(20);
+		DrvTimerDelayUs(200);
 		//Write on EEPROM enable
 		DrvTwiWriteReg(BMA180_ADDRESS,BMA180_REG_CTRL_REG0,1<<4);
-		DrvTimerDelay10Us(20);
+		DrvTimerDelayUs(200);
 		//Bandwidth filters: 20Hz
 		control = DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_BW_TCS);
 		control = control & 0x0F;        
 		control = control | (0x01 << 4); 
 		DrvTwiWriteReg(BMA180_ADDRESS, BMA180_REG_BW_TCS, control);
-		DrvTimerDelay10Us(20);
+		DrvTimerDelayUs(200);
 		//Mode: Low-Noise
 		control = DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_TC0_Z);
 		control = control & 0xFC;
 		control = control | 0x00; 
 		DrvTwiWriteReg(BMA180_ADDRESS, BMA180_REG_TC0_Z, control);
-		DrvTimerDelay10Us(20);
+		DrvTimerDelayUs(200);
 		//Range: +-8G
 		control = DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_OFFSET_LSB1);
 		control = control & 0xF1;
 		control = control | (0x05 << 1); 
 		DrvTwiWriteReg(BMA180_ADDRESS, BMA180_REG_OFFSET_LSB1, control);
-		DrvTimerDelay10Us(20);
+		DrvTimerDelayUs(200);
 		
 		//Calibration du capteur
 		//si l'eeprom est configué

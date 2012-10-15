@@ -24,8 +24,8 @@ void DrvTickReset(void);
 Int32U DrvTimerGetTime(void);
 
 //wait for delay
-void DrvTimerDelay10Us( Int16U delay_us );
-void DrvTimerDelayMs( Int32U delay_ms );
+void DrvTimerDelayUs( Int16U delay_us );
+void DrvTimerDelayMs( Int16U delay_ms );
 
 
 #endif /* DRVTICK_H_ */

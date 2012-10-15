@@ -21,7 +21,7 @@
 
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-#define NB_SAMPLE_MAX  10U
+#define NB_SAMPLE_MAX  5U
 
 ////////////////////////////////////////PRIVATE STRUCTIURES///////////////////////////////////////
 
@@ -50,8 +50,8 @@ static Int32U temp_max_cycle;
 //maintient de l'alitude
 static Int16U altitude_depart;
 static Int16U altitude;
-static Int16U baro_start;
 static Int16U baro_tab[ NB_SAMPLE_MAX ];
+static Int16U baro_tab2[ NB_SAMPLE_MAX ];
 static Int32U alti_moy;
 
 //initialisation des composants
@@ -70,7 +70,6 @@ void SrvImuInit( void )
 	direction = 0;
 	altitude_depart = 0;
 	altitude = 0;
-	baro_start = 0;
 	alti_moy = 0U;
 	
 	//init des composants	
@@ -104,8 +103,8 @@ void SrvImuDispatcher (Event_t in_event)
 		imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle );
 		imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle );
 		imu_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
-		//imu_reel.altitude = SrvKalmanFilterAlt( alti_moy, (accZangle - BMA180_ACC_1G) , temp_dernier_cycle );
-		imu_reel.altitude = alti_moy;
+		//imu_reel.altitude = SrvKalmanFilterAlt( alti_moy, (accZangle - BMA180_ACC_1G)/16U , temp_dernier_cycle );
+		imu_reel.altitude = alti_moy; //+ (accZangle - BMA180_ACC_1G);
 		imu_reel.altitude -= altitude_depart;
 		
 		//heartbeat
@@ -113,14 +112,10 @@ void SrvImuDispatcher (Event_t in_event)
 	}	
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
-		//on start la capture du barometre toutes les 300ms
-		if( baro_start++ == 5U )
-		{
-			CmpBMP085StartCapture();
-			baro_start = 0U;
-		}
-		
-		baro_tab[ NB_SAMPLE_MAX - 1U ] = altitude / 10U;
+		//on start la capture du barometre toutes les 100ms
+		CmpBMP085StartCapture();
+				
+		baro_tab[ NB_SAMPLE_MAX - 1U ] = altitude ;
 		alti_moy = 0U;
 		for ( Int8U loop = 0U ; loop < (NB_SAMPLE_MAX - 1U) ; loop++)
 		{
@@ -195,7 +190,7 @@ void SrvImuSensorsCalibration( void )
 		}
 		else
 		{
-			DrvTimerDelay10Us(STD_LOOP_TIME);
+			DrvTimerDelayMs(STD_LOOP_TIME);
 		}
 	} while (!calibrate);
 }
