@@ -67,8 +67,8 @@ int main(void)
 	DrvEepromInit();
 	
 	// ********************* PID init *************************************************
-	SrvPIDInit(0,12,1.5,-180); //roulis
-	SrvPIDInit(1,12,1.5,-180); //tangage
+	SrvPIDInit(0,12,0.5,-180); //roulis
+	SrvPIDInit(1,12,0.5,-180); //tangage
 	SrvPIDInit(2,10,0,0);  //lacet
 	SrvPIDInit(3,1,0,0);   //altitude
 	
@@ -104,7 +104,6 @@ int main(void)
 		current_main_event = DrvEventGetEvent( current_main_event );
 		// ********************* Compute sensors **************************************
 		SrvImuDispatcher(current_main_event);
-		SrvPIDDispatcher(current_main_event);
 		//DrvAdcDispatcher(current_main_event);
 		// ********************* Receive UART data ************************************
 		SrvCommDispatcher(current_main_event);

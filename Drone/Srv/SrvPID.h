@@ -20,8 +20,6 @@
 //init des valeurs du PID
 void SrvPIDInit (Int8U index,float P, float I, float D);
 
-//dispatcher d'evenements
-void SrvPIDDispatcher (Event_t in_event);
-
+Int16S SrvPIDCompute(Int8U index, float targetPosition, float currentPosition );
 
 #endif /* SRVPID_H_ */

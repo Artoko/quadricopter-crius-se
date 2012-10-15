@@ -74,7 +74,7 @@ static void SrvCommExecute (STrame trame)
 	{ 
 		//applique les angle souhaité
 		imu_desire.roulis = trame.param[PARAM_1];
-		imu_desire.tangage = trame.param[PARAM_2];
+		imu_desire.tangage = -1*trame.param[PARAM_2];
 		imu_desire.lacet = trame.param[PARAM_3];
 	}
 	else if(trame.param[PARAM_0] == COMM_ALTITUDE )

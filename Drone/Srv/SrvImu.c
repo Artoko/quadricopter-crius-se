@@ -9,7 +9,9 @@
 #include "Conf/conf_hard.h"
 
 #include "SrvImu.h"
+#include "SrvPID.h"
 #include "SrvKalman.h"
+#include "SrvMotor.h"
 
 #include "Drv/DrvTick.h"
 #include "Drv/DrvEeprom.h"
@@ -54,6 +56,12 @@ static Int16U baro_tab[ NB_SAMPLE_MAX ];
 static Int16U baro_tab2[ NB_SAMPLE_MAX ];
 static Int32U alti_moy;
 
+//erreur retournee par le calcul du PID
+static Int16S pid_erreur_roulis;
+static Int16S pid_erreur_tangage;
+static Int16S pid_erreur_lacet;
+static Int16S pid_erreur_altitude;
+
 //initialisation des composants
 void SrvImuInit( void )
 {
@@ -71,6 +79,10 @@ void SrvImuInit( void )
 	altitude_depart = 0;
 	altitude = 0;
 	alti_moy = 0U;
+	pid_erreur_roulis = 0;
+	pid_erreur_tangage = 0;
+	pid_erreur_lacet = 0;
+	pid_erreur_altitude = 0;
 	
 	//init des composants	
 	CmpHMC5883Init();
@@ -106,6 +118,19 @@ void SrvImuDispatcher (Event_t in_event)
 		//imu_reel.altitude = SrvKalmanFilterAlt( alti_moy, (accZangle - BMA180_ACC_1G)/16U , temp_dernier_cycle );
 		imu_reel.altitude = alti_moy; //+ (accZangle - BMA180_ACC_1G);
 		imu_reel.altitude -= altitude_depart;
+		
+		// ********************* PID **********************************************
+		pid_erreur_roulis	= SrvPIDCompute( 0, imu_desire.roulis					, imu_reel.roulis);
+		pid_erreur_tangage	= SrvPIDCompute( 1, imu_desire.tangage					, imu_reel.tangage);
+		pid_erreur_lacet	= SrvPIDCompute( 2, imu_reel.lacet + imu_desire.lacet	, imu_reel.lacet);
+		if(imu_reel.maintient_altitude == TRUE)
+		{
+			pid_erreur_altitude	= SrvPIDCompute( 3, imu_desire.altitude, imu_reel.altitude);
+			SrvMotorApplyRelativeSpeed(pid_erreur_altitude);
+		}
+		// ********************* Moteurs ******************************************
+		SrvMotorUpdate(pid_erreur_roulis, pid_erreur_tangage, pid_erreur_lacet);
+		speed = SrvMotorGetSpeed();
 		
 		//heartbeat
 		LED_TOGGLE();
