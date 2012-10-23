@@ -112,8 +112,8 @@ void SrvImuDispatcher (Event_t in_event)
 		SrvImuComputeSensors( temp_dernier_cycle );
 		
 		// ********************* Fusion des capteurs ******************************
-		imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle );
-		imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle );
+		imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle ) * 10U;
+		imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle ) * 10U;
 		imu_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
 		//imu_reel.altitude = SrvKalmanFilterAlt( alti_moy, (accZangle - BMA180_ACC_1G)/16U , temp_dernier_cycle );
 		imu_reel.altitude = alti_moy; //+ (accZangle - BMA180_ACC_1G);
@@ -132,13 +132,13 @@ void SrvImuDispatcher (Event_t in_event)
 		SrvMotorUpdate(pid_erreur_roulis, pid_erreur_tangage, pid_erreur_lacet);
 		speed = SrvMotorGetSpeed();
 		
-		//heartbeat
-		LED_TOGGLE();
 	}	
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
 		//on start la capture du barometre toutes les 100ms
 		CmpBMP085StartCapture();
+		//BARO
+		altitude = CmpBMP085GetAltitude();
 				
 		baro_tab[ NB_SAMPLE_MAX - 1U ] = altitude ;
 		alti_moy = 0U;
@@ -150,8 +150,6 @@ void SrvImuDispatcher (Event_t in_event)
 		alti_moy = alti_moy / (NB_SAMPLE_MAX - 1U);
 	}
 	
-	//BARO
-	altitude = CmpBMP085GetAltitude();
 	
 	
 	// a 10 sec on enregistre l'altitude
@@ -160,7 +158,7 @@ void SrvImuDispatcher (Event_t in_event)
 		//si c'est la premiere init
 		if( altitude_depart == 0 )
 		{
-			SrvImuSensorsSetAltitudeDepart();
+			//SrvImuSensorsSetAltitudeDepart();
 		}			
 	}		
 	

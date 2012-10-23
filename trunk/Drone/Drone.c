@@ -23,7 +23,11 @@
 #include "Srv/SrvStartEngine.h"
 #include "Srv/SrvPID.h"
 #include "Srv/SrvMotor.h"
+#include "Srv/SrvTimer.h"
 
+////////////////////////////////////////PRIVATE FUNCTIONS////////////////////////////////////////
+//fct appele par le timer
+static void HeartbeatIsrCallbackTimer( void ) ;
 
 ////////////////////////////////////////PRIVATE VARIABLES////////////////////////////////////////
 //event main
@@ -76,6 +80,7 @@ int main(void)
 	DrvInterruptSetAllInterrupts();
 	
 	// ********************* Composants init ******************************************
+	SrvTimerInit();
 	SrvImuInit();
 	
 	//Wait 2 sec for sensors init
@@ -96,7 +101,10 @@ int main(void)
 	LED_OFF();
 	
 	// ********************* Reset time ***********************************************
-	DrvEventTickReset();
+	SrvTimerTickReset();
+	
+	// ********************* Start Heartbeat ******************************************
+	SrvTimerAddTimer(CONF_TIMER_HEARTBEAT, 5000U, E_TIMER_MODE_PERIODIC, HeartbeatIsrCallbackTimer);
 	
     while(TRUE)
     {			
@@ -115,3 +123,9 @@ int main(void)
 	}		
 }
 
+//fct appele par le timer
+void HeartbeatIsrCallbackTimer( void)
+{
+	//heartbeat
+	LED_TOGGLE();
+}

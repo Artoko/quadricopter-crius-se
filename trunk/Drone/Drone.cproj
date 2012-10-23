@@ -21,7 +21,7 @@
     <OverrideVtorValue />
     <eraseonlaunchrule>0</eraseonlaunchrule>
     <AsfVersion>2.9.0</AsfVersion>
-    <avrtool>com.atmel.avrdbg.tool.jtagicemk3</avrtool>
+    <avrtool>com.atmel.avrdbg.tool.jtagicemkii</avrtool>
     <avrtoolinterface>debugWIRE</avrtoolinterface>
     <com_atmel_avrdbg_tool_jtagicemkii>
       <ToolType>com.atmel.avrdbg.tool.jtagicemkii</ToolType>
@@ -33,7 +33,7 @@
       </OverrideVtorValue>
       <Channel>
         <host>127.0.0.1</host>
-        <port>2568</port>
+        <port>1323</port>
         <ssl>False</ssl>
       </Channel>
       <ToolOptions>
@@ -283,6 +283,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Srv\SrvStartEngine.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Srv\SrvTimer.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Srv\SrvTimer.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Tools\tools_typedefs.h">
