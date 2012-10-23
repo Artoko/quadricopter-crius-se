@@ -7,6 +7,9 @@
 /////////////////////////////////////////////INCLUDES/////////////////////////////////////////////
 #include "CmpBMP085.h"
  
+ 
+#include "Srv/SrvTimer.h"
+ 
 #include "Drv/DrvTwi.h"
 #include "Drv/DrvTick.h"
 
@@ -41,20 +44,17 @@ static void CmpBMP085StartUT( void ) ;
 static void CmpBMP085ReadUT( void );
 static void CmpBMP085StartUP( void ) ;
 static void CmpBMP085ReadUP( void );
-
 /////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 static Int32U pressure;
 static Int32U BaroAlt;
 static Int32U BaroAltmin;
 static Int32U BaroAltmax;
-static Boolean StartBaro;
 
 
 //Initialisation du barometre
 Boolean CmpBMP085Init( void )
 {
 	Boolean o_success = FALSE;
-	StartBaro = FALSE;
 	pressure = 0U;
 	BaroAlt = 0U;
 	BaroAltmin = 0U;
@@ -62,71 +62,40 @@ Boolean CmpBMP085Init( void )
 	//on laisse un delai pour l'init du barometre
 	DrvTimerDelayMs(1000);
 	CmpBMP085ReadCalibration();
-	CmpBMP085StartUT();
-	DrvTimerDelayMs(5);
-	CmpBMP085ReadUT();
+	CmpBMP085StartCapture();
 	o_success = TRUE;
 	return o_success;
 }
 
+void CmpBMP085IsrCallbackReadUP( void) ;
+void CmpBMP085IsrCallbackReadUT( void) ;
 //
 void CmpBMP085StartCapture( void )
 {
-	StartBaro = TRUE;
+	CmpBMP085StartUT();
+	SrvTimerAddTimer(CONF_TIMER_START_BMP085_1, 45, E_TIMER_MODE_ONE_SHOT, CmpBMP085IsrCallbackReadUT);
 }
 
+//fct appele par le timer
+void CmpBMP085IsrCallbackReadUT( void)
+{
+	CmpBMP085ReadUT();
+	SrvTimerAddTimer(CONF_TIMER_START_BMP085_2, 250, E_TIMER_MODE_ONE_SHOT, CmpBMP085IsrCallbackReadUP);
+	CmpBMP085StartUP();
+}
+//fct appele par le timer
+void CmpBMP085IsrCallbackReadUP( void)
+{
+	CmpBMP085ReadUP();
+	CmpBMP085Compute();
+	s_barometer.state = 0;
+	BaroAlt = ((1.0f - pow(pressure/101325.0F, 0.190295F)) * 4433000.0F); //centimeter;
+}	
 //Get altitude du barometre
 Int16S CmpBMP085GetAltitude( void )
 {	 
-	CmpBMP085StateMachine();
 	return BaroAlt;	
 }	
-
-
-//on update la temerature et la pression
-void CmpBMP085StateMachine( void )
-{
-	if(StartBaro == TRUE)
-	{
-		Int32U currentTime = DrvTimerGetTime();
-		if (currentTime >= s_barometer.timeout) 
-		{	
-			s_barometer.timeout = currentTime;
-			switch (s_barometer.state)
-			{
-				case 0:
-				{
-					CmpBMP085StartUT();
-					s_barometer.state++;
-					s_barometer.timeout += 4600; //4.6 ms
-					break;
-				}
-				case 1:
-				{
-					CmpBMP085ReadUT();
-					s_barometer.state++;
-					break;
-				}
-				case 2:
-				{
-					CmpBMP085StartUP();
-					s_barometer.state++;
-					s_barometer.timeout += 14000; //14 ms
-					break;
-				}
-				case 3:
-				{
-					CmpBMP085ReadUP();
-					CmpBMP085Compute();
-					s_barometer.state = 0;
-					BaroAlt = ((1.0f - pow(pressure/101325.0F, 0.190295F)) * 4433000.0F); //centimeter;
-					StartBaro = FALSE;
-				}
-				break;
-			}
-		}	
-	}	
-}
 
 //read all value
 static void CmpBMP085ReadCalibration( void )
@@ -204,6 +173,5 @@ static void CmpBMP085Compute( void )
   pressure = p + ((x1 + x2 + 3791) >> 4);
   pression =pressure;
 }
-
 
 

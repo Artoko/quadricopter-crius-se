@@ -39,7 +39,7 @@
 #define MODE_ULTRA_HIGHRES      3 //oversampling=3, internalsamples=8, maxconvtimepressure=25.5ms, avgcurrent=12uA, RMSnoise_hPA=0.03, RMSnoise_m=0.25
 
 //define oversampling
-#define OSS MODE_HIGHRES//MODE_ULTRA_LOW_POWER
+#define OSS MODE_HIGHRES
 
 
 ////////////////////////////////////////PUBLIC STRUCTURES/////////////////////////////////////////

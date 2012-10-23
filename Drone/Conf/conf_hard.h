@@ -29,9 +29,15 @@
 ////////////////////////////////////////PUBLIC FREQUENCE OSC///////////////////////////////////////
 #define		CONF_FOSC_HZ				16000000UL
 #define		CONF_FOSC_MHZ				16UL
-#define		STD_LOOP_TIME				20			//10ms 
+#define		STD_LOOP_TIME				10			//10ms 
 //-----------------------------------------------------------------------------------------------//
 
+
+////////////////////////////////////////////PUBLIC TIMER///////////////////////////////////////////
+#define CONF_TIMER_HEARTBEAT			0U
+#define CONF_TIMER_START_BMP085_1		1U
+#define CONF_TIMER_START_BMP085_2		2U
+#define CONF_TIMER_NB					5U
 
 ////////////////////////////////////////////PUBLIC EVENT///////////////////////////////////////////
 #define		CONF_EVENT_TIMER_20MS		( 1 << 0U )
@@ -58,6 +64,9 @@
 #define		COMM_MOTOR			0
 #define		COMM_ANGLE			1
 #define		COMM_ALTITUDE		2
+
+
+
 //-----------------------------------------------------------------------------------------------//
 typedef struct SSangles
 {
