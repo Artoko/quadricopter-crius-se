@@ -14,7 +14,7 @@
 
 
 #define OFFCOMMAND 1000
-#define MAXCOMMAND 1500
+#define MAXCOMMAND 2000
 
 
 static Int16U frontMotor_R = 0U;
