@@ -48,8 +48,8 @@ STrame ma_trame;
 void DrvUartInit( )
 {
 	//on fixe les registres
-	#ifdef USE_UART_0 
-		UBRR0 = 0x0019U;		//38400 baud
+	#ifdef USE_UART_0
+		UBRR0 = 0x08U;		//115200 baud
 		UCSR0B |= (1<<RXEN0);	//enable RX
 		UCSR0B |= (1<<TXEN0);	//enable TX 
 		UCSR0B |= (1<<RXCIE0);	//enable RX interrupt 

@@ -29,7 +29,7 @@
 ////////////////////////////////////////PUBLIC FREQUENCE OSC///////////////////////////////////////
 #define		CONF_FOSC_HZ				16000000UL
 #define		CONF_FOSC_MHZ				16UL
-#define		STD_LOOP_TIME				10			//10ms 
+#define		STD_LOOP_TIME				20			//20ms 
 //-----------------------------------------------------------------------------------------------//
 
 
@@ -84,6 +84,11 @@ extern Int16U speed;
 extern Int32U pression;
 extern Int16S temperature;
 
+//erreur retournee par le calcul du PID
+extern Int16S pid_erreur_roulis;
+extern Int16S pid_erreur_tangage;
+extern Int16S pid_erreur_lacet;
+extern Int16S pid_erreur_altitude;
 
 
 

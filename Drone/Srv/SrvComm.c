@@ -91,10 +91,11 @@ static void SrvCommExecute (STrame trame)
 //on repporte les donnees
 static void SrvCommRepportData( void )
 {
-	Char o_message[ 40U ];
+	Char o_message[ 30U ];
 	Int8U lenght = 0;
+	
 	lenght = sprintf(	o_message	
-						,"%i, %i, %i, %i\n"
+						,"%i,%i,%i,%i\n"
 						,imu_reel.roulis
 						,imu_reel.tangage
 						,imu_reel.lacet	

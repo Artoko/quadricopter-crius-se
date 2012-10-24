@@ -35,6 +35,11 @@ volatile Event_t current_main_event = 0;
 
 Simu imu_desire;
 Simu imu_reel;
+//erreur retournee par le calcul du PID
+Int16S pid_erreur_roulis;
+Int16S pid_erreur_tangage;
+Int16S pid_erreur_lacet;
+Int16S pid_erreur_altitude;
 
 Int16U speed;
 Int32U pression;
@@ -71,8 +76,8 @@ int main(void)
 	DrvEepromInit();
 	
 	// ********************* PID init *************************************************
-	SrvPIDInit(0,12,0.5,-180); //roulis
-	SrvPIDInit(1,12,0.5,-180); //tangage
+	SrvPIDInit(0,7,0.5,-18); //roulis
+	SrvPIDInit(1,7,0.5,-18); //tangage
 	SrvPIDInit(2,10,0,0);  //lacet
 	SrvPIDInit(3,1,0,0);   //altitude
 	
@@ -84,7 +89,7 @@ int main(void)
 	SrvImuInit();
 	
 	//Wait 2 sec for sensors init
-	DrvTimerDelayMs(2000);
+	DrvTimerDelayMs(3000);
 		
 	// ********************* Calibration sensors **************************************
 	SrvImuSensorsCalibration();

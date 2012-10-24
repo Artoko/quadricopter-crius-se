@@ -134,7 +134,7 @@ void SrvTimerTickReset(void)
 ISR(TIMER2_COMPA_vect)
 {
 	OCR2A = TCNT2 + TIMER2_OFFSET_COMPA ;
-	if(tick_counter_20ms++ == 99)
+	if(tick_counter_20ms++ == 199)
 	{
 		tick_counter_20ms = 0;
 		DrvEventAddEvent(CONF_EVENT_TIMER_20MS);
