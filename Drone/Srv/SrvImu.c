@@ -52,8 +52,6 @@ static Int32U temp_max_cycle;
 //maintient de l'alitude
 static Int16U altitude_depart;
 static Int32U altitude;
-static Int16U baro_tab[ NB_SAMPLE_MAX ];
-static Int16U baro_tab2[ NB_SAMPLE_MAX ];
 static Int32U alti_moy;
 
 //initialisation des composants
@@ -109,8 +107,9 @@ void SrvImuDispatcher (Event_t in_event)
 		imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle ) * 10U;
 		imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle ) * 10U;
 		imu_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
+		
 		//imu_reel.altitude = SrvKalmanFilterAlt( alti_moy, (accZangle - BMA180_ACC_1G)/16U , temp_dernier_cycle );
-		imu_reel.altitude = altitude; //+ (accZangle - BMA180_ACC_1G);
+		imu_reel.altitude = CmpBMP085GetAltitude(); //+ (accZangle - BMA180_ACC_1G);
 		imu_reel.altitude -= altitude_depart;
 		
 		// ********************* PID **********************************************
@@ -129,20 +128,9 @@ void SrvImuDispatcher (Event_t in_event)
 	}	
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
+		//BARO
 		//on start la capture du barometre toutes les 100ms
 		CmpBMP085StartCapture();
-		//BARO
-		altitude = CmpBMP085GetAltitude();
-				
-		/*alti_moy = altitude;
-		baro_tab[ NB_SAMPLE_MAX - 1U ] = altitude ;
-		alti_moy = 0U;
-		for ( Int8U loop = 0U ; loop < (NB_SAMPLE_MAX - 1U) ; loop++)
-		{
-			baro_tab[ loop ] = baro_tab[ loop + 1U ];
-			alti_moy += baro_tab[ loop ];
-		}
-		alti_moy = alti_moy / (NB_SAMPLE_MAX - 1U);*/
 	}
 	
 	// a 10 sec on enregistre l'altitude
@@ -282,7 +270,7 @@ static void SrvImuComputeSensors(Int32U interval)
 		magnet.z *= -1;	
 
 		//on doit etre en dessous des 40 deg
-		if(!(accXangle > 40 || accXangle < -40 || accYangle > 40 || accYangle < -40))
+		if(!(accXangle > 10 && accXangle < -10 && accYangle > 10 && accYangle < -10))
 		{
 			//compensation avec l'accelerometre
 			float cosRoll = cos(ToRad(accYangle));

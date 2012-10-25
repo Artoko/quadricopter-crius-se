@@ -46,7 +46,6 @@ static void CmpBMP085IsrCallbackReadUT( void) ;
 /////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 static Int32U pressure;
 static Int32U BaroAlt;
-static Int16U BaroPID;
 
 
 
@@ -72,11 +71,8 @@ Int32U CmpBMP085GetAltitude( void )
 	static int16_t BaroHistTab[BARO_TAB_SIZE];
 	static int8_t BaroHistIdx;
 	static int32_t BaroHigh,BaroLow;
-	int32_t temp32;
 	int16_t last;
 
-	//**** Alt. Set Point stabilization PID ****
-	//calculate speed for D calculation
 	last = BaroHistTab[BaroHistIdx];
 	BaroHistTab[BaroHistIdx] = BaroAlt/10;
 	BaroHigh += BaroHistTab[BaroHistIdx];
