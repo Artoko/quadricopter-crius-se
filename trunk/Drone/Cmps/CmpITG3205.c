@@ -12,7 +12,7 @@
 #include "Drv/DrvEeprom.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-#define NB_SAMPLE_TO_CALIB_ITG3205	100
+#define NB_SAMPLE_TO_CALIB_ITG3205	200
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 Int8U loop_calibration_ITG3205 = 0;
 static Int16S gyro_calib[3] = {0,0,0};

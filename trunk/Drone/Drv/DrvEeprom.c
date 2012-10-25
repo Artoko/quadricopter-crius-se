@@ -4,13 +4,13 @@
 #include "DrvEeprom.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-#define ADDR_EEPROM_CHECK_EEPROM	0U
-#define ADDR_EEPROM_ACC_CALIB_X		1U
-#define ADDR_EEPROM_ACC_CALIB_Y		3U
-#define ADDR_EEPROM_ACC_CALIB_Z		5U
-#define ADDR_EEPROM_GYRO_CALIB_X	7U
-#define ADDR_EEPROM_GYRO_CALIB_Y	9U
-#define ADDR_EEPROM_GYRO_CALIB_Z	11U
+#define ADDR_EEPROM_CHECK_EEPROM	( Int8U *)0U
+#define ADDR_EEPROM_ACC_CALIB_X		( Int8U *)1U
+#define ADDR_EEPROM_ACC_CALIB_Y		( Int8U *)3U
+#define ADDR_EEPROM_ACC_CALIB_Z		( Int8U *)5U
+#define ADDR_EEPROM_GYRO_CALIB_X	( Int8U *)7U
+#define ADDR_EEPROM_GYRO_CALIB_Y	( Int8U *)9U
+#define ADDR_EEPROM_GYRO_CALIB_Z	( Int8U *)11U
 
 
 #define VAL_EEPROM_CHECK_OK			0U
@@ -20,13 +20,13 @@
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 //Fonction de lecture eeprom
-static Int8U DrvEepromReadByte ( Int8U addr );
+static Int8U DrvEepromReadByte ( const Int8U * addr );
 //Fonction d ecriture eeprom
-static void DrvEepromWriteByte ( Int8U addr, Int8U byte);
+static void DrvEepromWriteByte ( Int8U * addr, Int8U byte);
 //Fonction de lecture eeprom
-static Int16U DrvEepromReadShort( Int8U addr );
+static Int16U DrvEepromReadShort( const Int8U * addr );
 //Fonction d ecriture eeprom
-static void DrvEepromWriteShort ( Int8U addr, Int16U byte);
+static void DrvEepromWriteShort ( Int8U *addr, Int16U byte);
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 static Boolean eeprom_est_configure;
 
@@ -36,11 +36,11 @@ static Boolean eeprom_est_configure;
 Boolean DrvEepromInit ( void )
 {
 	Boolean o_success = FALSE;
-	DrvEepromWriteByte(ADDR_EEPROM_CHECK_EEPROM,VAL_EEPROM_CHECK_NOK);
-	Int8U val = DrvEepromReadByte(ADDR_EEPROM_CHECK_EEPROM);
+	static Int8U val;
+	val = DrvEepromReadByte(ADDR_EEPROM_CHECK_EEPROM);
 	if( val == VAL_EEPROM_CHECK_OK )
 	{
-		eeprom_est_configure = TRUE;
+		//eeprom_est_configure = TRUE;
 		o_success = TRUE;	
 	}
 	else
@@ -96,30 +96,30 @@ void DrvEepromWriteGyro ( Int16S calib[ 3U ] )
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 //Fonction de lecture eeprom
-static Int8U DrvEepromReadByte ( Int8U addr )
+static Int8U DrvEepromReadByte ( const Int8U * addr )
 {
-	return eeprom_read_byte((Int8U*)addr);
+	return eeprom_read_byte(addr);
 }
 
 //Fonction d ecriture eeprom
-static void DrvEepromWriteByte ( Int8U addr, Int8U byte)
+static void DrvEepromWriteByte ( Int8U * addr, Int8U byte)
 {
-	eeprom_write_byte((Int8U*)addr,byte);
+	eeprom_write_byte(addr,byte);
 }
 
 //Fonction de lecture eeprom
-static Int16U DrvEepromReadShort( Int8U addr )
+static Int16U DrvEepromReadShort( const Int8U * addr )
 {
 	Int16U ret = 0;
-	ret = eeprom_read_byte((Int8U*)addr) ;
+	ret = eeprom_read_byte(addr) ;
 	ret = ret << 8U ;
-	ret |= eeprom_read_byte((Int8U*)(addr + 1));
+	ret |= eeprom_read_byte((addr + 1));
 	return ret;
 }
 	
 //Fonction d ecriture eeprom
-static void DrvEepromWriteShort ( Int8U addr, Int16U byte)
+static void DrvEepromWriteShort ( Int8U *addr, Int16U byte)
 {
-	eeprom_write_byte((Int8U*)(addr), (Int8U)(byte >> 8U) );
-	eeprom_write_byte((Int8U*)(addr + 1) ,(Int8U)(byte));
+	eeprom_write_byte((addr), (Int8U)(byte >> 8U) );
+	eeprom_write_byte((addr + 1) ,(Int8U)(byte));
 }
