@@ -107,7 +107,7 @@ double SrvKalmanFilterY(double newAngle, double newRate, double dtime)
 
 /* Kalman filter variables and constants */
 const double Q_angleZ = 0.001; // Process noise covariance for the magnetometer - Sw
-const double Q_gyroZ = 0.01; // Process noise covariance for the gyro - Sw
+const double Q_gyroZ = 0.003; // Process noise covariance for the gyro - Sw
 const double R_angleZ = 0.3; // Measurement noise covariance - Sv
 
 double angleZ = 0; // The angle output from the Kalman filter

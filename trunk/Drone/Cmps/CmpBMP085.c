@@ -14,7 +14,7 @@
 #include "Drv/DrvTick.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-
+#define NB_MAX_ALT_TAB			3
 /////////////////////////////////////////PRIVATE STRUCTIURES///////////////////////////////////////
 static struct SS_BMP085
 {
@@ -32,6 +32,7 @@ static struct SS_BMP085
 		Int8U raw[4U];
 	}up; //uncompensated P
 	Int32U timeout;
+	Boolean init;
 } s_barometer;  
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
@@ -45,7 +46,10 @@ static void CmpBMP085IsrCallbackReadUP( void) ;
 static void CmpBMP085IsrCallbackReadUT( void) ;
 /////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 static Int32U pressure;
-static Int32U BaroAlt;
+
+static Int32U BaroAlt = 0U;
+static Int8U baro_index;
+static Int32U BaroAltTab[NB_MAX_ALT_TAB];
 
 
 
@@ -54,9 +58,8 @@ Boolean CmpBMP085Init( void )
 {
 	Boolean o_success = FALSE;
 	pressure = 0U;
-	BaroAlt = 0U;
+	s_barometer.init = FALSE;
 	CmpBMP085ReadCalibration();
-	CmpBMP085StartCapture();
 	o_success = TRUE;
 	return o_success;
 }
@@ -64,35 +67,36 @@ Boolean CmpBMP085Init( void )
 //Get altitude du barometre
 Int32U CmpBMP085GetAltitude( void )
 {	 
-	#define BARO_TAB_SIZE   40U
-	
-	uint8_t index;
-
-	static int16_t BaroHistTab[BARO_TAB_SIZE];
-	static int8_t BaroHistIdx;
-	static int32_t BaroHigh,BaroLow;
-	int16_t last;
-
-	last = BaroHistTab[BaroHistIdx];
-	BaroHistTab[BaroHistIdx] = BaroAlt/10;
-	BaroHigh += BaroHistTab[BaroHistIdx];
-	index = (BaroHistIdx + (BARO_TAB_SIZE/2))%BARO_TAB_SIZE;
-	BaroHigh -= BaroHistTab[index];
-	BaroLow  += BaroHistTab[index];
-	BaroLow  -= last;
-
-	BaroHistIdx++;
-	if (BaroHistIdx == BARO_TAB_SIZE) 
+	if(baro_index == NB_MAX_ALT_TAB)
 	{
-		BaroHistIdx = 0;
-	}		
-	
-	return  (BaroHigh*10/(BARO_TAB_SIZE/2));
+		for (Int8U loop = 0U; loop< NB_MAX_ALT_TAB ; loop++)
+		{
+			BaroAlt += BaroAltTab[ loop ];
+			BaroAltTab[ loop ] = 0;
+		}	
+		BaroAlt = BaroAlt / (NB_MAX_ALT_TAB + 1);
+		baro_index = 0;
+	}	
+	return BaroAlt;
 }
 
 //on start la capture du baro
 void CmpBMP085StartCapture( void )
-{
+{ 
+	if( s_barometer.init == TRUE )
+	{
+		CmpBMP085Compute();
+		pression = pressure;
+		if(baro_index < NB_MAX_ALT_TAB)
+		{
+			BaroAltTab[ baro_index ] = (1.0f - pow(pressure/101325.0f, 0.190295f)) * 443300.0f;;
+			baro_index++;
+		}
+	}
+	else
+	{
+		s_barometer.init = TRUE;
+	}
 	CmpBMP085StartUT();
 	SrvTimerAddTimer(CONF_TIMER_START_BMP085, 45U, E_TIMER_MODE_ONE_SHOT, CmpBMP085IsrCallbackReadUT);
 }
@@ -109,9 +113,6 @@ static void CmpBMP085IsrCallbackReadUT( void )
 static void CmpBMP085IsrCallbackReadUP( void)
 {
 	CmpBMP085ReadUP();
-	CmpBMP085Compute();
-	pression = pressure;
-	BaroAlt = (1.0f - pow(pressure/101325.0f, 0.190295f)) * 443300.0f;
 	SrvTimerStopTimer(CONF_TIMER_START_BMP085);
 }	
 
@@ -124,7 +125,8 @@ static void CmpBMP085ReadCalibration( void )
   DrvTwiReadRegBuf(BMP085_ADDRESS, CAL_AC1, &s_barometer.ac1, s_bytes);
   // now fix endianness
   int16_t *p;
-  for (p = &s_barometer.ac1; p <= &s_barometer.md; p++) {
+  for (p = &s_barometer.ac1; p <= &s_barometer.md; p++)
+  {
     swap_endianness(p, sizeof(*p));
   }
 }

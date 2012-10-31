@@ -17,7 +17,7 @@
 
 #define BMA180_CHIP_ID		0x03
 
-#define BMA180_ACC_1G		255
+#define BMA180_ACC_1G		256
 
 #define BMA180_REG_CHIP_ID		0x00
 #define BMA180_REG_ACC_X_LSB	0x02
