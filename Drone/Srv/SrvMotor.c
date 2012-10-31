@@ -54,8 +54,8 @@ void SrvMotorUpdate(Int16S roulis, Int16S tangage,Int16S lacet)
 		frontMotor_L = constrain(throttle + tangage /*+ roulis*/ - lacet, OFFCOMMAND, MAXCOMMAND);
 		
 		DrvServoMoveToPosition(0,(rearMotor_R -OFFCOMMAND)/10);
-		//DrvServoMoveToPosition(1,(frontMotor_R-OFFCOMMAND)/10);
-		//DrvServoMoveToPosition(2,(rearMotor_L -OFFCOMMAND)/10);
+		DrvServoMoveToPosition(1,(frontMotor_R-OFFCOMMAND)/10);
+		DrvServoMoveToPosition(2,(rearMotor_L -OFFCOMMAND)/10);
 		DrvServoMoveToPosition(3,(frontMotor_L-OFFCOMMAND)/10);
 	}
 	else

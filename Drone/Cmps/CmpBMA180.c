@@ -12,10 +12,10 @@
 #include "Drv/DrvEeprom.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-#define NB_SAMPLE_TO_CALIB_BMA180	100
+#define NB_SAMPLE_TO_CALIB_BMA180	100U
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
-Int8U loop_calibration_bma180 = 0;
-static Int16S accel_calib[3] = {0,0,0};
+Int8U loop_calibration_bma180 = 0U;
+static Int16S accel_calib[ 3U ] = { 0U, 0U, 0U };
 	
  ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
@@ -32,7 +32,7 @@ Boolean CmpBMA180Init(void)
 	{
 		DrvTimerDelayUs(200);
 		//Write on EEPROM enable
-		DrvTwiWriteReg(BMA180_ADDRESS,BMA180_REG_CTRL_REG0,1<<4);
+		DrvTwiWriteReg(BMA180_ADDRESS,BMA180_REG_CTRL_REG0, 1U<<4U );
 		DrvTimerDelayUs(200);
 		//Bandwidth filters: 20Hz
 		control = DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_BW_TCS);
@@ -99,28 +99,28 @@ Boolean CmpBMA180GetAcceleration(S_Acc_Angle *acc)
 		acc->y = (Int16S)(((buffer[3]<<8) | buffer[2])/16);
 		acc->z = (Int16S)(((buffer[5]<<8) | buffer[4])/16);
 		
-		if(loop_calibration_bma180 > 0)
+		if(loop_calibration_bma180 > 0U)
 		{
-			if( loop_calibration_bma180 == 1 )
+			if( loop_calibration_bma180 == 1U )
 			{
-				accel_calib[0] = accel_calib[0] / NB_SAMPLE_TO_CALIB_BMA180;
-				accel_calib[1] = accel_calib[1] / NB_SAMPLE_TO_CALIB_BMA180;
-				accel_calib[2] = accel_calib[2] / NB_SAMPLE_TO_CALIB_BMA180;
-				accel_calib[2] -= BMA180_ACC_1G;
+				accel_calib[0U] = accel_calib[0U] / (NB_SAMPLE_TO_CALIB_BMA180);
+				accel_calib[1U] = accel_calib[1U] / (NB_SAMPLE_TO_CALIB_BMA180);
+				accel_calib[2U] = accel_calib[2U] / (NB_SAMPLE_TO_CALIB_BMA180);
+				accel_calib[2U] -= BMA180_ACC_1G;
 			}
 			else
 			{
-				accel_calib[0] += acc->x;
-				accel_calib[1] += acc->y;
-				accel_calib[2] += acc->z;
+				accel_calib[0U] += acc->x;
+				accel_calib[1U] += acc->y;
+				accel_calib[2U] += acc->z;
 			}
 			loop_calibration_bma180--;
 		}
 		else
 		{
-			acc->x  -= accel_calib[0];
-			acc->y  -= accel_calib[1];
-			acc->z  -= accel_calib[2];
+			acc->x  -= accel_calib[0U];
+			acc->y  -= accel_calib[1U];
+			acc->z  -= accel_calib[2U];
 		}
 		return TRUE;
 	}

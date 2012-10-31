@@ -106,10 +106,11 @@ void SrvImuDispatcher (Event_t in_event)
 		// ********************* Fusion des capteurs ******************************
 		imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle ) * 10U;
 		imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle ) * 10U;
-		imu_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
+		//imu_reel.lacet= SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
+		imu_reel.lacet= gyroZAngle;		
 		
-		//imu_reel.altitude = SrvKalmanFilterAlt( alti_moy, (accZangle - BMA180_ACC_1G)/16U , temp_dernier_cycle );
 		imu_reel.altitude = CmpBMP085GetAltitude(); //+ (accZangle - BMA180_ACC_1G);
+		imu_reel.altitude = SrvKalmanFilterAlt( imu_reel.altitude, (accZangle - BMA180_ACC_1G), temp_dernier_cycle );
 		imu_reel.altitude -= altitude_depart;
 		
 		// ********************* PID **********************************************
@@ -270,7 +271,7 @@ static void SrvImuComputeSensors(Int32U interval)
 		magnet.z *= -1;	
 
 		//on doit etre en dessous des 40 deg
-		if(!(accXangle > 10 && accXangle < -10 && accYangle > 10 && accYangle < -10))
+		if(!(accXangle > 10 || accXangle < -10 || accYangle > 10 || accYangle < -10))
 		{
 			//compensation avec l'accelerometre
 			float cosRoll = cos(ToRad(accYangle));
