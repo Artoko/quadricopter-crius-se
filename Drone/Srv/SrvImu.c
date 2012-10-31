@@ -106,11 +106,11 @@ void SrvImuDispatcher (Event_t in_event)
 		// ********************* Fusion des capteurs ******************************
 		imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle ) * 10U;
 		imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle ) * 10U;
-		//imu_reel.lacet= SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
-		imu_reel.lacet= gyroZAngle;		
+		//imu_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
+		imu_reel.lacet    = direction;		
 		
 		imu_reel.altitude = CmpBMP085GetAltitude(); //+ (accZangle - BMA180_ACC_1G);
-		imu_reel.altitude = SrvKalmanFilterAlt( imu_reel.altitude, (accZangle - BMA180_ACC_1G), temp_dernier_cycle );
+		//imu_reel.altitude = SrvKalmanFilterAlt( imu_reel.altitude, (accZangle - BMA180_ACC_1G), temp_dernier_cycle );
 		imu_reel.altitude -= altitude_depart;
 		
 		// ********************* PID **********************************************
@@ -245,18 +245,18 @@ static void SrvImuComputeSensors(Int32U interval)
 		rotation.z *= -1;
 			
 		gyroRate				=	(float)(rotation.x / 14.375) ;
-		gyroYAngle	+=	(float)((float)((gyroRate * interval) / 100000));
+		gyroYAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
 		
 		gyroRate				=	rotation.y / 14.375 ;
-		gyroXAngle	+=	(float)((float)((gyroRate * interval) / 100000));
+		gyroXAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
 		
 		gyroRate				=	rotation.z / 14.375 ;
-		gyroZAngle	+=	(float)((float)((gyroRate * interval) / 100000));
+		gyroZAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
 		if(gyroZAngle < 0)
 		{
 			gyroZAngle += 360.0;
 		}
-		if(gyroZAngle > 360)
+		else if(gyroZAngle > 360)
 		{
 			gyroZAngle -= 360.0;
 		}
@@ -266,12 +266,13 @@ static void SrvImuComputeSensors(Int32U interval)
 	if(CmpHMC5883GetHeading(&magnet) != FALSE)
 	{
 		//#define MAG_ORIENTATION(X, Y, Z)  {magADC[ROLL]  =  X; magADC[PITCH]  =  Y; magADC[YAW]  = -Z;}
-		magnet.x *= 1;
+		magnet.x *= -1;
 		magnet.y *= 1;
 		magnet.z *= -1;	
 
+		
 		//on doit etre en dessous des 40 deg
-		if(!(accXangle > 10 || accXangle < -10 || accYangle > 10 || accYangle < -10))
+		if(!(accXangle > 40 || accXangle < -40 || accYangle > 40 || accYangle < -40))
 		{
 			//compensation avec l'accelerometre
 			float cosRoll = cos(ToRad(accYangle));
@@ -281,7 +282,7 @@ static void SrvImuComputeSensors(Int32U interval)
 			
 			float Xh = magnet.x * cosPitch + magnet.z * sinPitch;
 			float Yh = magnet.x * sinRoll * sinPitch + magnet.y * cosRoll - magnet.z * sinRoll * cosPitch;		
-			float heading = atan2(Yh, Xh) + (LOCAL_MAGNETIC_DECLINAISON / 1000);
+			float heading = atan2(Yh, Xh) - (LOCAL_MAGNETIC_DECLINAISON / 1000);
 			if(heading < 0)
 			{
 				heading += 2*M_PI;
@@ -291,7 +292,7 @@ static void SrvImuComputeSensors(Int32U interval)
 				heading -= 2*M_PI;
 			}
 			direction = ToDeg(heading);
-		}	
+		}
 	}
 }
 

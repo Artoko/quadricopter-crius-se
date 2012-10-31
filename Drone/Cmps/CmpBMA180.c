@@ -12,10 +12,10 @@
 #include "Drv/DrvEeprom.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-#define NB_SAMPLE_TO_CALIB_BMA180	100U
+#define NB_SAMPLE_TO_CALIB_BMA180	100
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 Int8U loop_calibration_bma180 = 0U;
-static Int16S accel_calib[ 3U ] = { 0U, 0U, 0U };
+static Int16S accel_calib[ 3U ] = { 0, 0, 0 };
 	
  ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
@@ -59,9 +59,9 @@ Boolean CmpBMA180Init(void)
 		if(conf == FALSE)	
 		{
 			loop_calibration_bma180 = NB_SAMPLE_TO_CALIB_BMA180;
-			accel_calib[0] = 0;
-			accel_calib[1] = 0;
-			accel_calib[2] = 0;
+			accel_calib[0U] = 0;
+			accel_calib[1U] = 0;
+			accel_calib[2U] = 0;
 		}	
 		else
 		{
@@ -87,25 +87,25 @@ Boolean CmpBMA180IsCalibrate(void)
 //Rotation X Y Z
 Boolean CmpBMA180GetAcceleration(S_Acc_Angle *acc)
 {
-	Int8U buffer[ 6U ] = {0U, 0U, 0U, 0U, 0U, 0U};
+	Int8U buffer[ 6U ] = { 0, 0, 0, 0, 0, 0 };
 
-	if(DrvTwiReadRegBuf(BMA180_ADDRESS, BMA180_REG_ACC_X_LSB, buffer, 6U) != 6U)
+	if( DrvTwiReadRegBuf( BMA180_ADDRESS, BMA180_REG_ACC_X_LSB, buffer, 6U ) != 6U )
 	{
 		return FALSE;
 	}
 	else
 	{
-		acc->x = (Int16S)(((buffer[1]<<8) | buffer[0])/16);
-		acc->y = (Int16S)(((buffer[3]<<8) | buffer[2])/16);
-		acc->z = (Int16S)(((buffer[5]<<8) | buffer[4])/16);
+		acc->x = (Int16S)(((buffer[1U]<<8) | buffer[0U])/16);
+		acc->y = (Int16S)(((buffer[3U]<<8) | buffer[2U])/16);
+		acc->z = (Int16S)(((buffer[5U]<<8) | buffer[4U])/16);
 		
 		if(loop_calibration_bma180 > 0U)
 		{
 			if( loop_calibration_bma180 == 1U )
 			{
-				accel_calib[0U] = accel_calib[0U] / (NB_SAMPLE_TO_CALIB_BMA180);
-				accel_calib[1U] = accel_calib[1U] / (NB_SAMPLE_TO_CALIB_BMA180);
-				accel_calib[2U] = accel_calib[2U] / (NB_SAMPLE_TO_CALIB_BMA180);
+				accel_calib[0U] = accel_calib[0U] / (NB_SAMPLE_TO_CALIB_BMA180 - 1);
+				accel_calib[1U] = accel_calib[1U] / (NB_SAMPLE_TO_CALIB_BMA180 - 1);
+				accel_calib[2U] = accel_calib[2U] / (NB_SAMPLE_TO_CALIB_BMA180 - 1);
 				accel_calib[2U] -= BMA180_ACC_1G;
 			}
 			else
