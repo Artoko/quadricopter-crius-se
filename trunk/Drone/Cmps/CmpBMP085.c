@@ -94,14 +94,14 @@ Int32U CmpBMP085GetAltitude( void )
 void CmpBMP085StartCapture( void )
 {
 	CmpBMP085StartUT();
-	SrvTimerAddTimer(CONF_TIMER_START_BMP085_1, 45U, E_TIMER_MODE_ONE_SHOT, CmpBMP085IsrCallbackReadUT);
+	SrvTimerAddTimer(CONF_TIMER_START_BMP085, 45U, E_TIMER_MODE_ONE_SHOT, CmpBMP085IsrCallbackReadUT);
 }
 
 //fct appele par le timer
 static void CmpBMP085IsrCallbackReadUT( void )
 {
 	CmpBMP085ReadUT();
-	SrvTimerAddTimer(CONF_TIMER_START_BMP085_2, 140U, E_TIMER_MODE_ONE_SHOT, CmpBMP085IsrCallbackReadUP);
+	SrvTimerReloadTimer(CONF_TIMER_START_BMP085, 140U, E_TIMER_MODE_ONE_SHOT, CmpBMP085IsrCallbackReadUP);
 	CmpBMP085StartUP();
 }
 
@@ -112,6 +112,7 @@ static void CmpBMP085IsrCallbackReadUP( void)
 	CmpBMP085Compute();
 	pression = pressure;
 	BaroAlt = (1.0f - pow(pressure/101325.0f, 0.190295f)) * 443300.0f;
+	SrvTimerStopTimer(CONF_TIMER_START_BMP085);
 }	
 
 //read all value

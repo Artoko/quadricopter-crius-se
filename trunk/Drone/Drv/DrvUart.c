@@ -41,7 +41,7 @@
 	volatile Boolean start_frame_uart_1 = FALSE;
 #endif
 
-STrame ma_trame;
+STrame trame_uart;
   
 /////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 // Init du Drv Uart 
@@ -67,27 +67,27 @@ void DrvUartInit( )
 		UCSR1C|= (1<<UCSZ11);  
 	#endif
 		
-	ma_trame.param[PARAM_0] = 0;
-	ma_trame.param[PARAM_1] = 0;
-	ma_trame.param[PARAM_2] = 0;			
-	ma_trame.param[PARAM_3] = 0;
-	ma_trame.param[PARAM_4] = 0;
+	trame_uart.param[PARAM_0] = 0;
+	trame_uart.param[PARAM_1] = 0;
+	trame_uart.param[PARAM_2] = 0;			
+	trame_uart.param[PARAM_3] = 0;
+	trame_uart.param[PARAM_4] = 0;
 }
 
 //on recupere le message
 void DrvUart0ReadMessage( STrame *trame )
 {
-	trame->param[PARAM_0] = ma_trame.param[PARAM_0] ;
-	trame->param[PARAM_1] = ma_trame.param[PARAM_1] ;
-	trame->param[PARAM_2] = ma_trame.param[PARAM_2] ;
-	trame->param[PARAM_3] = ma_trame.param[PARAM_3] ;
-	trame->param[PARAM_4] = ma_trame.param[PARAM_4] ;
+	trame->param[PARAM_0] = trame_uart.param[PARAM_0] ;
+	trame->param[PARAM_1] = trame_uart.param[PARAM_1] ;
+	trame->param[PARAM_2] = trame_uart.param[PARAM_2] ;
+	trame->param[PARAM_3] = trame_uart.param[PARAM_3] ;
+	trame->param[PARAM_4] = trame_uart.param[PARAM_4] ;
 		
-	ma_trame.param[PARAM_0] = 0;
-	ma_trame.param[PARAM_1] = 0;
-	ma_trame.param[PARAM_2] = 0;			
-	ma_trame.param[PARAM_3] = 0;
-	ma_trame.param[PARAM_4] = 0;
+	trame_uart.param[PARAM_0] = 0;
+	trame_uart.param[PARAM_1] = 0;
+	trame_uart.param[PARAM_2] = 0;			
+	trame_uart.param[PARAM_3] = 0;
+	trame_uart.param[PARAM_4] = 0;
 }
 //on recupere le message
 void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
@@ -181,7 +181,7 @@ ISR(USART_RX_vect)
 			ctr_buff_uart_0++;	
 			
 			
-			if( buff_uart_0[ctr_buff_uart_0 - 1U] == '#' )
+			if(( buff_uart_0[ctr_buff_uart_0 - 1U] == '#' ) && ( rcv_byte == '#' ))
 			{
 				//on attend le start frame
 				start_frame_uart_0 = FALSE;
@@ -210,8 +210,8 @@ ISR(USART_RX_vect)
 					}
 					else
 					{
-						ma_trame.param[index_param] *= decade;
-						ma_trame.param[index_param] += (buff_uart_0[ctr_buff_uart_0 - 1U] - 0x30);
+						trame_uart.param[index_param] *= decade;
+						trame_uart.param[index_param] += (buff_uart_0[ctr_buff_uart_0 - 1U] - 0x30);
 						decade = 10;
 					}
 				}				

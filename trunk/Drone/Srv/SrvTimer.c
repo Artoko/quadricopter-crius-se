@@ -13,10 +13,11 @@
 //structure configuration initial des leds
 typedef struct SSTimer
 {
-	volatile Boolean enable;
-	volatile Int16U delay;
-	volatile Int16U cpt_delay;
-	volatile ETimerMode mode;
+	Boolean enable;
+	Int16U delay;
+	Int16U cpt_delay;
+	ETimerMode mode;
+	Boolean reload;
 	ptrfct_Isr_Callback_Timer ptrfct;
 } STimer ;
 
@@ -28,6 +29,7 @@ typedef struct SSTimer
 							.cpt_delay = 0U,\
 							.mode = E_TIMER_MODE_NONE,\
 							.ptrfct = NULL,\
+							.reload = NULL,\
 						}\
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
@@ -55,6 +57,7 @@ void SrvTimerInit( void )
 	for(Int8U loop_index = 0U; loop_index < CONF_TIMER_NB ; loop_index++ )
 	{
 		MesTimer[ loop_index ].enable = FALSE;
+		MesTimer[ loop_index ].reload = FALSE;
 		MesTimer[ loop_index ].ptrfct = NULL;
 	}		
 	//on init le timer system a 1 ms
@@ -75,6 +78,18 @@ void SrvTimerAddTimer( Int8U index_timer, Int16U delay_100us, ETimerMode mode, p
 	MesTimer[ index_timer ].mode = mode;
 	MesTimer[ index_timer ].ptrfct = ptrfct;
 	MesTimer[ index_timer ].enable = TRUE;
+	MesTimer[ index_timer ].reload = FALSE;
+}
+
+//fct qui reparametre le timer
+void SrvTimerReloadTimer( Int8U index_timer, Int16U delay_100us, ETimerMode mode, ptrfct_Isr_Callback_Timer ptrfct )
+{
+	MesTimer[ index_timer ].delay = delay_100us;
+	MesTimer[ index_timer ].cpt_delay = 0U;
+	MesTimer[ index_timer ].mode = mode;
+	MesTimer[ index_timer ].ptrfct = ptrfct;
+	MesTimer[ index_timer ].enable = TRUE;
+	MesTimer[ index_timer ].reload = TRUE;
 }
 
 //fct qui met en pause le timer
@@ -91,6 +106,7 @@ void SrvTimerStopTimer( Int8U index_timer )
 	MesTimer[ index_timer ].cpt_delay = 0U;
 	MesTimer[ index_timer ].mode      = E_TIMER_MODE_NONE;
 	MesTimer[ index_timer ].ptrfct    = NULL;
+	MesTimer[ index_timer ].reload	  = FALSE;
 }
 
 //fct qui reseter le timer
@@ -181,12 +197,16 @@ ISR(TIMER2_COMPA_vect)
 					{
 						MesTimer[ loop_index ].ptrfct();
 					}
+					
 					//si on est en mode ONE SHOT 
 					//on vient d'excecuter la fct
 					if (MesTimer[ loop_index ].mode == E_TIMER_MODE_ONE_SHOT)
 					{
-						//on reinit le timer
-						SrvTimerStopTimer( loop_index );
+						if( MesTimer[ loop_index ].reload == FALSE )
+						{
+							//on reinit le timer
+							SrvTimerStopTimer( loop_index );
+						}
 					}
 				}
 			}
