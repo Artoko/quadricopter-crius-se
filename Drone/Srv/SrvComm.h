@@ -18,7 +18,7 @@
 
 
 //init des moteurs
-void SrvCommInit (void)  ;
+Boolean SrvCommInit (void)  ;
 //dispatcher d'evenements
 void SrvCommDispatcher (Event_t in_event) ;
 

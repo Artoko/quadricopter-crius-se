@@ -151,74 +151,80 @@ void DrvUart1SendMessage(Char *i_message,Int8U i_message_len )
 
 
 /////////////////////////////////////ISR PRIVATE FUNCTIONS////////////////////////////////////////
+
+#ifdef USE_UART_0	
 //UART0
 //-------------------
 //ISR uart octet recu
-Int8U decade = 1U;
-Int8U index_param = 0U;
+volatile Int8U decade = 1U;
+volatile Int8U index_param = 0U;
+volatile Char rcv_byte = 0U;
+volatile Char last_rcv_byte = 0U;
 ISR(USART_RX_vect)
 {
-	#ifdef USE_UART_0	
-		Int8U rcv_byte = 0U;
-		//on enregistre l'octet recu
-		rcv_byte = UDR0;
-		//si on a deja recu le start frame
-		if( start_frame_uart_0 == FALSE )
-        {
-			//si c'est un debut de trame
-			if(rcv_byte == '*' )
-			{
-				buff_uart_0[ 0U ] = '*';
-				ctr_buff_uart_0 = 1U;
-				//on a recu le start frame
-				start_frame_uart_0 = TRUE;
-			}
+	//on enregistre l'octet recu
+	rcv_byte = UDR0;
+	//si on a deja recu le start frame
+	if( start_frame_uart_0 == FALSE )
+    {
+		//si c'est un debut de trame
+		if(rcv_byte == '*' )
+		{
+			buff_uart_0[ 0U ] = '*';
+			ctr_buff_uart_0 = 1U;
+			//on a recu le start frame
+			start_frame_uart_0 = TRUE;
+		}
+	}
+	else
+	{
+		//on charge le message dans le buff_uart_0
+		buff_uart_0[ctr_buff_uart_0] = rcv_byte;
+		last_rcv_byte = buff_uart_0[ctr_buff_uart_0 - 1U];
+		ctr_buff_uart_0++;	
+			
+		//si fin de trame
+		if(( last_rcv_byte == '#' ) && ( rcv_byte == '#' ))
+		{
+			//on attend le start frame
+			start_frame_uart_0 = FALSE;
+			index_param = 0;
+			decade = 1U;
+			//on lance l'event
+			DrvEventAddEvent( CONF_EVENT_MSG_RCV );
 		}
 		else
 		{
-			//on charge le message dans le buff_uart_0
-			buff_uart_0[ctr_buff_uart_0] = rcv_byte;
-			ctr_buff_uart_0++;	
-			
-			
-			if(( buff_uart_0[ctr_buff_uart_0 - 1U] == '#' ) && ( rcv_byte == '#' ))
+			//si on a pas recu de nouvelle '*'
+			if(rcv_byte == '*' )
 			{
 				//on attend le start frame
 				start_frame_uart_0 = FALSE;
 				index_param = 0;
 				decade = 1U;
-				//on lance l'event
-				DrvEventAddEvent( CONF_EVENT_MSG_RCV );
 			}
 			else
 			{
-				//si on a pas recu de nouvelle '*'
-				if(rcv_byte == '*' )
+				//on discossie les params
+				if( last_rcv_byte == '-' )
 				{
-					//on attend le start frame
-					start_frame_uart_0 = FALSE;
-					index_param = 0;
+					index_param++;
 					decade = 1U;
 				}
 				else
 				{
-					//on discossie les params
-					if( buff_uart_0[ctr_buff_uart_0 - 1U] == '-' )
-					{
-						index_param++;
-						decade = 1U;
-					}
-					else
+					if(last_rcv_byte != '*')
 					{
 						trame_uart.param[index_param] *= decade;
-						trame_uart.param[index_param] += (buff_uart_0[ctr_buff_uart_0 - 1U] - 0x30);
-						decade = 10;
+						trame_uart.param[index_param] += (last_rcv_byte - 0x30U);
+						decade = 10U;
 					}
-				}				
-			}		
+				}
+			}				
 		}		
-	#endif
-}
+	}	
+}	
+#endif
 
 //ISR uart octet envoyé 
 ISR(USART_TX_vect)

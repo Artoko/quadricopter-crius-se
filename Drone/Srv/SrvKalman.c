@@ -15,7 +15,7 @@
 /* Kalman filter variables and constants */
 const double Q_angleX = 0.001; // Process noise covariance for the accelerometer - Sw
 const double Q_gyroX = 0.003; // Process noise covariance for the gyro - Sw
-const double R_angleX = 0.3; // Measurement noise covariance - Sv
+const double R_angleX = 0.03; // Measurement noise covariance - Sv
 
 double angleX = 0; // The angle output from the Kalman filter
 double biasX = 0; // The gyro bias calculated by the Kalman filter
@@ -26,7 +26,7 @@ double KX_0, KX_1;
 ////////////////////////////////////////PUBLIC FONCTIONS////////////////////////////////////////
 double SrvKalmanFilterX(double newAngle, double newRate, double dtime)
 {
-	dtX = dtime / 10000; // Convert from microseconds to seconds
+	dtX = dtime / 10000.0; // Convert from microseconds to seconds
 
 	// Discrete Kalman filter time update equations - Time Update ("Predict")
 	// Update xhat - Project the state ahead
@@ -61,7 +61,7 @@ double SrvKalmanFilterX(double newAngle, double newRate, double dtime)
 /* Kalman filter variables and constants */
 const double Q_angleY = 0.001; // Process noise covariance for the accelerometer - Sw
 const double Q_gyroY = 0.003; // Process noise covariance for the gyro - Sw
-const double R_angleY = 0.3; // Measurement noise covariance - Sv
+const double R_angleY = 0.03; // Measurement noise covariance - Sv
 
 double angleY = 0; // The angle output from the Kalman filter
 double biasY = 0; // The gyro bias calculated by the Kalman filter
@@ -71,7 +71,7 @@ double KY_0, KY_1;
 
 double SrvKalmanFilterY(double newAngle, double newRate, double dtime)
 {
-	dtY = dtime / 10000; // Convert from microseconds to seconds
+	dtY = dtime / 10000.0; // Convert from microseconds to seconds
 
 	// Discrete Kalman filter time update equations - Time Update ("Predict")
 	// Update xhat - Project the state ahead
@@ -108,7 +108,7 @@ double SrvKalmanFilterY(double newAngle, double newRate, double dtime)
 /* Kalman filter variables and constants */
 const double Q_angleZ = 0.001; // Process noise covariance for the magnetometer - Sw
 const double Q_gyroZ = 0.003; // Process noise covariance for the gyro - Sw
-const double R_angleZ = 0.3; // Measurement noise covariance - Sv
+const double R_angleZ = 0.03; // Measurement noise covariance - Sv
 
 double angleZ = 0; // The angle output from the Kalman filter
 double biasZ = 0; // The gZro bias calculated bZ the Kalman filter
@@ -118,7 +118,7 @@ double KZ_0, KZ_1;
 
 double SrvKalmanFilterZ(double newAngle, double newRate, double dtime)
 {
-	dtZ = dtime / 10000; // Convert from microseconds to seconds
+	dtZ = dtime / 10000.0; // Convert from microseconds to seconds
 
 	// Discrete Kalman filter time update equations - Time Update ("Predict")
 	// Update xhat - Project the state ahead
@@ -154,7 +154,7 @@ double SrvKalmanFilterZ(double newAngle, double newRate, double dtime)
 /* Kalman filter variables and constants */
 const double Q_baroALT = 0.001; // Process noise covariance for the barometer - Sw
 const double Q_accelALT = 0.003; // Process noise covariance for the accelerometer - Sw
-const double R_angleALT = 0.3; // Measurement noise covariance - Sv
+const double R_angleALT = 0.03; // Measurement noise covariance - Sv
 
 double angleALT = 0; // The angle output from the Kalman filter
 double biasALT = 0; // The gZro bias calculated bZ the Kalman filter
@@ -164,7 +164,7 @@ double KALT_0, KALT_1;
 
 double SrvKalmanFilterAlt(double newAngle, double newRate, double dtime)
 {
-	dtALT = dtime / 10000; // Convert from microseconds to seconds
+	dtALT = dtime / 10000.0; // Convert from microseconds to seconds
 
 	// Discrete Kalman filter time update equations - Time Update ("Predict")
 	// Update xhat - Project the state ahead

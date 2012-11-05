@@ -22,10 +22,10 @@ void SrvMotorInit (void) ;
 void SrvMotorUpdate(Int16S roulis, Int16S tangage,Int16S lacet) ;
 
 //applique une vittesse aux moteurs
-void SrvMotorApplyAbsoluteSpeed(Int8U speed) ;
+Boolean SrvMotorApplyAbsoluteSpeed(Int16U speed) ;
 
 //applique une vittesse aux moteurs
-void SrvMotorApplyRelativeSpeed(Int8U speed);
+Boolean SrvMotorApplyRelativeSpeed(Int16U speed);
 
 //recupere une vittesse des moteurs
 Int16U SrvMotorGetSpeed( void ) ;

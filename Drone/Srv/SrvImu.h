@@ -22,7 +22,7 @@
 
 
 ////////////////////////////////////////PUBLIC FONCTIONS/////////////////////////////////////////
-void SrvImuInit( void );
+Boolean SrvImuInit( void );
 void SrvImuDispatcher (Event_t in_event);
 void SrvImuSensorsCalibration( void );
 void SrvImuSensorsSetAltitudeDepart( void );

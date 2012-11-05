@@ -5,83 +5,101 @@
  *  Author: berryer
  */ 
 
+/////////////////////////////////////////////INCLUDES/////////////////////////////////////////////
+#include "Conf/conf_hard.h"
+
 #include "SrvMotor.h"
 
 #include "Drv/DrvUart.h"
 #include "Drv/DrvServo.h"
 #include "Drv/DrvTick.h"
 
+////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
+#define OFFCOMMAND 1000U
+#define MAXCOMMAND 2000U
+
+////////////////////////////////////////PRIVATE STRUCTIURES///////////////////////////////////////
+
+////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
+
+////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
+static Int16U frontMotor_R	= 0U;
+static Int16U frontMotor_L	= 0U;
+static Int16U rearMotor_R	= 0U;
+static Int16U rearMotor_L	= 0U;
+static Int16U throttle		= 0U;
 
 
-#define OFFCOMMAND 1000
-#define MAXCOMMAND 2000
-
-
-static Int16U frontMotor_R = 0U;
-static Int16U frontMotor_L = 0U;
-static Int16U rearMotor_R = 0U;
-static Int16U rearMotor_L = 0U;
-
-static Int16U throttle = 0U;
-
-
-
-//init des moteurs
+/************************************************************************/
+/* init des moteurs                                                     */
+/************************************************************************/
 void SrvMotorInit (void) 
 {
 	//init des variateurs brushless
 	DrvServo();
 	throttle = OFFCOMMAND;
+	return TRUE;
 }	
 
-
-//Commande des moteurs en fonction de l'angle
+/************************************************************************/
+/*Commande des moteurs en fonction de l'angle                           */
+/************************************************************************/
 void SrvMotorUpdate(Int16S roulis, Int16S tangage,Int16S lacet)
 {
 	if( throttle > OFFCOMMAND)
 	{
 		#define QUAD_X_MIX(X,Y,Z) (throttle + roulis * X + tangage * Y + lacet * lacet * Z)
-		// Calculate motor commands
-		/*
-		rearMotor_R	= constrain(QUAD_X_MIX(-1,+1,+1), OFFCOMMAND, MAXCOMMAND);
-		frontMotor_R = constrain(QUAD_X_MIX(-1,-1,-1), OFFCOMMAND, MAXCOMMAND);
-		rearMotor_L  = constrain(QUAD_X_MIX(+1,+1,-1), OFFCOMMAND, MAXCOMMAND);
-		frontMotor_L = constrain(QUAD_X_MIX(+1,-1,+1), OFFCOMMAND, MAXCOMMAND);
-		*/
+		// calcul de la vitesse pour chaque moteur
 		rearMotor_R	 = constrain(throttle - tangage /*- roulis*/ - lacet, OFFCOMMAND, MAXCOMMAND);
-		//frontMotor_R = constrain(throttle + roulis + tangage + lacet, OFFCOMMAND, MAXCOMMAND);
-		//rearMotor_L  = constrain(throttle - roulis - tangage + lacet, OFFCOMMAND, MAXCOMMAND);
+		frontMotor_R = constrain(throttle + roulis + tangage + lacet, OFFCOMMAND, MAXCOMMAND);
+		rearMotor_L  = constrain(throttle - roulis - tangage + lacet, OFFCOMMAND, MAXCOMMAND);
 		frontMotor_L = constrain(throttle + tangage /*+ roulis*/ - lacet, OFFCOMMAND, MAXCOMMAND);
 		
-		DrvServoMoveToPosition(0,(rearMotor_R -OFFCOMMAND)/10);
-		DrvServoMoveToPosition(1,(frontMotor_R-OFFCOMMAND)/10);
-		DrvServoMoveToPosition(2,(rearMotor_L -OFFCOMMAND)/10);
-		DrvServoMoveToPosition(3,(frontMotor_L-OFFCOMMAND)/10);
+		DrvServoMoveToPosition( 0U , (rearMotor_R  - OFFCOMMAND) );
+		DrvServoMoveToPosition( 1U , (frontMotor_R - OFFCOMMAND) );
+		DrvServoMoveToPosition( 2U , (rearMotor_L  - OFFCOMMAND) );
+		DrvServoMoveToPosition( 3U , (frontMotor_L - OFFCOMMAND) );
 	}
 	else
 	{
-		//on met tout les moteurs à zeros
-		DrvServoMoveToPosition(0,0);
-		DrvServoMoveToPosition(1,0);
-		DrvServoMoveToPosition(2,0);
-		DrvServoMoveToPosition(3,0);
+		//on met la vitesse de tout les moteurs à zeros 
+		DrvServoMoveToPosition( 0U , 0U );
+		DrvServoMoveToPosition( 1U , 0U );
+		DrvServoMoveToPosition( 2U , 0U );
+		DrvServoMoveToPosition( 3U , 0U );
 	}
 }	
 
-//recupere une vitesse des moteurs
+
+/************************************************************************/
+/*recupere la vitesse des moteurs                                       */
+/************************************************************************/
 Int16U SrvMotorGetSpeed( void ) 
 {
 	return throttle;
 }
 
-//applique une vitesse aux moteurs
-void SrvMotorApplyAbsoluteSpeed(Int8U speed)
+/************************************************************************/
+/*applique une vitesse absolue aux moteurs                              */
+/************************************************************************/
+Boolean SrvMotorApplyAbsoluteSpeed(Int16U speed)
 {
-	throttle = (speed * 10U) + OFFCOMMAND;
+	if( speed <= OFFCOMMAND )
+	{
+		throttle = speed + OFFCOMMAND;
+	}
+	return TRUE;
 }
 
-//applique une vitesse aux moteurs
-void SrvMotorApplyRelativeSpeed(Int8U speed)
+/************************************************************************/
+/*applique une vitesse relative aux moteurs                             */
+/************************************************************************/
+Boolean SrvMotorApplyRelativeSpeed(Int16U speed)
 {
-	throttle += speed;
+	//la somme doit etre inferieur 
+	if( (throttle + speed) <= MAXCOMMAND )
+	{
+		throttle += speed;
+	}
+	return TRUE;
 }

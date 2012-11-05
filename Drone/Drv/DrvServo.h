@@ -15,15 +15,18 @@
 #define MIN_ANGLE				0U      
 #define MAX_ANGLE				180U 
 
-#define PRESCALER				8U
+#define PRESCALER_NO			0U
+#define PRESCALER_1				_BV(CS10)
+#define PRESCALER_8			    _BV(CS11)
+#define PRESCALER_64			(_BV(CS11) | _BV(CS10))
+#define PRESCALER_256			_BV(CS12)
+#define PRESCALER_1024			(_BV(CS12) | _BV(CS10))
+#define PRESCALER_TX_FALL		(_BV(CS12) | _BV(CS11))
+#define PRESCALER_TX_RISE		(_BV(CS12) | _BV(CS11) | _BV(CS10))
 
 #define MIN_PULSE_WIDTH			1000U   //us  
 #define MAX_PULSE_WIDTH			2000U   //us  
- 
-#define REFRESH_INTERVAL		20000U * PRESCALER  //us
-
-#define OFFSET_TIMER			7U
-	
+ 	
 #define MAX_SERVOS				4U
 
 #define PORT_DIR_SERVO			DDRC
@@ -40,10 +43,10 @@ typedef struct {
 
 /////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 // Init du Drv Servo 
-void DrvServo( void ) ;
+Boolean DrvServo( void ) ;
 
 // bouge le servo a la position voulu en angle
-Boolean DrvServoMoveToPosition( Int8U index, Int8U angle) ;
+Boolean DrvServoMoveToPosition( Int8U index, Int16U angle) ;
 
 
 #endif /* DRV_SERVO_H_ */
