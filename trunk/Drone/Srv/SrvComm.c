@@ -23,7 +23,7 @@
 #define NB_CHAR_MAX		100U
 
 ////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
-
+//execute message entrant
 static void SrvCommExecute ( void );
 
 //on repporte les donnees
@@ -32,18 +32,22 @@ static void SrvCommRepportData( void) ;
 //passage des params de la trame
 static STrame ma_trame_comm;
 
-
-//init de la communication exterieur
-void SrvCommInit (void) 
+/************************************************************************/
+/*init de la communication                                              */
+/************************************************************************/
+Boolean SrvCommInit (void) 
 {
 	ma_trame_comm.param[PARAM_0] = 0U;
 	ma_trame_comm.param[PARAM_1] = 0U;
 	ma_trame_comm.param[PARAM_2] = 0U;
 	ma_trame_comm.param[PARAM_3] = 0U;
 	ma_trame_comm.param[PARAM_4] = 0U;
+	return TRUE;
 }	
 
-//dispatcher d'evenements
+/************************************************************************/
+/*dispatcher d'evenements                                               */
+/************************************************************************/
 void SrvCommDispatcher (Event_t in_event) 
 {
 	if( DrvEventTestEvent(in_event, CONF_EVENT_MSG_RCV))
@@ -52,8 +56,6 @@ void SrvCommDispatcher (Event_t in_event)
 		DrvUart0ReadMessage(&ma_trame_comm);
 		//dispatche trame
 		SrvCommExecute();
-		
-		//DrvUart0SendMessage("OK\n",4U);
 	}
 	
 	if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_100MS))
@@ -62,13 +64,19 @@ void SrvCommDispatcher (Event_t in_event)
 	}
 }
 
-//execute message
+/************************************************************************/
+/*execute message entrant                                               */
+/************************************************************************/
 static void SrvCommExecute ( void )
 {
 	if(ma_trame_comm.param[PARAM_0] == COMM_MOTOR )
 	{ 
-		//applique la vitesse au moteurs
-		SrvMotorApplyAbsoluteSpeed(ma_trame_comm.param[PARAM_1]);
+		//controle validité data
+		if(( ma_trame_comm.param[PARAM_1] >= 0U ) && ( ma_trame_comm.param[PARAM_1] <= 1000U ))
+		{
+			//applique la vitesse au moteurs
+			SrvMotorApplyAbsoluteSpeed(ma_trame_comm.param[PARAM_1]);
+		}
 	}
 	else if(ma_trame_comm.param[PARAM_0] == COMM_ANGLE )
 	{ 
@@ -87,8 +95,9 @@ static void SrvCommExecute ( void )
 	}
 }	
 
-
-//on repporte les donnees
+/************************************************************************/
+/*on repporte les donnees                                               */
+/************************************************************************/
 static void SrvCommRepportData( void )
 {
 	Char o_message[ 30U ];

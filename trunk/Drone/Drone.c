@@ -46,8 +46,7 @@ Int32U pression;
 Int16S temperature;
 
 int main(void)
-{
-	
+{	
 	// ********************* Interrupt Disable ****************************************
 	DrvInterruptClearAllInterrupts();
 	
@@ -76,10 +75,10 @@ int main(void)
 	DrvEepromInit();
 	
 	// ********************* PID init *************************************************
-	SrvPIDInit(0,7,0.5,-18); //roulis
-	SrvPIDInit(1,7,0.5,-18); //tangage
-	SrvPIDInit(2,10,0,0);  //lacet
-	SrvPIDInit(3,1,0,0);   //altitude
+	SrvPIDInit( 0U , 7  ,0.5 ,-18 );  //roulis
+	SrvPIDInit( 1U , 7  ,0.5 ,-18 );  //tangage
+	SrvPIDInit( 2U , 10 ,0   ,0   );  //lacet
+	SrvPIDInit( 3U , 1  ,0   ,0   );  //altitude
 	
 	// ********************* Interrupt Enable *****************************************
 	DrvInterruptSetAllInterrupts();
@@ -109,11 +108,10 @@ int main(void)
 	SrvTimerTickReset();
 	
 	// ********************* Start Heartbeat ******************************************
-	//SrvTimerAddTimer(CONF_TIMER_HEARTBEAT, 5000U, E_TIMER_MODE_PERIODIC, HeartbeatIsrCallbackTimer);
+	SrvTimerAddTimer(CONF_TIMER_HEARTBEAT, 5000U, E_TIMER_MODE_PERIODIC, HeartbeatIsrCallbackTimer);
 	
     while(TRUE)
     {			
-		
 		current_main_event = DrvEventGetEvent( current_main_event );
 		// ********************* Compute sensors **************************************
 		SrvImuDispatcher(current_main_event);
@@ -123,8 +121,6 @@ int main(void)
 		
 		// *********************Allumage progressif ***********************************
 		//SrvStartEngineDispatcher(current_main_event);
-		
-		
 	}		
 }
 

@@ -54,8 +54,11 @@ static Int16U altitude_depart;
 static Int32U altitude;
 static Int32U alti_moy;
 
-//initialisation des composants
-void SrvImuInit( void )
+
+/************************************************************************/
+/*Initialisation des composants                                         */
+/************************************************************************/
+Boolean SrvImuInit( void )
 {
 	//init des variables privées
 	accXangle = 0;
@@ -81,10 +84,12 @@ void SrvImuInit( void )
 	CmpBMA180Init();
 	CmpITG3205Init();
 	CmpBMP085Init();
-	
+	return TRUE;
 }
 
-//dispatcher d'evenements
+/************************************************************************/
+/*Dispatcher d'evenements                                               */
+/************************************************************************/
 void SrvImuDispatcher (Event_t in_event)
 {
 	//on calcul toutes les 20 millisecondes
@@ -103,23 +108,23 @@ void SrvImuDispatcher (Event_t in_event)
 		// ********************* Mesure des capteurs ******************************
 		SrvImuComputeSensors( temp_dernier_cycle );
 		
-		// ********************* Fusion des capteurs ******************************
+		// ********************* Fusion des capteurs ******************************		
 		imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle ) * 10U;
 		imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle ) * 10U;
-		//imu_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
-		imu_reel.lacet    = direction;		
+		imu_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
+		//imu_reel.lacet    = direction;		
 		
 		imu_reel.altitude = CmpBMP085GetAltitude(); //+ (accZangle - BMA180_ACC_1G);
-		//imu_reel.altitude = SrvKalmanFilterAlt( imu_reel.altitude, (accZangle - BMA180_ACC_1G), temp_dernier_cycle );
+		imu_reel.altitude = SrvKalmanFilterAlt( imu_reel.altitude, (accZangle - BMA180_ACC_1G), temp_dernier_cycle );
 		imu_reel.altitude -= altitude_depart;
 		
 		// ********************* PID **********************************************
-		pid_erreur_roulis	= SrvPIDCompute( 0, imu_desire.roulis					, imu_reel.roulis);
-		pid_erreur_tangage	= SrvPIDCompute( 1, imu_desire.tangage					, imu_reel.tangage);
-		pid_erreur_lacet	= SrvPIDCompute( 2, imu_reel.lacet + imu_desire.lacet	, imu_reel.lacet);
+		pid_erreur_roulis	= SrvPIDCompute( 0U , imu_desire.roulis					, imu_reel.roulis);
+		pid_erreur_tangage	= SrvPIDCompute( 1U , imu_desire.tangage				, imu_reel.tangage);
+		pid_erreur_lacet	= SrvPIDCompute( 2U , imu_reel.lacet + imu_desire.lacet	, imu_reel.lacet);
 		if(imu_reel.maintient_altitude == TRUE)
 		{
-			pid_erreur_altitude	= SrvPIDCompute( 3, imu_desire.altitude, imu_reel.altitude);
+			pid_erreur_altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.altitude);
 			SrvMotorApplyRelativeSpeed(pid_erreur_altitude);
 		}
 		// ********************* Moteurs ******************************************
@@ -146,13 +151,17 @@ void SrvImuDispatcher (Event_t in_event)
 	
 }
 
-//Enregistre l altitude de depart
+/************************************************************************/
+/*Enregistre l altitude de depart                                       */
+/************************************************************************/
 void SrvImuSensorsSetAltitudeDepart( void )
 {
 	altitude_depart = imu_reel.altitude;
 }
 
-//Enregistre l altitude de maintient
+/************************************************************************/
+/*Enregistre l altitude de maintient                                    */
+/************************************************************************/
 void SrvImuSensorsSetAltitudeMaintient( Int8U altitude )
 {
 	if(altitude != 0U)
@@ -166,7 +175,9 @@ void SrvImuSensorsSetAltitudeMaintient( Int8U altitude )
 	}
 }
 
-//Calibration des capteurs
+/************************************************************************/
+/*Calibration des capteurs                                              */
+/************************************************************************/
 void SrvImuSensorsCalibration( void )
 {
 	S_Gyr_Angle rotation;
@@ -174,7 +185,7 @@ void SrvImuSensorsCalibration( void )
 	S_Mag_Angle magnet;
 
 	Boolean calibrate = FALSE;
-	Int8U sens = 0;
+	Int8U sensors_calibrations = 0U;
 	do
 	{
 		//ACC
@@ -184,24 +195,29 @@ void SrvImuSensorsCalibration( void )
 		//MAG
 		CmpHMC5883GetHeading(&magnet);
 		
-		sens |= CmpITG3205IsCalibrate();
-		sens |= CmpBMA180IsCalibrate() << 1;
-		sens |= CmpHMC5883IsCalibrate() << 2;
+		sensors_calibrations |= CmpITG3205IsCalibrate();
+		sensors_calibrations |= CmpBMA180IsCalibrate()  << 1U;
+		sensors_calibrations |= CmpHMC5883IsCalibrate() << 2U;
 		
-		if(	sens == 7 )
+		if(	sensors_calibrations == 7U )
 		{
+			//la calibration est fini
 			calibrate = TRUE;
+			//on enregistre dans l'eeprom les données essentielles
 			DrvEepromConfigure();
 		}
 		else
 		{
+			//on attends 20ms
 			DrvTimerDelayMs(STD_LOOP_TIME);
 		}
 	} while (!calibrate);
 }
 
 ////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
-//on met a jours les angles
+/************************************************************************/
+/*Recuperation des données des capteurs et mise en forme  des données   */
+/************************************************************************/
 static void SrvImuComputeSensors(Int32U interval)
 {
 	float gyroRate = 0;	
@@ -260,12 +276,11 @@ static void SrvImuComputeSensors(Int32U interval)
 		{
 			gyroZAngle -= 360.0;
 		}
-
 	}		
 	//MAG
 	if(CmpHMC5883GetHeading(&magnet) != FALSE)
 	{
-		//#define MAG_ORIENTATION(X, Y, Z)  {magADC[ROLL]  =  X; magADC[PITCH]  =  Y; magADC[YAW]  = -Z;}
+		//#define MAG_ORIENTATION(X, Y, Z)  {magADC[ROLL]  =  -X; magADC[PITCH]  =  Y; magADC[YAW]  = -Z;}
 		magnet.x *= -1;
 		magnet.y *= 1;
 		magnet.z *= -1;	

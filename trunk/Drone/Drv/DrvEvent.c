@@ -4,8 +4,6 @@
  * Created: 28/06/2011 15:52:35
  *  Author: berryer
  */ 
-
-#include <util/atomic.h>
 #include "Conf/conf_hard.h"
 
 #include "DrvEvent.h"
@@ -17,15 +15,18 @@ static Event_t event_flags = 0U;
 
   
 /////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
-// Init du Drv Event 
-void DrvEventInit( void )
+/************************************************************************/
+/*Init du Drv Event                                                     */
+/************************************************************************/
+Boolean DrvEventInit( void )
 {
 	event_flags = 0U;
+	return TRUE;
 }
 
-////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
-
-//
+/************************************************************************/
+/*On recupere l'evenement en cours                                      */
+/************************************************************************/
 inline Event_t DrvEventGetEvent(Event_t in_event)
 {
 	ATOMIC
@@ -36,7 +37,9 @@ inline Event_t DrvEventGetEvent(Event_t in_event)
 	return event_flags;
 }
 
-//
+/************************************************************************/
+/*On test l'evenement en cours                                          */
+/************************************************************************/
 inline Boolean DrvEventTestEvent(Event_t in_event,Int8U conf_event ) 
 {
 	if (( in_event & conf_event) > 0 )
@@ -49,7 +52,9 @@ inline Boolean DrvEventTestEvent(Event_t in_event,Int8U conf_event )
 	}
 }
 
-//
+/************************************************************************/
+/*On ajoute un evenement aux evenements en cours                        */
+/************************************************************************/
 inline Boolean DrvEventAddEvent(Event_t event)
 {
 	event_flags |= event ;

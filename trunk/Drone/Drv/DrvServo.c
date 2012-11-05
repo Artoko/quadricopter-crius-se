@@ -8,21 +8,23 @@
 #include "Conf\conf_hard.h"
 #include "DrvServo.h"
 
-
-#define ConvertPowerToTick(power_const) map( power_const , 0U		,100U	,1000U	,2000U ) / 4U
-#define ConvertTickToPower(tick_const)  map( tick_const  , 1000U	,2000U	,0U		,100U  ) * 4U
+//calcule la vitesse en fonction de la puissance desiré
+#define ConvertPowerToTick(power_const) (Int16U)(map( power_const , 0U		,1000U	,MIN_PULSE_WIDTH	,MAX_PULSE_WIDTH ) / 4U)
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
+//index du servo controllé lors de l'IT
 static volatile Int8S pin_servo = -1;
-
+//tableau des servos actifs
 static volatile servo_t MesServos[ MAX_SERVOS ];
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
 
 /////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
-// Init du Drv servo 
-void DrvServo( void )
+/************************************************************************/
+/*Init du Drv servo                                                     */
+/************************************************************************/
+Boolean DrvServo( void )
 {
 	for(Int8U index_servo = 0; index_servo < MAX_SERVOS ; index_servo++)
 	{	
@@ -34,72 +36,63 @@ void DrvServo( void )
 	
 	//on init le timer 1 tick = 4us
 	TCCR1A	= 0U;             
-    TCCR1B	|= _BV(CS11) ; //64
-    TCCR1B	|= _BV(CS10) ; 
+    TCCR1B	|= PRESCALER_64 ; //64
     TIMSK1	|= _BV(OCIE1A) ;
-    TCNT1	= 0U;               
+    TCNT1	= 0U;  
+	
+	return TRUE;             
 }
 
-// bouge le servo a la position voulu 
-Boolean DrvServoMoveToPosition( Int8U index, Int8U power)
+/************************************************************************/
+/*Bouge le servo a la position voulu                                    */
+/************************************************************************/
+Boolean DrvServoMoveToPosition( Int8U index, Int16U power)
 {
-	Boolean ret = FALSE; 
 	//consigne
 	MesServos[ index ].ticks_consigne = ConvertPowerToTick(power);
-	if( MesServos[ index ].ticks_consigne != MesServos[ index ].ticks )
-	{	
-		MesServos[ index ].ticks = MesServos[ index ].ticks_consigne ;
-	}
-	else
-	{
-		ret = TRUE;
-	}
-	return ret;
+	MesServos[ index ].ticks = MesServos[ index ].ticks_consigne ;
+	return TRUE;
 }
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
 ///////////////////////////////////////////ISR FUNCTIONS//////////////////////////////////////////
+/************************************************************************/
+/*IT Timer 1 comparateur A : change pour chaque servo                   */
+/************************************************************************/
 SIGNAL (TIMER1_COMPA_vect) 
 { 
+	//on remet a jour le cpt timer pour les 20ms 
 	if(pin_servo < 0)
 	{
 		TCNT1 = 0U;
 	}
 	else
 	{
+		//on met la pin du servo au GND pour chaque servo
 		if( pin_servo < MAX_SERVOS )
 		{
-			PORT_SERVO &=~ ( 1<< MesServos[pin_servo].pin);
+			PORT_SERVO &=~ ( 1U << MesServos[pin_servo].pin );
 		}
 	}
 	
+	//on change de servo
 	pin_servo++;
 	if(pin_servo < MAX_SERVOS)
 	{
-		OCR1A = TCNT1 + MesServos[pin_servo].ticks + OFFSET_TIMER ;
+		//on charge le temp avant la prochaine IT pour le prochain servo
+		OCR1A = TCNT1 + MesServos[pin_servo].ticks ;
+		//on met la pin du servo au VCC pour chaque servo
 		PORT_SERVO |= ( 1<< MesServos[pin_servo].pin);
-		//servo en mouvement
-		if( MesServos[pin_servo].ticks != MesServos[pin_servo].ticks_consigne )
-		{
-			//on souhaite atteindre la consigne
-			if( MesServos[pin_servo].ticks < MesServos[pin_servo].ticks_consigne )
-			{
-				//on applique la nouvelle consigne				
-				MesServos[pin_servo].ticks += 1U;					
-			}
-			else if( MesServos[pin_servo].ticks > MesServos[pin_servo].ticks_consigne )
-			{
-				//on applique la nouvelle consigne				
-				MesServos[pin_servo].ticks -= 1U;		
-			}				
-		}
+		//applique la consigne
+		MesServos[pin_servo].ticks = MesServos[pin_servo].ticks_consigne;
 	}
 	else
 	{
+		//on charge le temp avant la prochaine IT pour le rafraichissement
 		if( pin_servo == MAX_SERVOS )
 		{
-			OCR1A = (unsigned int)0x0FA0 ; 
+			OCR1A = 5000U ; //20ms
 			pin_servo = -1; 
 		}
 	}		
