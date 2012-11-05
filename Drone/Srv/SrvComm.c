@@ -88,10 +88,10 @@ static void SrvCommExecute ( void )
 	else if(ma_trame_comm.param[PARAM_0] == COMM_ALTITUDE )
 	{ 
 		//on enregistre l'altitude de depart
-		SrvImuSensorsSetAltitudeDepart();
+		//SrvImuSensorsSetAltitudeDepart();
 		
 		//on enregistre l'altitude relative a la position de depart
-		SrvImuSensorsSetAltitudeMaintient(ma_trame_comm.param[PARAM_1]);
+		//SrvImuSensorsSetAltitudeMaintient(ma_trame_comm.param[PARAM_1]);
 	}
 }	
 
@@ -104,11 +104,14 @@ static void SrvCommRepportData( void )
 	Int8U lenght = 0;
 	
 	lenght = sprintf(	o_message	
-						,"%i,%i,%i,%i\n"
+						,"%i,%i,%i,%i,%i,%i,%i\n"
 						,imu_reel.roulis
 						,imu_reel.tangage
 						,imu_reel.lacet	
 						,imu_reel.altitude
+						,pid_erreur_roulis
+						,pid_erreur_tangage
+						,SrvMotorGetSpeed()
 					);
 	DrvUart0SendMessage( o_message , lenght );
 }

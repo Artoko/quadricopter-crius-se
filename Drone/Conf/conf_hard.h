@@ -77,11 +77,16 @@ typedef struct SSangles
 	Boolean maintient_altitude;
 }Simu;
 
+
 extern Simu imu_desire;
 extern Simu imu_reel;
 extern Int16U speed;
 extern Int32U pression;
 extern Int16S temperature;
+extern Int16U frontMotor_R;
+extern Int16U frontMotor_L;
+extern Int16U rearMotor_R;
+extern Int16U rearMotor_L;
 
 //erreur retournee par le calcul du PID
 extern Int16S pid_erreur_roulis;

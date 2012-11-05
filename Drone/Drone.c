@@ -45,6 +45,11 @@ Int16U speed;
 Int32U pression;
 Int16S temperature;
 
+Int16U frontMotor_R	= 0U;
+Int16U frontMotor_L	= 0U;
+Int16U rearMotor_R	= 0U;
+Int16U rearMotor_L	= 0U;
+
 int main(void)
 {	
 	// ********************* Interrupt Disable ****************************************
