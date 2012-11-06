@@ -53,6 +53,10 @@ Int16U rearMotor_L	= 0U;
 int main(void)
 {	
 	// ********************* Interrupt Disable ****************************************
+	//stop timer
+	TCCR0B = 0U;
+	TCCR1B = 0U;
+	TCCR2B = 0U;
 	DrvInterruptClearAllInterrupts();
 	
 	// ********************* Led init *************************************************
