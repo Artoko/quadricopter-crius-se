@@ -119,12 +119,11 @@ static void CmpBMP085IsrCallbackReadUP( void)
 //read all value
 static void CmpBMP085ReadCalibration( void )
 {
-  DrvTimerDelayMs(10);
   //read calibration data in one go
-  size_t s_bytes = (uint8_t*)&s_barometer.md - (uint8_t*)&s_barometer.ac1 + sizeof(s_barometer.ac1);
+  size_t s_bytes = (Int8U*)&s_barometer.md - (Int8U*)&s_barometer.ac1 + sizeof(s_barometer.ac1);
   DrvTwiReadRegBuf(BMP085_ADDRESS, CAL_AC1, &s_barometer.ac1, s_bytes);
   // now fix endianness
-  int16_t *p;
+  Int16S *p;
   for (p = &s_barometer.ac1; p <= &s_barometer.md; p++)
   {
     swap_endianness(p, sizeof(*p));

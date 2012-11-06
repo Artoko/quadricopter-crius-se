@@ -10,6 +10,7 @@
 #include "Srv/SrvPID.h"
 
 #include "Drv/DrvTick.h"
+#include "Drv/DrvEeprom.h"
 
 
 
@@ -27,15 +28,20 @@ static S_IMU_PID pid[ 4U ] ;
 
 void SrvPIDInit (Int8U index,float P, float I, float D)
 {
+	if(DrvEepromIsConfigured() == FALSE)
+	{	
+		DrvEepromWritePID(index,P,I,D);
+	}
+	else
+	{
+		DrvEepromReadPID(index,&P,&I,&D);
+	}
 	pid[index].P = P;
 	pid[index].I = I;
 	pid[index].D = D;
 	pid[index].lastPosition = 0;
 	pid[index].integratedError = 0;
-	imu_reel.maintient_altitude = FALSE;
 }
-
-
 
 Int16S SrvPIDCompute(Int8U index, float targetPosition, float currentPosition )
 {
@@ -44,9 +50,12 @@ Int16S SrvPIDCompute(Int8U index, float targetPosition, float currentPosition )
 	pid[index].integratedError += error;
 
 	// Limit the integrated error by the windupGuard
-	if (pid[index].integratedError < -1000) {
+	if (pid[index].integratedError < -1000) 
+	{
 		pid[index].integratedError = -1000;
-	} else if (pid[index].integratedError > 1000) {
+	} 
+	else if (pid[index].integratedError > 1000) 
+	{
 		pid[index].integratedError = 1000;
 	}
 	

@@ -6,12 +6,14 @@
  */ 
 
 #include "Conf/conf_hard.h"
+
 #include "SrvComm.h"
 #include "SrvMotor.h"
 #include "SrvImu.h"
 
 #include "Drv/DrvUart.h"
 #include "Drv/DrvTick.h"
+#include "Drv/DrvEeprom.h"
 
 #include "Cmps/CmpITG3205.h"
 #include "Cmps/CmpHMC5883.h"
@@ -93,6 +95,14 @@ static void SrvCommExecute ( void )
 		//on enregistre l'altitude relative a la position de depart
 		//SrvImuSensorsSetAltitudeMaintient(ma_trame_comm.param[PARAM_1]);
 	}
+	else if(ma_trame_comm.param[PARAM_0] == COMM_PID )
+	{
+		
+	}
+	else if(ma_trame_comm.param[PARAM_0] == COMM_EEPROM )
+	{
+		DrvEepromDeconfigure();
+	}
 }	
 
 /************************************************************************/
@@ -104,13 +114,17 @@ static void SrvCommRepportData( void )
 	Int8U lenght = 0;
 	
 	lenght = sprintf(	o_message	
-						,"%i,%i,%i,%i,%i,%i,%i\n"
+						,"%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\n"
 						,imu_reel.roulis
 						,imu_reel.tangage
 						,imu_reel.lacet	
 						,imu_reel.altitude
 						,pid_erreur_roulis
 						,pid_erreur_tangage
+						,frontMotor_R	
+						,frontMotor_L	
+						,rearMotor_R	
+						,rearMotor_L	
 						,SrvMotorGetSpeed()
 					);
 	DrvUart0SendMessage( o_message , lenght );

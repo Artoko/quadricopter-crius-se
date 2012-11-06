@@ -29,7 +29,7 @@ static Int16U throttle		= 0U;
 /************************************************************************/
 /* init des moteurs                                                     */
 /************************************************************************/
-void SrvMotorInit (void) 
+Boolean SrvMotorInit (void) 
 {
 	//init des variateurs brushless
 	DrvServo();
