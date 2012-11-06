@@ -82,7 +82,7 @@ int main(void)
 	// ********************* PID init *************************************************
 	SrvPIDInit( 0U , 7  ,0.5 ,-18 );  //roulis
 	SrvPIDInit( 1U , 7  ,0.5 ,-18 );  //tangage
-	SrvPIDInit( 2U , 10 ,0   ,0   );  //lacet
+	SrvPIDInit( 2U , 1  ,0   ,0   );  //lacet
 	SrvPIDInit( 3U , 1  ,0   ,0   );  //altitude
 	
 	// ********************* Interrupt Enable *****************************************

@@ -71,7 +71,6 @@ static inline void swap_endianness(void *buf, uint8_t size)
 #define ToDeg(x) (x*(float)(180/M_PI))  
 #define ToRad(x) (x*(float)(M_PI/180))  
 
-#define MID(x,limitdown,limitup)	(((float)x > (float)limitdown ) && ( (float)x < (float)limitup ))
 #define BIT_HIGH( reg , bit )		reg |=  ( 1U << bit );
 #define BIT_LOW( reg , bit )		reg &= ~( 1U << bit );
 #define BIT_TOGGLE( reg , bit )		reg ^=  ( 1U << bit );
@@ -89,8 +88,9 @@ static inline void swap_endianness(void *buf, uint8_t size)
  * Basic types for the microcontroler
  */
 
-#define MIN(A,B)  (((A)<(B)) ? (A) : (B) )
-#define MAX(A,B)  (((A)>(B)) ? (A) : (B) )
+#define MID(x,limitdown,limitup)	(((float)x > (float)limitdown ) && ( (float)x < (float)limitup ))
+#define MIN(A,B)					(((A)<(B)) ? (A) : (B) )
+#define MAX(A,B)					(((A)>(B)) ? (A) : (B) )
 
 // Unsigned 8 bits char
 typedef char Char;

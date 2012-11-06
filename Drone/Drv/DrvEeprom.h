@@ -22,6 +22,9 @@
 //Fonction d'initialisation
 Boolean DrvEepromInit ( void ) ;
 
+//ecrit l'etat de config de l'eeprom
+void DrvEepromDeconfigure ( void ) ;
+
 //retourne l'etat de config de l'eeprom
 Boolean DrvEepromIsConfigured ( void ) ;
 
@@ -29,15 +32,22 @@ Boolean DrvEepromIsConfigured ( void ) ;
 void DrvEepromConfigure ( void );
 
 //retourne les config de l'accelerometre
-void DrvEepromReadAcc ( Int16S calib[ 3U ] );
+void DrvEepromReadAcc ( Int16S *calib );
 
 //enregistre les config de l'accelerometre
 void DrvEepromWriteAcc ( Int16S calib[ 3U ] );
 
 //retourne les config du gyroscope
-void DrvEepromReadGyro ( Int16S calib[ 3U ] );
+void DrvEepromReadGyro ( Int16S *calib );
 
 //enregistre les config du gyroscope
 void DrvEepromWriteGyro ( Int16S calib[ 3U ] );
+
+//retourne les config du pid
+void DrvEepromReadPID(Int8U index,float *P, float *I, float *D);
+
+//enregistre les config du pid
+void DrvEepromWritePID (Int8U index,float P, float I, float D);
+
 
 #endif /* DRV_EEPROM_H_ */

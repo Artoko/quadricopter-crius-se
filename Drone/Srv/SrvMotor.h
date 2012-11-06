@@ -16,7 +16,7 @@
 
 
 //init des moteurs
-void SrvMotorInit (void) ;
+Boolean SrvMotorInit (void) ;
 
 //Update des moteurs
 void SrvMotorUpdate(Int16S roulis, Int16S tangage,Int16S lacet) ;

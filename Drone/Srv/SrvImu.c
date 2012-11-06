@@ -203,7 +203,7 @@ void SrvImuSensorsCalibration( void )
 		{
 			//la calibration est fini
 			calibrate = TRUE;
-			//on enregistre dans l'eeprom les données essentielles
+			//on valide dans l'eeprom les données des capteurs calibrés
 			DrvEepromConfigure();
 		}
 		else
