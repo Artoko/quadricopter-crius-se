@@ -44,12 +44,12 @@ void SrvMotorUpdate(Int16S roulis, Int16S tangage,Int16S lacet)
 {
 	if( throttle > OFFCOMMAND)
 	{
-		#define QUAD_X_MIX(X,Y,Z) (throttle + roulis * X + tangage * Y + lacet * lacet * Z)
+		//#define QUAD_X_MIX(X,Y,Z) (throttle + roulis * X + tangage * Y + lacet * lacet * Z)
 		// calcul de la vitesse pour chaque moteur
-		rearMotor_R	 = constrain(throttle - tangage /*- roulis*/ - lacet, OFFCOMMAND, MAXCOMMAND);
-		frontMotor_R = constrain(throttle + roulis + tangage + lacet, OFFCOMMAND, MAXCOMMAND);
-		rearMotor_L  = constrain(throttle - roulis - tangage + lacet, OFFCOMMAND, MAXCOMMAND);
-		frontMotor_L = constrain(throttle + tangage /*+ roulis*/ - lacet, OFFCOMMAND, MAXCOMMAND);
+		rearMotor_R	 = constrain(throttle - tangage /*- roulis - lacet*/, OFFCOMMAND, MAXCOMMAND);
+		frontMotor_R = constrain(throttle + roulis /*+ tangage + lacet*/, OFFCOMMAND, MAXCOMMAND);
+		rearMotor_L  = constrain(throttle - roulis /*- tangage + lacet*/, OFFCOMMAND, MAXCOMMAND);
+		frontMotor_L = constrain(throttle + tangage /*+ roulis - lacet*/, OFFCOMMAND, MAXCOMMAND);
 		
 		DrvServoMoveToPosition( 0U , (rearMotor_R  - OFFCOMMAND) );
 		DrvServoMoveToPosition( 1U , (frontMotor_R - OFFCOMMAND) );

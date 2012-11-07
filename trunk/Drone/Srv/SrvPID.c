@@ -28,13 +28,13 @@ static S_IMU_PID pid[ 4U ] ;
 
 void SrvPIDInit (Int8U index,float P, float I, float D)
 {
-	if(DrvEepromIsConfigured() == FALSE)
+	//if(DrvEepromIsConfigured() == FALSE)
 	{	
-		DrvEepromWritePID(index,P,I,D);
+		//DrvEepromWritePID(index,P,I,D);
 	}
-	else
+	//else
 	{
-		DrvEepromReadPID(index,&P,&I,&D);
+		//DrvEepromReadPID(index,&P,&I,&D);
 	}
 	pid[index].P = P;
 	pid[index].I = I;
