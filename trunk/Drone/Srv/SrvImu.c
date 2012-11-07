@@ -260,7 +260,7 @@ static void SrvImuComputeSensors(Int32U interval)
 		rotation.y *= 1;
 		rotation.z *= -1;
 			
-		gyroRate				=	(float)(rotation.x / 14.375) ;
+		gyroRate				=	rotation.x / 14.375 ;
 		gyroYAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
 		
 		gyroRate				=	rotation.y / 14.375 ;

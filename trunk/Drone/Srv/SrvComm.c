@@ -101,9 +101,11 @@ static void SrvCommExecute ( void )
 	}
 	else if(ma_trame_comm.param[PARAM_0] == COMM_EEPROM )
 	{
-		DrvEepromDeconfigure();
-		ptrfct_Isr_Callback tt = NULL;
-		tt();
+		if( ma_trame_comm.param[PARAM_1] == 1U)
+		{
+			DrvEepromDeconfigure();
+		}
+		RESET_SOFT();
 	}
 }	
 

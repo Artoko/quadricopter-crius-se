@@ -87,8 +87,8 @@ static inline void swap_endianness(void *buf, uint8_t size)
 /*
  * Basic types for the microcontroler
  */
-
-#define MID(x,limitdown,limitup)	(((float)x > (float)limitdown ) && ( (float)x < (float)limitup ))
+#define ABS(X)						((X) > 0 ? (X) : -(X))    
+#define MID(X,limitdown,limitup)	((X > limitdown ) && (X < limitup ))
 #define MIN(A,B)					(((A)<(B)) ? (A) : (B) )
 #define MAX(A,B)					(((A)>(B)) ? (A) : (B) )
 
@@ -123,7 +123,8 @@ typedef Int8U Boolean;
 
 //definit un type de pointeur de fonction pour abstraire les interruptions micro
 typedef void (*ptrfct_Isr_Callback)(void);
-
+//defini un pointeur vers une fct null, reset du micro
+#define RESET_SOFT() ptrfct_Isr_Callback ptrfct_null = NULL; ptrfct_null();
 
 
 #endif /* TOOLS_TYPEDEFS_H_ */
