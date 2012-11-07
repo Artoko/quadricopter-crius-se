@@ -29,7 +29,6 @@ typedef struct SSTimer
 							.cpt_delay = 0U,\
 							.mode = E_TIMER_MODE_NONE,\
 							.ptrfct = NULL,\
-							.reload = NULL,\
 						}\
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
@@ -57,7 +56,6 @@ void SrvTimerInit( void )
 	for(Int8U loop_index = 0U; loop_index < CONF_TIMER_NB ; loop_index++ )
 	{
 		MesTimer[ loop_index ].enable = FALSE;
-		MesTimer[ loop_index ].reload = FALSE;
 		MesTimer[ loop_index ].ptrfct = NULL;
 	}		
 	//on init le timer system a 1 ms
@@ -78,7 +76,6 @@ void SrvTimerAddTimer( Int8U index_timer, Int16U delay_100us, ETimerMode mode, p
 	MesTimer[ index_timer ].mode = mode;
 	MesTimer[ index_timer ].ptrfct = ptrfct;
 	MesTimer[ index_timer ].enable = TRUE;
-	MesTimer[ index_timer ].reload = FALSE;
 }
 
 //fct qui reparametre le timer
@@ -89,7 +86,6 @@ void SrvTimerReloadTimer( Int8U index_timer, Int16U delay_100us, ETimerMode mode
 	MesTimer[ index_timer ].mode = mode;
 	MesTimer[ index_timer ].ptrfct = ptrfct;
 	MesTimer[ index_timer ].enable = TRUE;
-	MesTimer[ index_timer ].reload = TRUE;
 }
 
 //fct qui met en pause le timer
@@ -106,7 +102,6 @@ void SrvTimerStopTimer( Int8U index_timer )
 	MesTimer[ index_timer ].cpt_delay = 0U;
 	MesTimer[ index_timer ].mode      = E_TIMER_MODE_NONE;
 	MesTimer[ index_timer ].ptrfct    = NULL;
-	MesTimer[ index_timer ].reload	  = FALSE;
 }
 
 //fct qui reseter le timer
@@ -114,7 +109,6 @@ void SrvTimerResetTimer( Int8U index_timer )
 {
 	MesTimer[ index_timer ].cpt_delay = 0U;	
 }
-
 
 //fct qui fixe un delay au timer
 void SrvTimerDelayTimer( Int8U index_timer , Int16U delay)
@@ -192,20 +186,26 @@ ISR(TIMER2_COMPA_vect)
 					//on remet a zero le compteur
 					MesTimer[ loop_index ].cpt_delay = 0U;
 					
-					//on appelle la fonction
-					if( MesTimer[ loop_index ].ptrfct != NULL )
-					{
-						MesTimer[ loop_index ].ptrfct();
-					}
-					
 					//si on est en mode ONE SHOT 
-					//on vient d'excecuter la fct
+					//on atteind le temp, on supprime le timer
 					if (MesTimer[ loop_index ].mode == E_TIMER_MODE_ONE_SHOT)
 					{
-						if( MesTimer[ loop_index ].reload == FALSE )
+						//on garde la fonction a ppelé avant de tt effacer
+						ptrfct_Isr_Callback_Timer ptrfct = MesTimer[ loop_index ].ptrfct;
+						//on supprime le timer One Shot
+						SrvTimerStopTimer( loop_index );
+						//on appelle la fonction
+						if( ptrfct != NULL )
 						{
-							//on reinit le timer
-							SrvTimerStopTimer( loop_index );
+							ptrfct();
+						}
+					}
+					else
+					{
+						//on appelle la fonction
+						if( MesTimer[ loop_index ].ptrfct != NULL )
+						{
+							MesTimer[ loop_index ].ptrfct();
 						}
 					}
 				}
