@@ -30,7 +30,6 @@ Boolean DrvServo( void )
 	{	
 		MesServos[ index_servo ].pin = index_servo;
 		MesServos[ index_servo ].ticks = ConvertPowerToTick( 0U );
-		MesServos[ index_servo ].ticks_consigne = MesServos[ index_servo ].ticks;
 		PORT_DIR_SERVO |= (1 << index_servo);
 	}
 	
@@ -49,8 +48,7 @@ Boolean DrvServo( void )
 Boolean DrvServoMoveToPosition( Int8U index, Int16U power)
 {
 	//consigne
-	MesServos[ index ].ticks_consigne = ConvertPowerToTick(power);
-	MesServos[ index ].ticks = MesServos[ index ].ticks_consigne ;
+	MesServos[ index ].ticks = ConvertPowerToTick(power);
 	return TRUE;
 }
 
@@ -84,15 +82,13 @@ SIGNAL (TIMER1_COMPA_vect)
 		OCR1A = TCNT1 + MesServos[pin_servo].ticks ;
 		//on met la pin du servo au VCC pour chaque servo
 		PORT_SERVO |= ( 1<< MesServos[pin_servo].pin);
-		//applique la consigne
-		MesServos[pin_servo].ticks = MesServos[pin_servo].ticks_consigne;
 	}
 	else
 	{
 		//on charge le temp avant la prochaine IT pour le rafraichissement
 		if( pin_servo == MAX_SERVOS )
 		{
-			OCR1A = 5000U ; //20ms
+			OCR1A =  5000U ; //20ms
 			pin_servo = -1; 
 		}
 	}		

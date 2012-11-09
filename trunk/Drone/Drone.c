@@ -117,7 +117,7 @@ int main(void)
 	SrvTimerTickReset();
 	
 	// ********************* Start Heartbeat ******************************************
-	SrvTimerAddTimer(CONF_TIMER_HEARTBEAT, 5000U, E_TIMER_MODE_PERIODIC, HeartbeatIsrCallbackTimer);
+	SrvTimerAddTimer(CONF_TIMER_HEARTBEAT, 500U, E_TIMER_MODE_PERIODIC, HeartbeatIsrCallbackTimer);
 	
     while(TRUE)
     {			

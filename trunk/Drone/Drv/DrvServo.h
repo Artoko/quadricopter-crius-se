@@ -38,7 +38,6 @@
 typedef struct {
 	Int16U pin;
 	Int16U ticks;
-	Int16U ticks_consigne;
 } servo_t;
 
 /////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////

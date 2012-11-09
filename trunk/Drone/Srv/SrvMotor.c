@@ -34,6 +34,10 @@ Boolean SrvMotorInit (void)
 	//init des variateurs brushless
 	DrvServo();
 	throttle = OFFCOMMAND;
+	rearMotor_R	 = throttle;
+	frontMotor_R = throttle;
+	rearMotor_L  = throttle;
+	frontMotor_L = throttle;
 	return TRUE;
 }	
 
@@ -59,6 +63,10 @@ void SrvMotorUpdate(Int16S roulis, Int16S tangage,Int16S lacet)
 	else
 	{
 		//on met la vitesse de tout les moteurs à zeros 
+		rearMotor_R	 = throttle;
+		frontMotor_R = throttle;
+		rearMotor_L  = throttle;
+		frontMotor_L = throttle;
 		DrvServoMoveToPosition( 0U , 0U );
 		DrvServoMoveToPosition( 1U , 0U );
 		DrvServoMoveToPosition( 2U , 0U );

@@ -90,10 +90,10 @@ static void SrvCommExecute ( void )
 	else if(ma_trame_comm.param[PARAM_0] == COMM_ALTITUDE )
 	{ 
 		//on enregistre l'altitude de depart
-		//SrvImuSensorsSetAltitudeDepart();
+		SrvImuSensorsSetAltitudeDepart();
 		
 		//on enregistre l'altitude relative a la position de depart
-		//SrvImuSensorsSetAltitudeMaintient(ma_trame_comm.param[PARAM_1]);
+		SrvImuSensorsSetAltitudeMaintient(ma_trame_comm.param[PARAM_1]);
 	}
 	else if(ma_trame_comm.param[PARAM_0] == COMM_PID )
 	{

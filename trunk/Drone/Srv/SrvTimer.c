@@ -22,7 +22,8 @@ typedef struct SSTimer
 } STimer ;
 
 ////////////////////////////////////////PRIVATE DEFINES/////////////////////////////////////////
-#define TIMER2_OFFSET_COMPA		0x18U//0xF9U
+#define TIMER2_OFFSET_COMPA		0x18U
+#define TIMER2_OFFSET_COMPB		0xF9U
 #define MACRO_NULL_TIMER {\
 							.enable = FALSE,\
 							.delay = 0U,\
@@ -63,8 +64,11 @@ void SrvTimerInit( void )
 	TCCR2B	|= _BV(CS22) ;
 	TCNT2	= 0;
 	OCR2A   = TIMER2_OFFSET_COMPA;
+	OCR2B   = TIMER2_OFFSET_COMPB;
 	TIFR2	|= _BV(OCF2A);
 	TIMSK2	|= _BV(OCIE2A) ;
+	TIFR2	|= _BV(OCF2B);
+	TIMSK2	|= _BV(OCIE2B) ;
 }
 
 	
@@ -141,35 +145,8 @@ void SrvTimerTickReset(void)
 
 /////////////////////////////////////ISR PRIVATE FUNCTIONS////////////////////////////////////////
 //ISR timer event 1ms
-ISR(TIMER2_COMPA_vect)
+ISR(TIMER2_COMPB_vect)
 {
-	OCR2A = TCNT2 + TIMER2_OFFSET_COMPA ;
-	if(tick_counter_20ms++ == 199)
-	{
-		tick_counter_20ms = 0;
-		DrvEventAddEvent(CONF_EVENT_TIMER_20MS);
-		if(tick_counter_100ms++ == 4)
-		{
-			tick_counter_100ms = 0;
-			DrvEventAddEvent(CONF_EVENT_TIMER_100MS);
-			if(tick_counter_1s++ == 9)
-			{
-				tick_counter_1s = 0;
-				DrvEventAddEvent(CONF_EVENT_TIMER_1S);
-				if(tick_counter_5s++ == 4)
-				{
-					tick_counter_5s = 0;
-					DrvEventAddEvent(CONF_EVENT_TIMER_5S);
-					if(tick_counter_10s++ == 1)
-					{
-						tick_counter_10s = 0;
-						DrvEventAddEvent(CONF_EVENT_TIMER_10S);
-					}
-				}
-			}
-		}
-	}
-	
 	for(Int8U loop_index = 0U; loop_index < CONF_TIMER_NB ; loop_index++ )
 	{
 		//si le timer est activé
@@ -211,5 +188,35 @@ ISR(TIMER2_COMPA_vect)
 				}
 			}
 		}			
+	}
+}	
+//ISR timer event 100us
+ISR(TIMER2_COMPA_vect)
+{
+	OCR2A = TCNT2 + TIMER2_OFFSET_COMPA ;
+	if(tick_counter_20ms++ == 199)
+	{
+		tick_counter_20ms = 0;
+		DrvEventAddEvent(CONF_EVENT_TIMER_20MS);
+		if(tick_counter_100ms++ == 4)
+		{
+			tick_counter_100ms = 0;
+			DrvEventAddEvent(CONF_EVENT_TIMER_100MS);
+			if(tick_counter_1s++ == 9)
+			{
+				tick_counter_1s = 0;
+				DrvEventAddEvent(CONF_EVENT_TIMER_1S);
+				if(tick_counter_5s++ == 4)
+				{
+					tick_counter_5s = 0;
+					DrvEventAddEvent(CONF_EVENT_TIMER_5S);
+					if(tick_counter_10s++ == 1)
+					{
+						tick_counter_10s = 0;
+						DrvEventAddEvent(CONF_EVENT_TIMER_10S);
+					}
+				}
+			}
+		}
 	}
 }
