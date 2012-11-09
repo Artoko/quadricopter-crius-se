@@ -54,7 +54,7 @@ static Int16U altitude_depart;
 static Int32U altitude;
 static Int32U alti_moy;
 
-
+Int8U wait_alt = 0U;
 /************************************************************************/
 /*Initialisation des composants                                         */
 /************************************************************************/
@@ -78,12 +78,15 @@ Boolean SrvImuInit( void )
 	pid_erreur_tangage = 0;
 	pid_erreur_lacet = 0;
 	pid_erreur_altitude = 0;
+	wait_alt = 0U;
 	
 	//init des composants	
 	CmpHMC5883Init();
 	CmpBMA180Init();
 	CmpITG3205Init();
 	CmpBMP085Init();
+	
+	CmpBMP085StartCapture();
 	return TRUE;
 }
 
@@ -134,9 +137,14 @@ void SrvImuDispatcher (Event_t in_event)
 	}	
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
+		
 		//BARO
 		//on start la capture du barometre toutes les 100ms
-		CmpBMP085StartCapture();
+		//if(wait_alt == 2U)
+		{
+			//wait_alt = 0U;
+		}
+		//wait_alt++;
 	}
 	
 	// a 10 sec on enregistre l'altitude

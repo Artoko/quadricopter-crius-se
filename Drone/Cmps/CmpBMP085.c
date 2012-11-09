@@ -15,8 +15,13 @@
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
 #define NB_MAX_ALT_TAB			3
+
+#define STEP_READ_UT			0U
+#define STEP_READ_UP			1U
+#define STEP_COMPUTE			2U
+#define STEP_NONE				3U
 /////////////////////////////////////////PRIVATE STRUCTIURES///////////////////////////////////////
-static struct SS_BMP085
+struct SS_BMP085
 {
 	Int16S  ac1, ac2, ac3;
 	Int16U ac4, ac5, ac6;
@@ -32,7 +37,6 @@ static struct SS_BMP085
 		Int8U raw[4U];
 	}up; //uncompensated P
 	Int32U timeout;
-	Boolean init;
 } s_barometer;  
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
@@ -42,8 +46,6 @@ static void CmpBMP085StartUT( void ) ;
 static void CmpBMP085ReadUT( void ) ;
 static void CmpBMP085StartUP( void ) ;
 static void CmpBMP085ReadUP( void ) ;
-static void CmpBMP085IsrCallbackReadUP( void) ;
-static void CmpBMP085IsrCallbackReadUT( void) ;
 /////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 static Int32U pressure;
 
@@ -52,13 +54,14 @@ static Int8U baro_index;
 static Int32U BaroAltTab[NB_MAX_ALT_TAB];
 
 
+static Int8U step_baro = STEP_NONE;
+
 
 //Initialisation du barometre
 Boolean CmpBMP085Init( void )
 {
 	Boolean o_success = FALSE;
 	pressure = 0U;
-	s_barometer.init = FALSE;
 	CmpBMP085ReadCalibration();
 	o_success = TRUE;
 	return o_success;
@@ -66,16 +69,27 @@ Boolean CmpBMP085Init( void )
 
 //Get altitude du barometre
 Int32U CmpBMP085GetAltitude( void )
-{	 
-	if(baro_index == NB_MAX_ALT_TAB)
+{	
+	if(step_baro == STEP_READ_UT)
 	{
-		for (Int8U loop = 0U; loop< NB_MAX_ALT_TAB ; loop++)
-		{
-			BaroAlt += BaroAltTab[ loop ];
-			BaroAltTab[ loop ] = 0;
-		}	
-		BaroAlt = BaroAlt / (NB_MAX_ALT_TAB + 1);
-		baro_index = 0;
+		step_baro = STEP_READ_UP;
+		CmpBMP085ReadUT();
+		CmpBMP085StartUP();
+	}
+	else if(step_baro == STEP_READ_UP)
+	{
+		step_baro = STEP_COMPUTE;
+		CmpBMP085ReadUT();
+		CmpBMP085StartUP();
+	}
+	else
+	{
+		step_baro = STEP_READ_UT;
+		CmpBMP085ReadUP();
+		CmpBMP085Compute();
+		pression = pressure;	
+	    BaroAlt = (Int32U)((1.0f - pow(pressure/101325.0f, 0.190295f)) * 443300.0f);
+		CmpBMP085StartUT();		
 	}	
 	return BaroAlt;
 }
@@ -83,38 +97,8 @@ Int32U CmpBMP085GetAltitude( void )
 //on start la capture du baro
 void CmpBMP085StartCapture( void )
 { 
-	if( s_barometer.init == TRUE )
-	{
-		CmpBMP085Compute();
-		pression = pressure;
-		if(baro_index < NB_MAX_ALT_TAB)
-		{
-			BaroAltTab[ baro_index ] = (1.0f - pow(pressure/101325.0f, 0.190295f)) * 443300.0f;;
-			baro_index++;
-		}
-	}
-	else
-	{
-		s_barometer.init = TRUE;
-	}
-	CmpBMP085StartUT();
-	SrvTimerAddTimer(CONF_TIMER_START_BMP085, 45U, E_TIMER_MODE_ONE_SHOT, CmpBMP085IsrCallbackReadUT);
+	step_baro = STEP_READ_UT;
 }
-
-//fct appele par le timer
-static void CmpBMP085IsrCallbackReadUT( void )
-{
-	CmpBMP085ReadUT();
-	SrvTimerReloadTimer(CONF_TIMER_START_BMP085, 140U, E_TIMER_MODE_ONE_SHOT, CmpBMP085IsrCallbackReadUP);
-	CmpBMP085StartUP();
-}
-
-//fct appele par le timer
-static void CmpBMP085IsrCallbackReadUP( void)
-{
-	CmpBMP085ReadUP();
-	SrvTimerStopTimer(CONF_TIMER_START_BMP085);
-}	
 
 //read all value
 static void CmpBMP085ReadCalibration( void )
@@ -168,28 +152,28 @@ static void CmpBMP085Compute( void )
   Int32S  x1, x2, x3, b3, b5, b6, p, tmp;
   Int32U b4, b7;
   // Temperature calculations
-  x1 = ((Int32S)s_barometer.ut.val - s_barometer.ac6) * s_barometer.ac5 >> 15;
-  x2 = ((Int32S)s_barometer.mc << 11) / (x1 + s_barometer.md);
+  x1 = ((Int32S)s_barometer.ut.val - s_barometer.ac6) * s_barometer.ac5 >> 15U;
+  x2 = ((Int32S)s_barometer.mc << 11U) / (x1 + s_barometer.md);
   b5 = x1 + x2;
-  temperature = (b5 + 8)>>4;
+  temperature = (b5 + 8U)>>4U;
   // Pressure calculations
-  b6 = b5 - 4000;
-  x1 = (s_barometer.b2 * (b6 * b6 >> 12)) >> 11; 
-  x2 = s_barometer.ac2 * b6 >> 11;
+  b6 = b5 - 4000U;
+  x1 = (s_barometer.b2 * (b6 * b6 >> 12)) >> 11U; 
+  x2 = s_barometer.ac2 * b6 >> 11U;
   x3 = x1 + x2;
   tmp = s_barometer.ac1;
-  tmp = (tmp*4 + x3) << OSS;
-  b3 = (tmp+2)/4;
-  x1 = s_barometer.ac3 * b6 >> 13;
-  x2 = (s_barometer.b1 * (b6 * b6 >> 12)) >> 16;
-  x3 = ((x1 + x2) + 2) >> 2;
-  b4 = (s_barometer.ac4 * (Int32U)(x3 + 32768)) >> 15;
-  b7 = ((Int32U) (s_barometer.up.val >> (8-OSS)) - b3) * (50000 >> OSS);
-  p = b7 < 0x80000000 ? (b7 * 2) / b4 : (b7 / b4) * 2;
-  x1 = (p >> 8) * (p >> 8);
-  x1 = (x1 * 3038) >> 16;
-  x2 = (-7357 * p) >> 16;
-  pressure = p + ((x1 + x2 + 3791) >> 4);
+  tmp = (tmp*4U + x3) << OSS;
+  b3 = (tmp+2U)/4U;
+  x1 = s_barometer.ac3 * b6 >> 13U;
+  x2 = (s_barometer.b1 * (b6 * b6 >> 12U)) >> 16U;
+  x3 = ((x1 + x2) + 2U) >> 2U;
+  b4 = (s_barometer.ac4 * (Int32U)(x3 + 32768U)) >> 15U;
+  b7 = ((Int32U) (s_barometer.up.val >> (8U-OSS)) - b3) * (50000U >> OSS);
+  p = b7 < 0x80000000 ? (b7 * 2U) / b4 : (b7 / b4) * 2U;
+  x1 = (p >> 8U) * (p >> 8U);
+  x1 = (x1 * 3038U) >> 16U;
+  x2 = (-7357 * p) >> 16U;
+  pressure = p + ((x1 + x2 + 3791U) >> 4U);
 }
 
 
