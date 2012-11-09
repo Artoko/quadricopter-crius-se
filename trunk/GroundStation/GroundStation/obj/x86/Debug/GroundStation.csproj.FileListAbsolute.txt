@@ -1,0 +1,28 @@
+C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStation\GroundStation\bin\Debug\GroundStation.exe
+C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStation\GroundStation\bin\Debug\GroundStation.pdb
+C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStation\GroundStation\bin\Debug\ZedGraph.dll
+C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStation\GroundStation\bin\Debug\fr\ZedGraph.resources.dll
+C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStation\GroundStation\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStation\GroundStation\obj\x86\Debug\GroundStation.Properties.Resources.resources
+C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStation\GroundStation\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStation\GroundStation\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStation\GroundStation\obj\x86\Debug\GroundStation.exe
+C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStation\GroundStation\obj\x86\Debug\GroundStation.pdb
+C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStation\GroundStation\obj\x86\Debug\GroundStation.GroundStationMainForm.resources
+C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStation\GroundStation\obj\x86\Debug\GroundStation.FormGraph.resources
+C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStation\GroundStation\obj\x86\Debug\GroundStation.FormSerial.resources
+C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStation\GroundStation\obj\x86\Debug\GroundStation.FormCommand.resources
+C:\Users\Louis\Desktop\GroundStation\GroundStation\obj\x86\Debug\GroundStation.exe
+C:\Users\Louis\Desktop\GroundStation\GroundStation\obj\x86\Debug\GroundStation.pdb
+C:\Users\Louis\Desktop\GroundStation\GroundStation\bin\Debug\GroundStation.exe
+C:\Users\Louis\Desktop\GroundStation\GroundStation\bin\Debug\GroundStation.pdb
+C:\Users\Louis\Desktop\GroundStation\GroundStation\bin\Debug\ZedGraph.dll
+C:\Users\Louis\Desktop\GroundStation\GroundStation\bin\Debug\fr\ZedGraph.resources.dll
+C:\Users\Louis\Desktop\GroundStation\GroundStation\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Louis\Desktop\GroundStation\GroundStation\obj\x86\Debug\GroundStation.FormCommand.resources
+C:\Users\Louis\Desktop\GroundStation\GroundStation\obj\x86\Debug\GroundStation.FormGraph.resources
+C:\Users\Louis\Desktop\GroundStation\GroundStation\obj\x86\Debug\GroundStation.FormSerial.resources
+C:\Users\Louis\Desktop\GroundStation\GroundStation\obj\x86\Debug\GroundStation.GroundStationMainForm.resources
+C:\Users\Louis\Desktop\GroundStation\GroundStation\obj\x86\Debug\GroundStation.Properties.Resources.resources
+C:\Users\Louis\Desktop\GroundStation\GroundStation\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\Louis\Desktop\GroundStation\GroundStation\obj\x86\Debug\GenerateResource.write.1.tlog
