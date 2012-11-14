@@ -73,19 +73,9 @@ void SrvTimerInit( void )
 
 	
 //fct qui parametre le timer
-void SrvTimerAddTimer( Int8U index_timer, Int16U delay_100us, ETimerMode mode, ptrfct_Isr_Callback_Timer ptrfct )
+void SrvTimerAddTimer( Int8U index_timer, Int16U delay_ms, ETimerMode mode, ptrfct_Isr_Callback_Timer ptrfct )
 {
-	MesTimer[ index_timer ].delay = delay_100us;
-	MesTimer[ index_timer ].cpt_delay = 0U;
-	MesTimer[ index_timer ].mode = mode;
-	MesTimer[ index_timer ].ptrfct = ptrfct;
-	MesTimer[ index_timer ].enable = TRUE;
-}
-
-//fct qui reparametre le timer
-void SrvTimerReloadTimer( Int8U index_timer, Int16U delay_100us, ETimerMode mode, ptrfct_Isr_Callback_Timer ptrfct )
-{
-	MesTimer[ index_timer ].delay = delay_100us;
+	MesTimer[ index_timer ].delay = delay_ms;
 	MesTimer[ index_timer ].cpt_delay = 0U;
 	MesTimer[ index_timer ].mode = mode;
 	MesTimer[ index_timer ].ptrfct = ptrfct;
