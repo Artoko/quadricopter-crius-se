@@ -43,8 +43,10 @@ struct SS_BMP085
 static void CmpBMP085ReadCalibration( void ) ;
 static void CmpBMP085Compute( void ) ;
 static void CmpBMP085StartUT( void ) ;
+static void CmpBMP085CallbackUT( void ) ;
 static void CmpBMP085ReadUT( void ) ;
 static void CmpBMP085StartUP( void ) ;
+static void CmpBMP085CallbackUP( void ) ;
 static void CmpBMP085ReadUP( void ) ;
 /////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 static Int32U pressure;
@@ -70,34 +72,42 @@ Boolean CmpBMP085Init( void )
 //Get altitude du barometre
 Int32U CmpBMP085GetAltitude( void )
 {	
-	if(step_baro == STEP_READ_UT)
+	if( step_baro == STEP_READ_UT )
 	{
-		step_baro = STEP_READ_UP;
 		CmpBMP085ReadUT();
-		CmpBMP085StartUP();
+		CmpBMP085StartUP();		
+		step_baro = STEP_NONE;
 	}
-	else if(step_baro == STEP_READ_UP)
+	else if( step_baro == STEP_READ_UP )
 	{
-		step_baro = STEP_COMPUTE;
-		CmpBMP085ReadUT();
-		CmpBMP085StartUP();
-	}
-	else
-	{
-		step_baro = STEP_READ_UT;
 		CmpBMP085ReadUP();
 		CmpBMP085Compute();
-		pression = pressure;	
-	    BaroAlt = (Int32U)((1.0f - pow(pressure/101325.0f, 0.190295f)) * 443300.0f);
-		CmpBMP085StartUT();		
-	}	
+		pression = pressure;
+		BaroAlt = (Int32U)((1.0f - pow(pressure/101325.0f, 0.190295f)) * 443300.0f);
+		step_baro = STEP_NONE;
+	}
 	return BaroAlt;
 }
 
 //on start la capture du baro
 void CmpBMP085StartCapture( void )
 { 
+	CmpBMP085StartUT();
+	SrvTimerAddTimer( CONF_TIMER_BMP085 , 5U, E_TIMER_MODE_ONE_SHOT, CmpBMP085CallbackUT);
+}
+
+//callback timer 
+static void CmpBMP085CallbackUT( void ) 
+{
 	step_baro = STEP_READ_UT;
+	SrvTimerAddTimer( CONF_TIMER_BMP085 , 15U, E_TIMER_MODE_ONE_SHOT, CmpBMP085CallbackUP);
+}
+
+//callback timer
+static void CmpBMP085CallbackUP( void )
+{
+	step_baro = STEP_READ_UP;
+	SrvTimerStopTimer( CONF_TIMER_BMP085 );
 }
 
 //read all value

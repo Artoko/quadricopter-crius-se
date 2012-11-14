@@ -33,10 +33,7 @@ typedef enum
 void SrvTimerInit( void ) ;
 
 //fct qui parametre le timer
-void SrvTimerAddTimer( Int8U index_timer, Int16U delay_100us, ETimerMode mode, ptrfct_Isr_Callback_Timer ptrfct ) ;
-
-//fct qui reparametre le timer
-void SrvTimerReloadTimer( Int8U index_timer, Int16U delay_100us, ETimerMode mode, ptrfct_Isr_Callback_Timer ptrfct ) ;
+void SrvTimerAddTimer( Int8U index_timer, Int16U delay_ms, ETimerMode mode, ptrfct_Isr_Callback_Timer ptrfct ) ;
 
 //fct qui met en pause le timer
 void SrvTimerPauseTimer( Int8U index_timer ) ;

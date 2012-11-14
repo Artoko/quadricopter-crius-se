@@ -117,7 +117,6 @@ void SrvImuDispatcher (Event_t in_event)
 		imu_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
 		//imu_reel.lacet    = direction;		
 		
-		imu_reel.altitude = CmpBMP085GetAltitude(); //+ (accZangle - BMA180_ACC_1G);
 		//imu_reel.altitude = SrvKalmanFilterAlt( imu_reel.altitude, (accZangle - BMA180_ACC_1G), temp_dernier_cycle );
 		imu_reel.altitude -= altitude_depart;
 		
@@ -137,15 +136,11 @@ void SrvImuDispatcher (Event_t in_event)
 	}	
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
-		
 		//BARO
 		//on start la capture du barometre toutes les 100ms
-		//if(wait_alt == 2U)
-		{
-			//wait_alt = 0U;
-		}
-		//wait_alt++;
+		CmpBMP085StartCapture();
 	}
+	imu_reel.altitude = CmpBMP085GetAltitude();
 	
 	// a 10 sec on enregistre l'altitude
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_10S ) == TRUE)
