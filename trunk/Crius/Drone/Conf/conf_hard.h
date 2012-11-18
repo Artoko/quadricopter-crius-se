@@ -74,6 +74,7 @@ typedef struct SSangles
 	Int16S roulis;
 	Int16S tangage;
 	Int16S lacet;
+	Int16S nord;
 	Int16U altitude;
 	Int16U adc_conv;
 	Boolean maintient_altitude;

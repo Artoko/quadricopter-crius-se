@@ -81,11 +81,19 @@ Int32U CmpBMP085GetAltitude( void )
 	else if( step_baro == STEP_READ_UP )
 	{
 		CmpBMP085ReadUP();
+		step_baro = STEP_COMPUTE;
+	}
+	else if( step_baro == STEP_COMPUTE )
+	{
 		CmpBMP085Compute();
 		pression = pressure;
 		BaroAlt = (Int32U)((1.0f - pow(pressure/101325.0f, 0.190295f)) * 443300.0f);
 		step_baro = STEP_NONE;
 	}
+	else
+	{
+		//		
+	}		
 	return BaroAlt;
 }
 
