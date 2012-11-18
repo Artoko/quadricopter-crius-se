@@ -114,11 +114,12 @@ void SrvImuDispatcher (Event_t in_event)
 		// ********************* Fusion des capteurs ******************************		
 		imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle ) * 10U;
 		imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle ) * 10U;
-		imu_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
+		imu_reel.lacet    = gyroZAngle;
+		imu_reel.nord	  = direction;
 		//imu_reel.lacet    = direction;		
 		
 		//imu_reel.altitude = SrvKalmanFilterAlt( imu_reel.altitude, (accZangle - BMA180_ACC_1G), temp_dernier_cycle );
-		imu_reel.altitude -= altitude_depart;
+		
 		
 		// ********************* PID **********************************************
 		pid_erreur_roulis	= SrvPIDCompute( 0U , imu_desire.roulis					, imu_reel.roulis);
@@ -141,6 +142,7 @@ void SrvImuDispatcher (Event_t in_event)
 		CmpBMP085StartCapture();
 	}
 	imu_reel.altitude = CmpBMP085GetAltitude();
+	imu_reel.altitude -= altitude_depart;
 	
 	// a 10 sec on enregistre l'altitude
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_10S ) == TRUE)
