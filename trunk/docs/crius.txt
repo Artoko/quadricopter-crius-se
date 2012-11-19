@@ -1,0 +1,11 @@
+·Dimensions 50 mm X 50 mm
+·Standard Mk style mounting holes 45mm X 45mm
+·Weigh 13.9g
+·SMD component design with atmega328P
+·ITG3205 TRIPLE AXIS GYRO
+BMA180 ACCELEROMETER
+BMP085 BAROMETER
+HMC5883L MAGNETOMETER
+·Design with servo output for Camera Pitch and Roll
+·Separate 3.3v regulated supply for the sensors
+·On board logic level converter
