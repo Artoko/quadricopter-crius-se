@@ -74,7 +74,13 @@ static void SrvCommExecute ( void )
 	if(ma_trame_comm.param[PARAM_0] == COMM_MOTOR )
 	{ 
 		//controle validité data
-		if(( ma_trame_comm.param[PARAM_1] >= 0U ) && ( ma_trame_comm.param[PARAM_1] <= 1000U ))
+		if(
+		   ( ma_trame_comm.param[PARAM_1] >= 0U ) &&
+		   ( ma_trame_comm.param[PARAM_1] <= 1000U ) &&
+		   ( ma_trame_comm.param[PARAM_2] <= 0U ) &&
+		   ( ma_trame_comm.param[PARAM_3] <= 0U ) &&
+		   ( ma_trame_comm.param[PARAM_4] <= 0U )
+		  )
 		{
 			//applique la vitesse au moteurs
 			SrvMotorApplyAbsoluteSpeed(ma_trame_comm.param[PARAM_1]);
@@ -83,9 +89,9 @@ static void SrvCommExecute ( void )
 	else if(ma_trame_comm.param[PARAM_0] == COMM_ANGLE )
 	{ 
 		//applique les angle souhaité
-		imu_desire.roulis = ma_trame_comm.param[PARAM_1];
-		imu_desire.tangage = -1*ma_trame_comm.param[PARAM_2];
-		imu_desire.lacet = ma_trame_comm.param[PARAM_3];
+		imu_desire.roulis = (Int16S)ma_trame_comm.param[PARAM_1];
+		imu_desire.tangage = (Int16S)ma_trame_comm.param[PARAM_2];
+		imu_desire.lacet = (Int16S)ma_trame_comm.param[PARAM_3];
 	}
 	else if(ma_trame_comm.param[PARAM_0] == COMM_ALTITUDE )
 	{ 
@@ -118,13 +124,14 @@ static void SrvCommRepportData( void )
 	Int8U lenght = 0;
 	
 	lenght = sprintf(	o_message	
-						,"%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\n"
+						,"%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\n"
 						,imu_reel.roulis
 						,imu_reel.tangage
 						,imu_reel.lacet	
 						,imu_reel.altitude
 						,pid_erreur_roulis
 						,pid_erreur_tangage
+						,pid_erreur_lacet
 						,frontMotor_R	
 						,frontMotor_L	
 						,rearMotor_R	

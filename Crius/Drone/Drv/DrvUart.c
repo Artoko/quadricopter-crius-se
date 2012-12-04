@@ -88,6 +88,9 @@ void DrvUart0ReadMessage( STrame *trame )
 	trame_uart.param[PARAM_2] = 0;			
 	trame_uart.param[PARAM_3] = 0;
 	trame_uart.param[PARAM_4] = 0;
+	
+	//on attend le start frame
+	start_frame_uart_0 = FALSE;
 }
 //on recupere le message
 void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
@@ -160,6 +163,7 @@ volatile Int8U decade = 1U;
 volatile Int8U index_param = 0U;
 volatile Char rcv_byte = 0U;
 volatile Char last_rcv_byte = 0U;
+volatile Int8S signe = 0;
 ISR(USART_RX_vect)
 {
 	//on enregistre l'octet recu
@@ -174,6 +178,7 @@ ISR(USART_RX_vect)
 			ctr_buff_uart_0 = 1U;
 			//on a recu le start frame
 			start_frame_uart_0 = TRUE;
+			signe = 0;
 		}
 	}
 	else
@@ -186,10 +191,8 @@ ISR(USART_RX_vect)
 		//si fin de trame
 		if(( last_rcv_byte == '#' ) && ( rcv_byte == '#' ))
 		{
-			//on attend le start frame
-			start_frame_uart_0 = FALSE;
 			index_param = 0;
-			decade = 1U;
+			decade = 1;
 			//on lance l'event
 			DrvEventAddEvent( CONF_EVENT_MSG_RCV );
 		}
@@ -201,23 +204,37 @@ ISR(USART_RX_vect)
 				//on attend le start frame
 				start_frame_uart_0 = FALSE;
 				index_param = 0;
-				decade = 1U;
+				decade = 1;
 			}
 			else
 			{
 				//on discossie les params
-				if( last_rcv_byte == '-' )
+				if( last_rcv_byte == '+' )
 				{
 					index_param++;
-					decade = 1U;
+					decade = 1;
+					signe = 0;
+				}
+				else if( last_rcv_byte == '-' )
+				{
+					index_param++;
+					decade = 1;		
+					signe = 1;
 				}
 				else
 				{
 					if(last_rcv_byte != '*')
 					{
 						trame_uart.param[index_param] *= decade;
-						trame_uart.param[index_param] += (last_rcv_byte - 0x30U);
-						decade = 10U;
+						if(signe == 1)
+						{
+							trame_uart.param[index_param] -= (last_rcv_byte - 0x30);
+						}
+						else
+						{
+							trame_uart.param[index_param] += (last_rcv_byte - 0x30);
+						}
+						decade = 10;
 					}
 				}
 			}				
