@@ -25,6 +25,7 @@ namespace GroundStation
         PointPairList courbe9 = new PointPairList();
         PointPairList courbe10 = new PointPairList();
         PointPairList courbe11 = new PointPairList();
+        PointPairList courbe12 = new PointPairList();
         
         public int timeout = 0;
         GraphPane myPane1;
@@ -42,11 +43,12 @@ namespace GroundStation
             myPane1.AddCurve("altitude", courbe4, Color.Brown, SymbolType.None);
             myPane1.AddCurve("pid roulis", courbe5, Color.YellowGreen, SymbolType.None);
             myPane1.AddCurve("pid tangage", courbe6, Color.Green, SymbolType.None);
-            myPane1.AddCurve("front motor R", courbe7, Color.DarkCyan, SymbolType.None);
-            myPane1.AddCurve("front motor L", courbe8, Color.BlueViolet, SymbolType.None);
-            myPane1.AddCurve("rear motor R", courbe9, Color.Chartreuse, SymbolType.None);
-            myPane1.AddCurve("rear motor L", courbe10, Color.Chocolate, SymbolType.None);
-            myPane1.AddCurve("vitesse", courbe11, Color.Coral, SymbolType.None);
+            myPane1.AddCurve("pid lacet", courbe7, Color.Firebrick, SymbolType.None);
+            myPane1.AddCurve("front motor R", courbe8, Color.DarkCyan, SymbolType.None);
+            myPane1.AddCurve("front motor L", courbe9, Color.BlueViolet, SymbolType.None);
+            myPane1.AddCurve("rear motor R", courbe10, Color.Chartreuse, SymbolType.None);
+            myPane1.AddCurve("rear motor L", courbe11, Color.Chocolate, SymbolType.None);
+            myPane1.AddCurve("vitesse", courbe12, Color.Coral, SymbolType.None);
             GroundStationMainForm.serial.AddCallback(IncommingMessage);
         }
 
@@ -85,25 +87,29 @@ namespace GroundStation
                 {
                     courbe6.Add(timeout, System.Convert.ToInt16(param[5]));
                 }
-                if (checkBoxmotorFR.Checked == true)
+                if (checkBoxpidlacet.Checked == true)
                 {
                     courbe7.Add(timeout, System.Convert.ToInt16(param[6]));
                 }
-                if (checkBoxmotorFL.Checked == true)
+                if (checkBoxmotorFR.Checked == true)
                 {
                     courbe8.Add(timeout, System.Convert.ToInt16(param[7]));
                 }
-                if (checkBoxmotorRR.Checked == true)
+                if (checkBoxmotorFL.Checked == true)
                 {
                     courbe9.Add(timeout, System.Convert.ToInt16(param[8]));
                 }
-                if (checkBoxmotorRL.Checked == true)
+                if (checkBoxmotorRR.Checked == true)
                 {
                     courbe10.Add(timeout, System.Convert.ToInt16(param[9]));
                 }
-                if (checkBoxvitesse.Checked == true)
+                if (checkBoxmotorRL.Checked == true)
                 {
                     courbe11.Add(timeout, System.Convert.ToInt16(param[10]));
+                }
+                if (checkBoxvitesse.Checked == true)
+                {
+                    courbe12.Add(timeout, System.Convert.ToInt16(param[11]));
                 }
 
                 zedGraphControl1.AxisChange();
@@ -132,6 +138,7 @@ namespace GroundStation
             courbe9.Clear();
             courbe10.Clear();
             courbe11.Clear();
+            courbe12.Clear();
             timeout = 0;
             zedGraphControl1.AxisChange();
             zedGraphControl1.Refresh();

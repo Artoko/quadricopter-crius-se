@@ -39,6 +39,8 @@
             this.labelLacet = new System.Windows.Forms.Label();
             this.buttonReset = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.checkBoxFullSpeed = new System.Windows.Forms.CheckBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.PowerTrackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarRoulis)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarTangage)).BeginInit();
@@ -60,7 +62,7 @@
             // 
             this.PowerTrackBar.LargeChange = 1;
             this.PowerTrackBar.Location = new System.Drawing.Point(12, 89);
-            this.PowerTrackBar.Maximum = 1000;
+            this.PowerTrackBar.Maximum = 500;
             this.PowerTrackBar.Name = "PowerTrackBar";
             this.PowerTrackBar.Size = new System.Drawing.Size(268, 45);
             this.PowerTrackBar.TabIndex = 1;
@@ -81,6 +83,7 @@
             this.trackBarRoulis.LargeChange = 1;
             this.trackBarRoulis.Location = new System.Drawing.Point(12, 131);
             this.trackBarRoulis.Maximum = 900;
+            this.trackBarRoulis.Minimum = -900;
             this.trackBarRoulis.Name = "trackBarRoulis";
             this.trackBarRoulis.Size = new System.Drawing.Size(268, 45);
             this.trackBarRoulis.TabIndex = 1;
@@ -101,6 +104,7 @@
             this.trackBarTangage.LargeChange = 1;
             this.trackBarTangage.Location = new System.Drawing.Point(12, 177);
             this.trackBarTangage.Maximum = 900;
+            this.trackBarTangage.Minimum = -900;
             this.trackBarTangage.Name = "trackBarTangage";
             this.trackBarTangage.Size = new System.Drawing.Size(268, 45);
             this.trackBarTangage.TabIndex = 1;
@@ -120,11 +124,11 @@
             // 
             this.trackBarLacet.LargeChange = 1;
             this.trackBarLacet.Location = new System.Drawing.Point(12, 225);
-            this.trackBarLacet.Maximum = 900;
+            this.trackBarLacet.Maximum = 100;
+            this.trackBarLacet.Minimum = -100;
             this.trackBarLacet.Name = "trackBarLacet";
             this.trackBarLacet.Size = new System.Drawing.Size(268, 45);
             this.trackBarLacet.TabIndex = 1;
-            this.trackBarLacet.TickFrequency = 10;
             this.trackBarLacet.ValueChanged += new System.EventHandler(this.LacetTrackBar_ValueChanged);
             // 
             // labelLacet
@@ -156,11 +160,35 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.buttonReseteeprom_Click);
             // 
+            // checkBoxFullSpeed
+            // 
+            this.checkBoxFullSpeed.AutoSize = true;
+            this.checkBoxFullSpeed.Location = new System.Drawing.Point(362, 100);
+            this.checkBoxFullSpeed.Name = "checkBoxFullSpeed";
+            this.checkBoxFullSpeed.Size = new System.Drawing.Size(74, 17);
+            this.checkBoxFullSpeed.TabIndex = 4;
+            this.checkBoxFullSpeed.Text = "Full speed";
+            this.checkBoxFullSpeed.UseVisualStyleBackColor = true;
+            this.checkBoxFullSpeed.CheckedChanged += new System.EventHandler(this.checkBoxFullSpeed_CheckedChanged);
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(388, 159);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(145, 17);
+            this.checkBox1.TabIndex = 5;
+            this.checkBox1.Text = "Combine roulis && tangage";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
             // FormCommand
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(402, 371);
+            this.ClientSize = new System.Drawing.Size(563, 371);
+            this.Controls.Add(this.checkBox1);
+            this.Controls.Add(this.checkBoxFullSpeed);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.buttonReset);
             this.Controls.Add(this.labelLacet);
@@ -200,5 +228,7 @@
         private System.Windows.Forms.Label labelLacet;
         private System.Windows.Forms.Button buttonReset;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.CheckBox checkBoxFullSpeed;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }

@@ -122,9 +122,9 @@ void SrvImuDispatcher (Event_t in_event)
 		
 		
 		// ********************* PID **********************************************
-		pid_erreur_roulis	= SrvPIDCompute( 0U , imu_desire.roulis					, imu_reel.roulis);
-		pid_erreur_tangage	= SrvPIDCompute( 1U , imu_desire.tangage				, imu_reel.tangage);
-		pid_erreur_lacet	= SrvPIDCompute( 2U , imu_reel.lacet + imu_desire.lacet	, imu_reel.lacet);
+		pid_erreur_roulis	= SrvPIDCompute( 0U , (float)imu_desire.roulis					, (float)imu_reel.roulis);
+		pid_erreur_tangage	= SrvPIDCompute( 1U , (float)imu_desire.tangage					, (float)imu_reel.tangage);
+		pid_erreur_lacet	= SrvPIDCompute( 2U , (float)(imu_reel.lacet + imu_desire.lacet), (float)imu_reel.lacet);
 		if(imu_reel.maintient_altitude == TRUE)
 		{
 			pid_erreur_altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.altitude);

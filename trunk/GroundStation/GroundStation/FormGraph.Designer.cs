@@ -44,6 +44,7 @@
             this.checkBoxmotorFL = new System.Windows.Forms.CheckBox();
             this.checkBoxmotorRR = new System.Windows.Forms.CheckBox();
             this.checkBoxmotorRL = new System.Windows.Forms.CheckBox();
+            this.checkBoxpidlacet = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // zedGraphControl1
@@ -130,7 +131,7 @@
             // checkBoxvitesse
             // 
             this.checkBoxvitesse.AutoSize = true;
-            this.checkBoxvitesse.Location = new System.Drawing.Point(10, 271);
+            this.checkBoxvitesse.Location = new System.Drawing.Point(10, 294);
             this.checkBoxvitesse.Name = "checkBoxvitesse";
             this.checkBoxvitesse.Size = new System.Drawing.Size(59, 17);
             this.checkBoxvitesse.TabIndex = 5;
@@ -150,7 +151,7 @@
             // checkBoxmotorFR
             // 
             this.checkBoxmotorFR.AutoSize = true;
-            this.checkBoxmotorFR.Location = new System.Drawing.Point(10, 180);
+            this.checkBoxmotorFR.Location = new System.Drawing.Point(10, 203);
             this.checkBoxmotorFR.Name = "checkBoxmotorFR";
             this.checkBoxmotorFR.Size = new System.Drawing.Size(69, 17);
             this.checkBoxmotorFR.TabIndex = 6;
@@ -160,7 +161,7 @@
             // checkBoxmotorFL
             // 
             this.checkBoxmotorFL.AutoSize = true;
-            this.checkBoxmotorFL.Location = new System.Drawing.Point(10, 203);
+            this.checkBoxmotorFL.Location = new System.Drawing.Point(10, 226);
             this.checkBoxmotorFL.Name = "checkBoxmotorFL";
             this.checkBoxmotorFL.Size = new System.Drawing.Size(67, 17);
             this.checkBoxmotorFL.TabIndex = 7;
@@ -170,7 +171,7 @@
             // checkBoxmotorRR
             // 
             this.checkBoxmotorRR.AutoSize = true;
-            this.checkBoxmotorRR.Location = new System.Drawing.Point(10, 226);
+            this.checkBoxmotorRR.Location = new System.Drawing.Point(10, 249);
             this.checkBoxmotorRR.Name = "checkBoxmotorRR";
             this.checkBoxmotorRR.Size = new System.Drawing.Size(71, 17);
             this.checkBoxmotorRR.TabIndex = 8;
@@ -180,12 +181,22 @@
             // checkBoxmotorRL
             // 
             this.checkBoxmotorRL.AutoSize = true;
-            this.checkBoxmotorRL.Location = new System.Drawing.Point(10, 248);
+            this.checkBoxmotorRL.Location = new System.Drawing.Point(10, 271);
             this.checkBoxmotorRL.Name = "checkBoxmotorRL";
             this.checkBoxmotorRL.Size = new System.Drawing.Size(69, 17);
             this.checkBoxmotorRL.TabIndex = 9;
             this.checkBoxmotorRL.Text = "motor RL";
             this.checkBoxmotorRL.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxpidlacet
+            // 
+            this.checkBoxpidlacet.AutoSize = true;
+            this.checkBoxpidlacet.Location = new System.Drawing.Point(10, 180);
+            this.checkBoxpidlacet.Name = "checkBoxpidlacet";
+            this.checkBoxpidlacet.Size = new System.Drawing.Size(66, 17);
+            this.checkBoxpidlacet.TabIndex = 5;
+            this.checkBoxpidlacet.Text = "pid lacet";
+            this.checkBoxpidlacet.UseVisualStyleBackColor = true;
             // 
             // FormGraph
             // 
@@ -197,6 +208,7 @@
             this.Controls.Add(this.checkBoxmotorFL);
             this.Controls.Add(this.checkBoxmotorFR);
             this.Controls.Add(this.checkBoxvitesse);
+            this.Controls.Add(this.checkBoxpidlacet);
             this.Controls.Add(this.checkBoxpidtangage);
             this.Controls.Add(this.checkBoxpidroulis);
             this.Controls.Add(this.checkBoxaltitude);
@@ -232,6 +244,7 @@
         private System.Windows.Forms.CheckBox checkBoxmotorFL;
         private System.Windows.Forms.CheckBox checkBoxmotorRR;
         private System.Windows.Forms.CheckBox checkBoxmotorRL;
+        private System.Windows.Forms.CheckBox checkBoxpidlacet;
 
     }
 }
