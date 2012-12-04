@@ -11,7 +11,6 @@ namespace GroundStation
 {
     public partial class FormCommand : Form
     {
-        private bool combine_roulis_tangage = false;
         public FormCommand()
         {
             InitializeComponent();
@@ -20,6 +19,10 @@ namespace GroundStation
         private void Speedbutton_Click(object sender, EventArgs e)
         {
             GroundStationMainForm.serial.SendMessage("*0+0##");
+            PowerTrackBar.Value = 0;
+            trackBarRoulis.Value = 0;
+            trackBarLacet.Value = 0;
+            trackBarTangage.Value = 0;
         }
 
         private void PowerTrackBar_ValueChanged(object sender, EventArgs e)
@@ -89,11 +92,19 @@ namespace GroundStation
         private void buttonReset_Click(object sender, EventArgs e)
         {
             GroundStationMainForm.serial.SendMessage("*4+0##");
+            PowerTrackBar.Value = 0;
+            trackBarRoulis.Value = 0;
+            trackBarLacet.Value = 0;
+            trackBarTangage.Value = 0;
         }
 
         private void buttonReseteeprom_Click(object sender, EventArgs e)
         {
             GroundStationMainForm.serial.SendMessage("*4+1##");
+            PowerTrackBar.Value = 0;
+            trackBarRoulis.Value = 0;
+            trackBarLacet.Value = 0;
+            trackBarTangage.Value = 0;
         }
 
         private void checkBoxFullSpeed_CheckedChanged(object sender, EventArgs e)
