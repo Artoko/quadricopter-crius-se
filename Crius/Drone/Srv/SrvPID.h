@@ -16,10 +16,17 @@
 
 #include "Drv/DrvEvent.h"
 
+typedef struct
+{
+	float P, I, D;
+	float lastPosition;
+	float integratedError;
+}S_IMU_PID;
 
 //init des valeurs du PID
-void SrvPIDInit (Int8U index,float P, float I, float D);
+void SrvPIDInit(void );
 
 Int16S SrvPIDCompute(Int8U index, float targetPosition, float currentPosition );
+
 
 #endif /* SRVPID_H_ */

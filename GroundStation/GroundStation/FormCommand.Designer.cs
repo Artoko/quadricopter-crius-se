@@ -41,10 +41,25 @@
             this.button1 = new System.Windows.Forms.Button();
             this.checkBoxFullSpeed = new System.Windows.Forms.CheckBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.numericUpDownP = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownI = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownD = new System.Windows.Forms.NumericUpDown();
+            this.labelP = new System.Windows.Forms.Label();
+            this.labelI = new System.Windows.Forms.Label();
+            this.labelD = new System.Windows.Forms.Label();
+            this.numericUpDownindex = new System.Windows.Forms.NumericUpDown();
+            this.labelindex = new System.Windows.Forms.Label();
+            this.ButtonWrite = new System.Windows.Forms.Button();
+            this.buttonRepportData = new System.Windows.Forms.Button();
+            this.buttonRead = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.PowerTrackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarRoulis)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarTangage)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarLacet)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownP)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownI)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownD)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownindex)).BeginInit();
             this.SuspendLayout();
             // 
             // Stopbutton
@@ -65,6 +80,7 @@
             this.PowerTrackBar.Maximum = 500;
             this.PowerTrackBar.Name = "PowerTrackBar";
             this.PowerTrackBar.Size = new System.Drawing.Size(268, 45);
+            this.PowerTrackBar.SmallChange = 10;
             this.PowerTrackBar.TabIndex = 1;
             this.PowerTrackBar.TickFrequency = 10;
             this.PowerTrackBar.ValueChanged += new System.EventHandler(this.PowerTrackBar_ValueChanged);
@@ -142,7 +158,7 @@
             // 
             // buttonReset
             // 
-            this.buttonReset.Location = new System.Drawing.Point(21, 304);
+            this.buttonReset.Location = new System.Drawing.Point(12, 340);
             this.buttonReset.Name = "buttonReset";
             this.buttonReset.Size = new System.Drawing.Size(120, 23);
             this.buttonReset.TabIndex = 3;
@@ -152,7 +168,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(21, 333);
+            this.button1.Location = new System.Drawing.Point(138, 340);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(120, 23);
             this.button1.TabIndex = 3;
@@ -180,13 +196,147 @@
             this.checkBox1.TabIndex = 5;
             this.checkBox1.Text = "Combine roulis && tangage";
             this.checkBox1.UseVisualStyleBackColor = true;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
+            // numericUpDownP
+            // 
+            this.numericUpDownP.Location = new System.Drawing.Point(55, 304);
+            this.numericUpDownP.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.numericUpDownP.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+            this.numericUpDownP.Name = "numericUpDownP";
+            this.numericUpDownP.Size = new System.Drawing.Size(86, 20);
+            this.numericUpDownP.TabIndex = 6;
+            // 
+            // numericUpDownI
+            // 
+            this.numericUpDownI.Location = new System.Drawing.Point(147, 304);
+            this.numericUpDownI.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.numericUpDownI.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+            this.numericUpDownI.Name = "numericUpDownI";
+            this.numericUpDownI.Size = new System.Drawing.Size(86, 20);
+            this.numericUpDownI.TabIndex = 6;
+            // 
+            // numericUpDownD
+            // 
+            this.numericUpDownD.Location = new System.Drawing.Point(239, 304);
+            this.numericUpDownD.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.numericUpDownD.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+            this.numericUpDownD.Name = "numericUpDownD";
+            this.numericUpDownD.Size = new System.Drawing.Size(86, 20);
+            this.numericUpDownD.TabIndex = 6;
+            // 
+            // labelP
+            // 
+            this.labelP.AutoSize = true;
+            this.labelP.Location = new System.Drawing.Point(91, 285);
+            this.labelP.Name = "labelP";
+            this.labelP.Size = new System.Drawing.Size(14, 13);
+            this.labelP.TabIndex = 7;
+            this.labelP.Text = "P";
+            // 
+            // labelI
+            // 
+            this.labelI.AutoSize = true;
+            this.labelI.Location = new System.Drawing.Point(179, 288);
+            this.labelI.Name = "labelI";
+            this.labelI.Size = new System.Drawing.Size(39, 13);
+            this.labelI.TabIndex = 7;
+            this.labelI.Text = "I  (/10)";
+            // 
+            // labelD
+            // 
+            this.labelD.AutoSize = true;
+            this.labelD.Location = new System.Drawing.Point(274, 285);
+            this.labelD.Name = "labelD";
+            this.labelD.Size = new System.Drawing.Size(15, 13);
+            this.labelD.TabIndex = 7;
+            this.labelD.Text = "D";
+            // 
+            // numericUpDownindex
+            // 
+            this.numericUpDownindex.Location = new System.Drawing.Point(8, 304);
+            this.numericUpDownindex.Name = "numericUpDownindex";
+            this.numericUpDownindex.Size = new System.Drawing.Size(41, 20);
+            this.numericUpDownindex.TabIndex = 8;
+            // 
+            // labelindex
+            // 
+            this.labelindex.AutoSize = true;
+            this.labelindex.Location = new System.Drawing.Point(12, 285);
+            this.labelindex.Name = "labelindex";
+            this.labelindex.Size = new System.Drawing.Size(33, 13);
+            this.labelindex.TabIndex = 7;
+            this.labelindex.Text = "Index";
+            // 
+            // ButtonWrite
+            // 
+            this.ButtonWrite.Location = new System.Drawing.Point(331, 301);
+            this.ButtonWrite.Name = "ButtonWrite";
+            this.ButtonWrite.Size = new System.Drawing.Size(75, 23);
+            this.ButtonWrite.TabIndex = 9;
+            this.ButtonWrite.Text = "Write";
+            this.ButtonWrite.UseVisualStyleBackColor = true;
+            this.ButtonWrite.Click += new System.EventHandler(this.ButtonWrite_Click);
+            // 
+            // buttonRepportData
+            // 
+            this.buttonRepportData.Location = new System.Drawing.Point(264, 340);
+            this.buttonRepportData.Name = "buttonRepportData";
+            this.buttonRepportData.Size = new System.Drawing.Size(120, 23);
+            this.buttonRepportData.TabIndex = 10;
+            this.buttonRepportData.Text = "Repport Data";
+            this.buttonRepportData.UseVisualStyleBackColor = true;
+            this.buttonRepportData.Click += new System.EventHandler(this.buttonRepportData_Click);
+            // 
+            // buttonRead
+            // 
+            this.buttonRead.Location = new System.Drawing.Point(412, 301);
+            this.buttonRead.Name = "buttonRead";
+            this.buttonRead.Size = new System.Drawing.Size(75, 23);
+            this.buttonRead.TabIndex = 9;
+            this.buttonRead.Text = "Read";
+            this.buttonRead.UseVisualStyleBackColor = true;
+            this.buttonRead.Click += new System.EventHandler(this.ButtonRead_Click);
             // 
             // FormCommand
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(563, 371);
+            this.ClientSize = new System.Drawing.Size(563, 372);
+            this.Controls.Add(this.buttonRepportData);
+            this.Controls.Add(this.buttonRead);
+            this.Controls.Add(this.ButtonWrite);
+            this.Controls.Add(this.numericUpDownindex);
+            this.Controls.Add(this.labelindex);
+            this.Controls.Add(this.labelD);
+            this.Controls.Add(this.labelI);
+            this.Controls.Add(this.labelP);
+            this.Controls.Add(this.numericUpDownD);
+            this.Controls.Add(this.numericUpDownI);
+            this.Controls.Add(this.numericUpDownP);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.checkBoxFullSpeed);
             this.Controls.Add(this.button1);
@@ -206,10 +356,15 @@
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.Text = "Command";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormCommand_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.PowerTrackBar)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarRoulis)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarTangage)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarLacet)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownP)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownI)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownD)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownindex)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -230,5 +385,16 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.CheckBox checkBoxFullSpeed;
         private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.NumericUpDown numericUpDownP;
+        private System.Windows.Forms.NumericUpDown numericUpDownI;
+        private System.Windows.Forms.NumericUpDown numericUpDownD;
+        private System.Windows.Forms.Label labelP;
+        private System.Windows.Forms.Label labelI;
+        private System.Windows.Forms.Label labelD;
+        private System.Windows.Forms.NumericUpDown numericUpDownindex;
+        private System.Windows.Forms.Label labelindex;
+        private System.Windows.Forms.Button ButtonWrite;
+        private System.Windows.Forms.Button buttonRepportData;
+        private System.Windows.Forms.Button buttonRead;
     }
 }

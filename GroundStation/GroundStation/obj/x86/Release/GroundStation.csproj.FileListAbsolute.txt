@@ -12,3 +12,9 @@ C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStat
 C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStation\GroundStation\obj\x86\Release\GroundStation.GroundStationMainForm.resources
 C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStation\GroundStation\obj\x86\Release\GroundStation.FormSerial.resources
 C:\Documents and Settings\berryer\Desktop\Bureau\4 Perso\Softs\autres\GroundStation\GroundStation\obj\x86\Release\GroundStation.FormCommand.resources
+C:\Users\berryer\Desktop\Crius\GroundStation\GroundStation\obj\x86\Release\GroundStation.FormCommand.resources
+C:\Users\berryer\Desktop\Crius\GroundStation\GroundStation\obj\x86\Release\GroundStation.FormGraph.resources
+C:\Users\berryer\Desktop\Crius\GroundStation\GroundStation\obj\x86\Release\GroundStation.GroundStationMainForm.resources
+C:\Users\berryer\Desktop\Crius\GroundStation\GroundStation\obj\x86\Release\GroundStation.Properties.Resources.resources
+C:\Users\berryer\Desktop\Crius\GroundStation\GroundStation\obj\x86\Release\GroundStation.csproj.GenerateResource.Cache
+C:\Users\berryer\Desktop\Crius\GroundStation\GroundStation\obj\x86\Release\GroundStation.exe

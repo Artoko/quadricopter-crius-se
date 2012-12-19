@@ -15,32 +15,47 @@
 
 
 ////////////////////////////////////////PRIVATE STRUCTURES/////////////////////////////////////////
-typedef struct
-{
-	float P, I, D;
-	float lastPosition;
-	float integratedError;
-}S_IMU_PID;
+
 
 static S_IMU_PID pid[ 4U ] ;
 
 
 
-void SrvPIDInit (Int8U index,float P, float I, float D)
+void SrvPIDInit(void )
 {
-	//if(DrvEepromIsConfigured() == FALSE)
-	{	
-		//DrvEepromWritePID(index,P,I,D);
-	}
-	//else
-	{
-		//DrvEepromReadPID(index,&P,&I,&D);
-	}
-	pid[index].P = P;
-	pid[index].I = I;
-	pid[index].D = D;
-	pid[index].lastPosition = 0;
-	pid[index].integratedError = 0;
+	float P;
+	float I;
+	float D;
+	//roulis
+	DrvEepromReadPID(0U,&P,&I,&D);
+	pid[0U].P = P;
+	pid[0U].I = I;
+	pid[0U].D = D;
+	pid[0U].lastPosition = 0;
+	pid[0U].integratedError = 0;
+	//tangage
+	DrvEepromReadPID(1U,&P,&I,&D);
+	pid[1U].P = P;
+	pid[1U].I = I;
+	pid[1U].D = D;
+	pid[1U].lastPosition = 0;
+	pid[1U].integratedError = 0;
+	//lacet
+	DrvEepromReadPID(2U,&P,&I,&D);
+	pid[2U].P = P;
+	pid[2U].I = I;
+	pid[2U].D = D;
+	pid[2U].lastPosition = 0;
+	pid[2U].integratedError = 0;
+	//altitude
+	DrvEepromReadPID(3U,&P,&I,&D);
+	pid[3U].P = P;
+	pid[3U].I = I;
+	pid[3U].D = D;
+	pid[3U].lastPosition = 0;
+	pid[3U].integratedError = 0;
+	
+	
 }
 
 Int16S SrvPIDCompute(Int8U index, float targetPosition, float currentPosition )
@@ -63,3 +78,4 @@ Int16S SrvPIDCompute(Int8U index, float targetPosition, float currentPosition )
 	pid[index].lastPosition = currentPosition;
 	return (Int16S)(((pid[index].P * error) / 10) + ((pid[index].I * pid[index].integratedError) / 10) + dTerm);
 }
+

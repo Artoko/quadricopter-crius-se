@@ -34,6 +34,8 @@ static void SrvCommRepportData( void) ;
 //passage des params de la trame
 static STrame ma_trame_comm;
 
+static Boolean want_repport_data = FALSE;
+
 /************************************************************************/
 /*init de la communication                                              */
 /************************************************************************/
@@ -62,7 +64,10 @@ void SrvCommDispatcher (Event_t in_event)
 	
 	if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_100MS))
 	{
-		SrvCommRepportData();
+		if( want_repport_data == TRUE )
+		{
+			SrvCommRepportData();
+		}
 	}
 }
 
@@ -84,6 +89,7 @@ static void SrvCommExecute ( void )
 		{
 			//applique la vitesse au moteurs
 			SrvMotorApplyAbsoluteSpeed(ma_trame_comm.param[PARAM_1]);
+			DrvUart0SendMessage( "OK\n" , 3U );
 		}
 	}
 	else if(ma_trame_comm.param[PARAM_0] == COMM_ANGLE )
@@ -92,6 +98,7 @@ static void SrvCommExecute ( void )
 		imu_desire.roulis = (Int16S)ma_trame_comm.param[PARAM_1];
 		imu_desire.tangage = (Int16S)ma_trame_comm.param[PARAM_2];
 		imu_desire.lacet = (Int16S)ma_trame_comm.param[PARAM_3];
+		DrvUart0SendMessage( "OK\n" , 3U );
 	}
 	else if(ma_trame_comm.param[PARAM_0] == COMM_ALTITUDE )
 	{ 
@@ -100,9 +107,46 @@ static void SrvCommExecute ( void )
 		
 		//on enregistre l'altitude relative a la position de depart
 		SrvImuSensorsSetAltitudeMaintient(ma_trame_comm.param[PARAM_1]);
+		DrvUart0SendMessage( "OK\n" , 3U );
 	}
 	else if(ma_trame_comm.param[PARAM_0] == COMM_PID )
 	{
+		//Write PID
+		if(  ma_trame_comm.param[PARAM_1] == 1 )
+		{
+			Int8U index = 0;
+			float P = 0;
+			float I = 0;
+			float D = 0;
+			index = ma_trame_comm.param[PARAM_2];
+			P = (float)(Int16S)( ma_trame_comm.param[PARAM_3]);
+			I = (float)(Int16S)( ma_trame_comm.param[PARAM_4]);
+			I /= 10;
+			D = (float)(Int16S)( ma_trame_comm.param[PARAM_5]);
+			DrvEepromWritePID(index,P,I,D);
+			SrvPIDInit();
+			DrvUart0SendMessage( "OK\n" , 3U );
+		}
+		//Read PID
+		else
+		{
+			Int8U index = 0;
+			float P = 0;
+			float I = 0;
+			float D = 0;
+			index = ma_trame_comm.param[PARAM_2];
+			DrvEepromReadPID(index,&P,&I,&D);
+			
+			Char pid_message[ 20U ];
+			Int8U lenght = 0;
+			lenght = sprintf(pid_message
+			,"PID:%i,%i,%i\n"
+			,(Int16S)P
+			,(Int16S)(I*10)
+			,(Int16S)D
+			);
+			DrvUart0SendMessage( pid_message , lenght );
+		}
 		
 	}
 	else if(ma_trame_comm.param[PARAM_0] == COMM_EEPROM )
@@ -111,7 +155,20 @@ static void SrvCommExecute ( void )
 		{
 			DrvEepromDeconfigure();
 		}
+		DrvUart0SendMessage( "OK\n" , 3U );
 		RESET_SOFT();
+	}
+	else if (ma_trame_comm.param[PARAM_0]  == COMM_REPPORT)
+	{
+		if (want_repport_data == TRUE)
+		{
+			want_repport_data = FALSE;
+		}
+		else
+		{
+			want_repport_data = TRUE;
+		}
+		DrvUart0SendMessage( "OK\n" , 3U );
 	}
 }	
 

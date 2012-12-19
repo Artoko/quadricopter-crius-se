@@ -65,6 +65,7 @@
 #define		COMM_ALTITUDE		2U
 #define		COMM_PID			3U
 #define		COMM_EEPROM			4U
+#define		COMM_REPPORT		5U
 
 
 

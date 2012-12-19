@@ -12,12 +12,14 @@ namespace GroundStation
     public partial class GroundStationMainForm : Form
     {
         public static ClassSerial serial = new ClassSerial();
-
+        
+        delegate void FillToolStrip(string value);
 
         #region load and exit main form
         public GroundStationMainForm()
         {
             InitializeComponent();
+            GroundStationMainForm.serial.AddCallback(IncommingMessage);
         }
         private void GroundStationMainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -50,7 +52,31 @@ namespace GroundStation
                 StatetoolStripStatusLabel.Text = "Etat : Deconnecte";
             }
         }
+
+        public void IncommingMessage(string message)
+        {
+            try
+            {
+                Invoke((FillToolStrip)AddItemToolStrip, message);
+            }
+            catch { }
+        }
+
+        void AddItemToolStrip(string value)
+        {
+            toolStripStatusButtonMessage.Text = "Messages : " + value;
+            toolStripStatusButtonMessage.DropDownItems.Add(value);
+            toolStripStatusButtonMessage.ToolTipText = "count ( " + Convert.ToString(toolStripStatusButtonMessage.DropDownItems.Count - 1) + " )";
+            if (toolStripStatusButtonMessage.DropDownItems.Count > 20)
+            {
+                toolStripStatusButtonMessage.DropDownItems.RemoveAt(0);
+            }
+        }
         #endregion
+
+
+
+        
 
 
         private void ShowNewForm(object sender, EventArgs e)
@@ -58,9 +84,6 @@ namespace GroundStation
             FormGraph childForm = new FormGraph();
             childForm.MdiParent = this;
             childForm.Show();
-            FormSerial childForm1 = new FormSerial();
-            childForm1.MdiParent = this;
-            childForm1.Show();
             FormCommand childForm2 = new FormCommand();
             childForm2.MdiParent = this;
             childForm2.Show();

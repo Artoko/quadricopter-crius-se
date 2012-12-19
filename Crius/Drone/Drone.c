@@ -35,6 +35,7 @@ volatile Event_t current_main_event = 0;
 
 Simu imu_desire;
 Simu imu_reel;
+
 //erreur retournee par le calcul du PID
 Int16S pid_erreur_roulis;
 Int16S pid_erreur_tangage;
@@ -53,11 +54,12 @@ Int16U rearMotor_L	= 0U;
 int main(void)
 {	
 	// ********************* Interrupt Disable ****************************************
-	//stop timer
+	DrvInterruptClearAllInterrupts();
+	
+	// ********************* Stop Timers **********************************************
 	TCCR0B = 0U;
 	TCCR1B = 0U;
 	TCCR2B = 0U;
-	DrvInterruptClearAllInterrupts();
 	
 	// ********************* Led init *************************************************
 	CONFIGURE_LED_PIN();
@@ -84,10 +86,7 @@ int main(void)
 	DrvEepromInit();
 	
 	// ********************* PID init *************************************************
-	SrvPIDInit( 0U , 1  ,0   ,-13 );  //roulis
-	SrvPIDInit( 1U , 1  ,0   ,-13 );  //tangage
-	SrvPIDInit( 2U , 1  ,0   ,0   );  //lacet
-	SrvPIDInit( 3U , 1  ,0   ,0   );  //altitude
+	SrvPIDInit();
 	
 	// ********************* Interrupt Enable *****************************************
 	DrvInterruptSetAllInterrupts();
