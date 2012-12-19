@@ -67,27 +67,20 @@ void DrvUartInit( )
 		UCSR1C|= (1<<UCSZ11);  
 	#endif
 		
-	trame_uart.param[PARAM_0] = 0;
-	trame_uart.param[PARAM_1] = 0;
-	trame_uart.param[PARAM_2] = 0;			
-	trame_uart.param[PARAM_3] = 0;
-	trame_uart.param[PARAM_4] = 0;
+	for(Int8U loop = 0U; loop < NB_PARAM ; loop++)
+	{
+		trame_uart.param[loop] = 0;
+	}
 }
 
 //on recupere le message
 void DrvUart0ReadMessage( STrame *trame )
 {
-	trame->param[PARAM_0] = trame_uart.param[PARAM_0] ;
-	trame->param[PARAM_1] = trame_uart.param[PARAM_1] ;
-	trame->param[PARAM_2] = trame_uart.param[PARAM_2] ;
-	trame->param[PARAM_3] = trame_uart.param[PARAM_3] ;
-	trame->param[PARAM_4] = trame_uart.param[PARAM_4] ;
-		
-	trame_uart.param[PARAM_0] = 0;
-	trame_uart.param[PARAM_1] = 0;
-	trame_uart.param[PARAM_2] = 0;			
-	trame_uart.param[PARAM_3] = 0;
-	trame_uart.param[PARAM_4] = 0;
+	for(Int8U loop = 0U; loop < NB_PARAM ; loop++)
+	{
+		trame->param[loop] = trame_uart.param[loop] ;
+		trame_uart.param[loop] = 0;
+	}
 	
 	//on attend le start frame
 	start_frame_uart_0 = FALSE;

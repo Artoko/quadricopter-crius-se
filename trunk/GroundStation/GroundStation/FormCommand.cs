@@ -11,9 +11,55 @@ namespace GroundStation
 {
     public partial class FormCommand : Form
     {
+        delegate void FillPIDBox(short value);
+
+
         public FormCommand()
         {
             InitializeComponent();
+
+            GroundStationMainForm.serial.AddCallback(IncommingMessage);
+        }
+        private void FormCommand_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            GroundStationMainForm.serial.DeleteCallback(IncommingMessage);
+        }
+
+
+        public void IncommingMessage(string message)
+        {
+            try
+            {
+                if (message.Contains("PID:"))
+                {
+                    message = message.Substring(message.IndexOf("PID:"), message.Length - message.IndexOf("PID:"));
+                    string [] tab = message.Remove(0, 4).Split(',');
+                    if (tab.Count() == 3)
+                    {
+                        short P = Convert.ToInt16(tab[0]);
+                        short I = Convert.ToInt16(tab[1]);
+                        short D = Convert.ToInt16(tab[2]);
+
+                        numericUpDownP.Invoke((FillPIDBox)WritenumericUpDownP, P);
+                        numericUpDownI.Invoke((FillPIDBox)WritenumericUpDownI, I);
+                        numericUpDownD.Invoke((FillPIDBox)WritenumericUpDownD, D);
+                    }
+                }
+            }
+            catch { }
+        }
+
+        void WritenumericUpDownP(short value)
+        {
+            numericUpDownP.Value = value;
+        }
+        void WritenumericUpDownI(short value)
+        {
+            numericUpDownI.Value = value;
+        }
+        void WritenumericUpDownD(short value)
+        {
+            numericUpDownD.Value = value;
         }
 
         private void Speedbutton_Click(object sender, EventArgs e)
@@ -45,12 +91,7 @@ namespace GroundStation
         {
             if (checkBox1.Checked)
             {
-                combine_roulis_tangage = true;
                 trackBarTangage.Value = trackBarRoulis.Value;
-            }
-            else
-            {
-                combine_roulis_tangage = false;
             }
             GroundStationMainForm.serial.SendMessage(FormatString());
             labelroulis.Text = "roulis angle : " + trackBarRoulis.Value.ToString();
@@ -60,28 +101,13 @@ namespace GroundStation
         {
             if (checkBox1.Checked)
             {
-                combine_roulis_tangage = true;
                 trackBarRoulis.Value = trackBarTangage.Value;
-            }
-            else
-            {
-                combine_roulis_tangage = false;
             }
             GroundStationMainForm.serial.SendMessage(FormatString());
             labeltangage.Text = "tangage angle : " + trackBarTangage.Value.ToString();
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-            if (checkBox1.Checked)
-            {
-                combine_roulis_tangage = true;
-            }
-            else
-            {
-                combine_roulis_tangage = false;
-            }
-        }
+        
 
         private void LacetTrackBar_ValueChanged(object sender, EventArgs e)
         {
@@ -119,8 +145,47 @@ namespace GroundStation
             }
         }
 
-        
+        private void ButtonWrite_Click(object sender, EventArgs e)
+        {
+            string frame = "*3+1+" + numericUpDownindex.Value;
+            if (numericUpDownP.Value >= 0)
+            {
+                frame += "+" + numericUpDownP.Value;
+            }
+            else
+            {
+                frame += numericUpDownP.Value;
+            }
+            if (numericUpDownI.Value >= 0)
+            {
+                frame += "+" + numericUpDownI.Value;
+            }
+            else
+            {
+                frame += numericUpDownI.Value;
+            }
+            if (numericUpDownD.Value >= 0)
+            {
+                frame += "+" + numericUpDownD.Value + "##";
+            }
+            else
+            {
+                frame += numericUpDownD.Value + "##";
+            }
+            GroundStationMainForm.serial.SendMessage(frame);
+        }
 
+        private void ButtonRead_Click(object sender, EventArgs e)
+        {
+            GroundStationMainForm.serial.SendMessage("*3+0+" + numericUpDownindex.Value + "##");
+        }
+
+        private void buttonRepportData_Click(object sender, EventArgs e)
+        {
+            GroundStationMainForm.serial.SendMessage("*5+0##");
+
+        }
+        
         private string FormatString()
         {
             string frame = "*1";
@@ -150,6 +215,16 @@ namespace GroundStation
             }
             return frame;
         }
+
+        
+
+        
+
+        
+
+        
+
+        
 
         
 
