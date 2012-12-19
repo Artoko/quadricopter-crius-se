@@ -63,53 +63,113 @@ namespace GroundStation
             try
             {
                 string[] param = message.Replace("\0", "").Replace(" ", "").Split(',');
+                courbe1.Add(timeout, System.Convert.ToInt16(param[0]));
+                courbe2.Add(timeout, System.Convert.ToInt16(param[1]));
+                courbe3.Add(timeout, System.Convert.ToInt16(param[2]));
+                courbe4.Add(timeout, System.Convert.ToInt16(param[3]));
+                courbe5.Add(timeout, System.Convert.ToInt16(param[4]));
+                courbe6.Add(timeout, System.Convert.ToInt16(param[5]));
+                courbe7.Add(timeout, System.Convert.ToInt16(param[6]));
+                courbe8.Add(timeout, System.Convert.ToInt16(param[7]));
+                courbe9.Add(timeout, System.Convert.ToInt16(param[8]));
+                courbe10.Add(timeout, System.Convert.ToInt16(param[9]));
+                courbe11.Add(timeout, System.Convert.ToInt16(param[10]));
+                courbe12.Add(timeout, System.Convert.ToInt16(param[11]));
                 if (checkBoxRoulis.Checked == true)
                 {
-                    courbe1.Add(timeout, System.Convert.ToInt16(param[0]));
+                    myPane1.CurveList[0].IsVisible = true;
+                }
+                else
+                {
+                    myPane1.CurveList[0].IsVisible = false;
                 }
                 if (checkBoxtangage.Checked == true)
                 {
-                    courbe2.Add(timeout, System.Convert.ToInt16(param[1]));
+                    myPane1.CurveList[1].IsVisible = true;
+                }
+                else
+                {
+                    myPane1.CurveList[1].IsVisible = false;
                 }
                 if (checkBoxlacet.Checked == true)
                 {
-                    courbe3.Add(timeout, System.Convert.ToInt16(param[2]));
+                    myPane1.CurveList[2].IsVisible = true;
+                }
+                else
+                {
+                    myPane1.CurveList[2].IsVisible = false;
                 }
                 if (checkBoxaltitude.Checked == true)
                 {
-                    courbe4.Add(timeout, System.Convert.ToInt16(param[3]));
+                    myPane1.CurveList[3].IsVisible = true;
+                }
+                else
+                {
+                    myPane1.CurveList[3].IsVisible = false;
                 }
                 if (checkBoxpidroulis.Checked == true)
                 {
-                    courbe5.Add(timeout, System.Convert.ToInt16(param[4]));
+                    myPane1.CurveList[4].IsVisible = true;
+                }
+                else
+                {
+                    myPane1.CurveList[4].IsVisible = false;
                 }
                 if (checkBoxpidtangage.Checked == true)
                 {
-                    courbe6.Add(timeout, System.Convert.ToInt16(param[5]));
+                    myPane1.CurveList[5].IsVisible = true;
+                }
+                else
+                {
+                    myPane1.CurveList[5].IsVisible = false;
                 }
                 if (checkBoxpidlacet.Checked == true)
                 {
-                    courbe7.Add(timeout, System.Convert.ToInt16(param[6]));
+                    myPane1.CurveList[6].IsVisible = true;
+                }
+                else
+                {
+                    myPane1.CurveList[6].IsVisible = false;
                 }
                 if (checkBoxmotorFR.Checked == true)
                 {
-                    courbe8.Add(timeout, System.Convert.ToInt16(param[7]));
+                    myPane1.CurveList[7].IsVisible = true;
+                }
+                else
+                {
+                    myPane1.CurveList[7].IsVisible = false;
                 }
                 if (checkBoxmotorFL.Checked == true)
                 {
-                    courbe9.Add(timeout, System.Convert.ToInt16(param[8]));
+                    myPane1.CurveList[8].IsVisible = true;
+                }
+                else
+                {
+                    myPane1.CurveList[8].IsVisible = false;
                 }
                 if (checkBoxmotorRR.Checked == true)
                 {
-                    courbe10.Add(timeout, System.Convert.ToInt16(param[9]));
+                    myPane1.CurveList[9].IsVisible = true;
+                }
+                else
+                {
+                    myPane1.CurveList[9].IsVisible = false;
                 }
                 if (checkBoxmotorRL.Checked == true)
                 {
-                    courbe11.Add(timeout, System.Convert.ToInt16(param[10]));
+                    myPane1.CurveList[10].IsVisible = true;
+                }
+                else
+                {
+                    myPane1.CurveList[10].IsVisible = false;
                 }
                 if (checkBoxvitesse.Checked == true)
                 {
-                    courbe12.Add(timeout, System.Convert.ToInt16(param[11]));
+                    myPane1.CurveList[11].IsVisible = true;
+                }
+                else
+                {
+                    myPane1.CurveList[11].IsVisible = false;
                 }
 
                 zedGraphControl1.AxisChange();
