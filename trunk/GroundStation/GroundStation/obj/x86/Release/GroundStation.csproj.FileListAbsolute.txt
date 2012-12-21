@@ -18,3 +18,9 @@ C:\Users\berryer\Desktop\Crius\GroundStation\GroundStation\obj\x86\Release\Groun
 C:\Users\berryer\Desktop\Crius\GroundStation\GroundStation\obj\x86\Release\GroundStation.Properties.Resources.resources
 C:\Users\berryer\Desktop\Crius\GroundStation\GroundStation\obj\x86\Release\GroundStation.csproj.GenerateResource.Cache
 C:\Users\berryer\Desktop\Crius\GroundStation\GroundStation\obj\x86\Release\GroundStation.exe
+C:\Users\berryer\Desktop\Crius\GroundStation\GroundStation\obj\x86\Release\GroundStation.csprojResolveAssemblyReference.cache
+C:\Users\berryer\Desktop\Crius\GroundStation\GroundStation\bin\Release\GroundStation.exe
+C:\Users\berryer\Desktop\Crius\GroundStation\GroundStation\bin\Release\GroundStation.pdb
+C:\Users\berryer\Desktop\Crius\GroundStation\GroundStation\bin\Release\ZedGraph.dll
+C:\Users\berryer\Desktop\Crius\GroundStation\GroundStation\bin\Release\fr\ZedGraph.resources.dll
+C:\Users\berryer\Desktop\Crius\GroundStation\GroundStation\obj\x86\Release\GroundStation.pdb
