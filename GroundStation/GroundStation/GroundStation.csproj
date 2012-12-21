@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClassSerial.cs" />
+    <Compile Include="ClassServerTcp.cs" />
     <Compile Include="FormCommand.cs">
       <SubType>Form</SubType>
     </Compile>

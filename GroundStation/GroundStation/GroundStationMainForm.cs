@@ -6,24 +6,61 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
+using System.Reflection;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace GroundStation
 {
     public partial class GroundStationMainForm : Form
     {
         public static ClassSerial serial = new ClassSerial();
-        
+        Server tcpserv;
+
+        [DllImport("user32.dll")]
+        static extern IntPtr SetParent(IntPtr hwndChild, IntPtr hwndNewParent);
+
         delegate void FillToolStrip(string value);
 
         #region load and exit main form
         public GroundStationMainForm()
         {
             InitializeComponent();
+            tcpserv = new Server();
             GroundStationMainForm.serial.AddCallback(IncommingMessage);
+
+            /*ProcessStartInfo notepadStartInfo = new ProcessStartInfo("Using3DModels.exe");
+            Process notepad = new Process();
+            notepad.StartInfo = notepadStartInfo;
+            notepad.Start();
+            Thread.Sleep(1000);*/
+
+
+          /* Process p = Process.Start("Using3DModels.exe");
+            Thread.Sleep(3000);
+            p.StartInfo.CreateNoWindow = true;    // new
+            SetParent(p.MainWindowHandle, this.panel1.Handle);
+            p.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;   //new*/
+            
         }
         private void GroundStationMainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             serial.Deconnect();
+            tcpserv.CloseServer();
+
+            try
+            {
+                foreach (Process proc in Process.GetProcessesByName("Using3DModels"))
+                {
+                    proc.Kill();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
         private void GroundStationMainForm_Load(object sender, EventArgs e)
         {
@@ -52,7 +89,6 @@ namespace GroundStation
                 StatetoolStripStatusLabel.Text = "Etat : Deconnecte";
             }
         }
-
         public void IncommingMessage(string message)
         {
             try
@@ -61,17 +97,35 @@ namespace GroundStation
             }
             catch { }
         }
-
         void AddItemToolStrip(string value)
         {
-            toolStripStatusButtonMessage.Text = "Messages : " + value;
-            toolStripStatusButtonMessage.DropDownItems.Add(value);
-            toolStripStatusButtonMessage.ToolTipText = "count ( " + Convert.ToString(toolStripStatusButtonMessage.DropDownItems.Count - 1) + " )";
-            if (toolStripStatusButtonMessage.DropDownItems.Count > 20)
+            try
             {
-                toolStripStatusButtonMessage.DropDownItems.RemoveAt(0);
+                if (!value.Contains("OK") && !value.Contains("PID"))
+                {
+                    toolStripStatusButtonMessage.Text = "Messages : " + value;
+                    toolStripStatusButtonMessage.DropDownItems.Add(value);
+                    toolStripStatusButtonMessage.ToolTipText = "count ( " + Convert.ToString(toolStripStatusButtonMessage.DropDownItems.Count - 1) + " )";
+                    if (toolStripStatusButtonMessage.DropDownItems.Count > 20)
+                    {
+                        toolStripStatusButtonMessage.DropDownItems.RemoveAt(0);
+                    } 
+                    
+                    string[] param = value.Replace("\0", "").Replace(" ", "").Split(',');
+
+                    string Z = System.Convert.ToString(-1 * System.Convert.ToInt16(param[2]));
+                    tcpserv.SendMessage("x=0/y=0/z=0/rotx=" + System.Convert.ToInt16(param[0])  + "/roty=" + System.Convert.ToInt16(param[1])  + "/rotz=" + Z + "##");
+
+                    
+                }
+            }
+            catch
+            {
             }
         }
+
+
+       
         #endregion
 
 
@@ -192,6 +246,7 @@ namespace GroundStation
                 childForm.Close();
             }
         }
+
 
 
         

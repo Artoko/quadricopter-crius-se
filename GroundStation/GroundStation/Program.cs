@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using System.Security.Permissions;
 
 namespace GroundStation
 {
@@ -11,6 +12,7 @@ namespace GroundStation
         /// Point d'entrée principal de l'application.
         /// </summary>
         [STAThread]
+        [SecurityPermission(SecurityAction.Demand)]
         static void Main()
         {
             Application.EnableVisualStyles();
