@@ -34,7 +34,7 @@ static void SrvCommRepportData( void) ;
 //passage des params de la trame
 static STrame ma_trame_comm;
 
-static Boolean want_repport_data = FALSE;
+static Boolean want_repport_data = TRUE;
 
 /************************************************************************/
 /*init de la communication                                              */
@@ -46,6 +46,7 @@ Boolean SrvCommInit (void)
 	ma_trame_comm.param[PARAM_2] = 0U;
 	ma_trame_comm.param[PARAM_3] = 0U;
 	ma_trame_comm.param[PARAM_4] = 0U;
+	want_repport_data = TRUE;
 	return TRUE;
 }	
 

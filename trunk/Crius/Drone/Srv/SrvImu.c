@@ -272,7 +272,7 @@ static void SrvImuComputeSensors(Int32U interval)
 		gyroXAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
 		
 		gyroRate				=	rotation.z / 14.375 ;
-		if((float)((float)((gyroRate * interval) / 1000000.0)) > 0.01)
+		if(((float)((float)((gyroRate * interval) / 1000000.0)) > 0.01) || ((float)((float)((gyroRate * interval) / 1000000.0)) < -0.01) )
 		{
 			gyroZAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
 			if(gyroZAngle < 0)
