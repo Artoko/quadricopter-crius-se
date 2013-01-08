@@ -79,7 +79,7 @@ namespace GroundStation
                     {
                         System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
                         clientStream.Write(encoding.GetBytes(write_message), 0, write_message.Length);
-                        write_message = "";
+                        write_message = string.Empty ;
                     }
                 }
                 catch

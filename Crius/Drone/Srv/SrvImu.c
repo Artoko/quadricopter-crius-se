@@ -115,6 +115,14 @@ void SrvImuDispatcher (Event_t in_event)
 		imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle ) * 10U;
 		imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle ) * 10U;
 		imu_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
+		if(imu_reel.lacet < 0)
+		{
+			imu_reel.lacet += 360.0;
+		}
+		else if(imu_reel.lacet > 360)
+		{
+			imu_reel.lacet -= 360.0;
+		}
 		//imu_reel.lacet    = gyroZAngle;
 		//imu_reel.nord	  = direction;	
 		
@@ -273,19 +281,6 @@ static void SrvImuComputeSensors(Int32U interval)
 		
 		gyroRate				=	rotation.z / 14.375 ;
 		gyroZAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
-		
-		/*if(((float)((float)((gyroRate * interval) / 1000000.0)) > 0.01) || ((float)((float)((gyroRate * interval) / 1000000.0)) < -0.01) )
-		{
-			gyroZAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
-			if(gyroZAngle < 0)
-			{
-				gyroZAngle += 360.0;
-			}
-			else if(gyroZAngle > 360)
-			{
-				gyroZAngle -= 360.0;
-			}
-		}*/
 	}		
 	//MAG
 	if(CmpHMC5883GetHeading(&magnet) != FALSE)
