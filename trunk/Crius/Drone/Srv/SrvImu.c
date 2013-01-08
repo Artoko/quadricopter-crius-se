@@ -114,9 +114,9 @@ void SrvImuDispatcher (Event_t in_event)
 		// ********************* Fusion des capteurs ******************************		
 		imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle ) * 10U;
 		imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle ) * 10U;
-		imu_reel.lacet    = gyroZAngle;
-		imu_reel.nord	  = direction;
-		//imu_reel.lacet    = direction;		
+		imu_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
+		//imu_reel.lacet    = gyroZAngle;
+		//imu_reel.nord	  = direction;	
 		
 		//imu_reel.altitude = SrvKalmanFilterAlt( imu_reel.altitude, (accZangle - BMA180_ACC_1G), temp_dernier_cycle );
 		
@@ -272,7 +272,9 @@ static void SrvImuComputeSensors(Int32U interval)
 		gyroXAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
 		
 		gyroRate				=	rotation.z / 14.375 ;
-		if(((float)((float)((gyroRate * interval) / 1000000.0)) > 0.01) || ((float)((float)((gyroRate * interval) / 1000000.0)) < -0.01) )
+		gyroZAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
+		
+		/*if(((float)((float)((gyroRate * interval) / 1000000.0)) > 0.01) || ((float)((float)((gyroRate * interval) / 1000000.0)) < -0.01) )
 		{
 			gyroZAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
 			if(gyroZAngle < 0)
@@ -283,7 +285,7 @@ static void SrvImuComputeSensors(Int32U interval)
 			{
 				gyroZAngle -= 360.0;
 			}
-		}
+		}*/
 	}		
 	//MAG
 	if(CmpHMC5883GetHeading(&magnet) != FALSE)
