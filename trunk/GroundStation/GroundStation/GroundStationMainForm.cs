@@ -19,9 +19,6 @@ namespace GroundStation
         public static ClassSerial serial = new ClassSerial();
         Server tcpserv;
 
-        [DllImport("user32.dll")]
-        static extern IntPtr SetParent(IntPtr hwndChild, IntPtr hwndNewParent);
-
         delegate void FillToolStrip(string value);
 
         #region load and exit main form
