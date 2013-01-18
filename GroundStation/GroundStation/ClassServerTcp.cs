@@ -36,13 +36,19 @@ namespace GroundStation
             client_connect = true;
             while (client_connect)
             {
-                //blocks until a client has connected to the server
-                TcpClient client = this.tcpListener.AcceptTcpClient();
+                try
+                {
+                    //blocks until a client has connected to the server
+                    TcpClient client = this.tcpListener.AcceptTcpClient();
 
-                //create a thread to handle communication 
-                //with connected client
-                Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
-                clientThread.Start(client);
+                    //create a thread to handle communication 
+                    //with connected client
+                    Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
+                    clientThread.Start(client);
+                }
+                catch
+                {
+                }
             }
         }
         public void SendMessage(string mess)
