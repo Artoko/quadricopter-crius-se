@@ -123,8 +123,6 @@ void SrvImuDispatcher (Event_t in_event)
 		{
 			imu_reel.lacet -= 360.0;
 		}
-		//imu_reel.lacet    = gyroZAngle;
-		//imu_reel.nord	  = direction;	
 		
 		//imu_reel.altitude = SrvKalmanFilterAlt( imu_reel.altitude, (accZangle - BMA180_ACC_1G), temp_dernier_cycle );
 		

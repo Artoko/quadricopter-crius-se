@@ -28,19 +28,11 @@ namespace GroundStation
             tcpserv = new Server();
             GroundStationMainForm.serial.AddCallback(IncommingMessage);
 
-            /*ProcessStartInfo notepadStartInfo = new ProcessStartInfo("Using3DModels.exe");
+            ProcessStartInfo notepadStartInfo = new ProcessStartInfo("Using3DModels.exe");
             Process notepad = new Process();
             notepad.StartInfo = notepadStartInfo;
             notepad.Start();
-            Thread.Sleep(1000);*/
-
-
-          /* Process p = Process.Start("Using3DModels.exe");
-            Thread.Sleep(3000);
-            p.StartInfo.CreateNoWindow = true;    // new
-            SetParent(p.MainWindowHandle, this.panel1.Handle);
-            p.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;   //new*/
-            
+            Thread.Sleep(200);            
         }
         private void GroundStationMainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -111,7 +103,7 @@ namespace GroundStation
                     string[] param = value.Replace("\0", "").Replace(" ", "").Split(',');
 
                     string Z = System.Convert.ToString(-1 * System.Convert.ToInt16(param[2]));
-                    tcpserv.SendMessage("x=0/y=0/z=0/rotx=" + System.Convert.ToInt16(param[0])  + "/roty=" + System.Convert.ToInt16(param[1])  + "/rotz=" + Z + "##");
+                    tcpserv.SendMessage("x=0/y=0/z=0/rotx=" + System.Convert.ToInt16(param[0]) + "/roty=" + System.Convert.ToInt16(param[1]) + "/rotz=" + Z + "/vit=" + System.Convert.ToInt16(param[11]) + "##");
 
                     
                 }
