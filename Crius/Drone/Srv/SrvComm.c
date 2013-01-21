@@ -194,7 +194,7 @@ static void SrvCommRepportData( void )
 						,frontMotor_L	
 						,rearMotor_R	
 						,rearMotor_L	
-						,SrvMotorGetSpeed()
+						,SrvMotorGetSpeed() - 1000
 					);
 	DrvUart0SendMessage( o_message , lenght );
 }

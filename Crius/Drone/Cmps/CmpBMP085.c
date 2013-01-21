@@ -14,7 +14,7 @@
 #include "Drv/DrvTick.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-#define NB_MAX_ALT_TAB			3
+#define NB_MAX_ALT_TAB			10U
 
 #define STEP_READ_UT			0U
 #define STEP_READ_UP			1U
@@ -89,6 +89,19 @@ Int32U CmpBMP085GetAltitude( void )
 		pression = pressure;
 		BaroAlt = (Int32U)((1.0f - pow(pressure/101325.0f, 0.190295f)) * 443300.0f);
 		step_baro = STEP_NONE;
+		/*Int8U loop = 0 ;
+		for( loop = 0 ; loop < (NB_MAX_ALT_TAB - 1U) ; loop++ )
+		{
+			BaroAltTab[ loop ] = BaroAltTab[ loop + 1U ];	
+		}
+		
+		BaroAltTab[ NB_MAX_ALT_TAB - 1U ] = BaroAlt;
+		
+		for( loop = 0 ; loop < NB_MAX_ALT_TAB ; loop++ )
+		{
+			BaroAlt	+= BaroAltTab[ loop ];
+		}	
+	    BaroAlt	/= NB_MAX_ALT_TAB;*/
 	}
 	else
 	{

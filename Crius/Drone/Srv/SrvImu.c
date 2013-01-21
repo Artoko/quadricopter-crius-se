@@ -112,18 +112,26 @@ void SrvImuDispatcher (Event_t in_event)
 		SrvImuComputeSensors( temp_dernier_cycle );
 		
 		// ********************* Fusion des capteurs ******************************		
-		imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle ) * 10U;
-		imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle ) * 10U;
-		imu_reel.lacet    = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
-		if(imu_reel.lacet < 0)
+		imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle ) * 10;
+		imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle ) * 10;
+		imu_reel.nord     = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
+		if(imu_reel.nord < 0)
+		{
+			imu_reel.nord += 360.0;
+		}
+		else if(imu_reel.nord > 360)
+		{
+			imu_reel.nord -= 360.0;
+		}
+		imu_reel.lacet	  = gyroZAngle;
+		if(imu_reel.lacet < 0.0)
 		{
 			imu_reel.lacet += 360.0;
 		}
-		else if(imu_reel.lacet > 360)
+		else if(imu_reel.lacet > 360.0)
 		{
 			imu_reel.lacet -= 360.0;
 		}
-		
 		//imu_reel.altitude = SrvKalmanFilterAlt( imu_reel.altitude, (accZangle - BMA180_ACC_1G), temp_dernier_cycle );
 		
 		
@@ -141,7 +149,7 @@ void SrvImuDispatcher (Event_t in_event)
 		speed = SrvMotorGetSpeed();
 		
 	}	
-	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
+	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_1S ) == TRUE)
 	{
 		//BARO
 		//on start la capture du barometre toutes les 100ms
