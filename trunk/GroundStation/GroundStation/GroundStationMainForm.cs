@@ -32,7 +32,13 @@ namespace GroundStation
             Process notepad = new Process();
             notepad.StartInfo = notepadStartInfo;
             notepad.Start();
-            Thread.Sleep(200);            
+            Thread.Sleep(200);  
+          
+            ProcessStartInfo boussoleStartInfo = new ProcessStartInfo("boussole.exe");
+            Process boussole = new Process();
+            boussole.StartInfo = boussoleStartInfo;
+            boussole.Start();
+            Thread.Sleep(200);
         }
         private void GroundStationMainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -42,6 +48,18 @@ namespace GroundStation
             try
             {
                 foreach (Process proc in Process.GetProcessesByName("Using3DModels"))
+                {
+                    proc.Kill();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            } 
+            
+            try
+            {
+                foreach (Process proc in Process.GetProcessesByName("boussole"))
                 {
                     proc.Kill();
                 }

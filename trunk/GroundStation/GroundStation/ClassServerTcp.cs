@@ -93,6 +93,7 @@ namespace GroundStation
                     //a socket error has occured
                     break;
                 }
+                Thread.Sleep(10);
 
                 //message has successfully been received
                 //ASCIIEncoding encoder = new ASCIIEncoding();
