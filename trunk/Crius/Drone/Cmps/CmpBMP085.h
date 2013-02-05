@@ -50,7 +50,7 @@
 //fonction init du capteur
 Boolean CmpBMP085Init( void );
 void CmpBMP085StartCapture( void );
-void CmpBMP085StateMachine( void );
+void CmpBMP085ComputeAltitude( void );
 Int32U CmpBMP085GetAltitude( void );
 
 #endif /*BMA180_H_*/

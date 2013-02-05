@@ -71,6 +71,11 @@ Boolean CmpBMP085Init( void )
 
 //Get altitude du barometre
 Int32U CmpBMP085GetAltitude( void )
+{
+	return BaroAlt;
+}	
+
+void CmpBMP085ComputeAltitude( void )
 {	
 	if( step_baro == STEP_READ_UT )
 	{
@@ -107,7 +112,6 @@ Int32U CmpBMP085GetAltitude( void )
 	{
 		//		
 	}		
-	return BaroAlt;
 }
 
 //on start la capture du baro

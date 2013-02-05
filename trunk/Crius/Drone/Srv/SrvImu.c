@@ -132,7 +132,25 @@ void SrvImuDispatcher (Event_t in_event)
 		{
 			imu_reel.lacet -= 360.0;
 		}
-		//imu_reel.altitude = SrvKalmanFilterAlt( imu_reel.altitude, (accZangle - BMA180_ACC_1G), temp_dernier_cycle );
+		
+		/*if( (Int16S)(accZangle - BMA180_ACC_1G) > (Int16S)5 )
+		{
+			imu_reel.altitude +=(-1 * (accZangle - BMA180_ACC_1G));		
+		}
+		else if( (Int16S)(accZangle - BMA180_ACC_1G) < (Int16S)-5 )
+		{
+			imu_reel.altitude +=(-1 * (accZangle - BMA180_ACC_1G));
+		}*/
+		
+		
+		//imu_reel.altitude 
+		Int16S delta_z = (-1 * (accZangle - (BMA180_ACC_1G)));
+		if(( delta_z > -10 ) && ( delta_z < 10 ))
+		{
+			delta_z = 0U;
+		}
+	    imu_reel.altitude += delta_z;
+		//imu_reel.lacet = SrvKalmanFilterAlt(imu_reel.altitude,-1 * (accZangle - (BMA180_ACC_1G)),  temp_dernier_cycle );
 		
 		
 		// ********************* PID **********************************************
@@ -151,12 +169,13 @@ void SrvImuDispatcher (Event_t in_event)
 	}	
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_1S ) == TRUE)
 	{
+		imu_reel.altitude -= altitude_depart;
+		imu_reel.altitude = CmpBMP085GetAltitude();
 		//BARO
 		//on start la capture du barometre toutes les 100ms
 		CmpBMP085StartCapture();
 	}
-	imu_reel.altitude = CmpBMP085GetAltitude();
-	imu_reel.altitude -= altitude_depart;
+	CmpBMP085ComputeAltitude();
 	
 	// a 10 sec on enregistre l'altitude
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_10S ) == TRUE)

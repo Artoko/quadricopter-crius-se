@@ -10,6 +10,7 @@
 #include "SrvComm.h"
 #include "SrvMotor.h"
 #include "SrvImu.h"
+#include "SrvPID.h"
 
 #include "Drv/DrvUart.h"
 #include "Drv/DrvTick.h"
