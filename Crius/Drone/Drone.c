@@ -6,8 +6,6 @@
  */ 
 
 /////////////////////////////////////////////INCLUDES/////////////////////////////////////////////
-
-
 #include "Conf/conf_hard.h"
 
 #include "Drv/DrvTick.h"
@@ -55,7 +53,7 @@ int main(void)
 {	
 	// ********************* Interrupt Disable ****************************************
 	DrvInterruptClearAllInterrupts();
-	
+
 	// ********************* Stop Timers **********************************************
 	TCCR0B = 0U;
 	TCCR1B = 0U;
@@ -65,6 +63,8 @@ int main(void)
 	CONFIGURE_LED_PIN();
 	//start Initialisation
 	LED_ON();
+	
+	// ********************* General variables init *************************************************
 	imu_desire.roulis	= 0;
 	imu_desire.tangage  = 0;
 	imu_desire.lacet	= 0;
@@ -97,6 +97,7 @@ int main(void)
 	
 	//Wait 2 sec for sensors init
 	DrvTimerDelayMs(3000);
+	LED_OFF();
 		
 	// ********************* Calibration sensors **************************************
 	SrvImuSensorsCalibration();
@@ -110,7 +111,7 @@ int main(void)
 	SrvCommInit();	
 	
 	//stop Initialisation
-	LED_OFF();
+	LED_ON();
 	
 	// ********************* Reset time ***********************************************
 	SrvTimerTickReset();

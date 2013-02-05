@@ -152,9 +152,9 @@ double SrvKalmanFilterZ(double newAngle, double newRate, double dtime)
 
 
 /* Kalman filter variables and constants */
-const double Q_baroALT = 0.001; // Process noise covariance for the barometer - Sw
-const double Q_accelALT = 0.003; // Process noise covariance for the accelerometer - Sw
-const double R_angleALT = 0.03; // Measurement noise covariance - Sv
+const double Q_baroALT = 0.01; // Process noise covariance for the barometer - Sw
+const double Q_accelALT = 1; // Process noise covariance for the accelerometer - Sw
+const double R_angleALT = 0.01; // Measurement noise covariance - Sv
 
 double angleALT = 0; // The angle output from the Kalman filter
 double biasALT = 0; // The gZro bias calculated bZ the Kalman filter
