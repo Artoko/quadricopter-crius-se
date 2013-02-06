@@ -39,6 +39,7 @@ STimer MesTimer[ CONF_TIMER_NB ];
 volatile Int16U tick_counter_20ms = 0U;
 volatile Int16U tick_counter_50ms = 0U;
 volatile Int8U tick_counter_100ms = 0U;
+volatile Int8U tick_counter_500ms = 0U;
 volatile Int8U tick_counter_1s = 0U;
 volatile Int8U tick_counter_5s = 0U;
 volatile Int8U tick_counter_10s = 0U;
@@ -124,6 +125,7 @@ void SrvTimerTickReset(void)
 	tick_counter_20ms = 0U;
 	tick_counter_50ms = 0U;
 	tick_counter_100ms = 0U;
+	tick_counter_500ms = 0U;
 	tick_counter_1s = 0U;
 	tick_counter_5s = 0U;
 	tick_counter_10s = 0U;
@@ -192,21 +194,26 @@ ISR(TIMER2_COMPA_vect)
 		{
 			tick_counter_100ms = 0;
 			DrvEventAddEvent(CONF_EVENT_TIMER_100MS);
-			if(tick_counter_1s++ == 9)
+			if(tick_counter_500ms++ == 4)
 			{
-				tick_counter_1s = 0;
-				DrvEventAddEvent(CONF_EVENT_TIMER_1S);
-				if(tick_counter_5s++ == 4)
+				tick_counter_500ms = 0U;
+				DrvEventAddEvent(CONF_EVENT_TIMER_500MS);
+				if(tick_counter_1s++ == 1)
 				{
-					tick_counter_5s = 0;
-					DrvEventAddEvent(CONF_EVENT_TIMER_5S);
-					if(tick_counter_10s++ == 1)
+					tick_counter_1s = 0;
+					DrvEventAddEvent(CONF_EVENT_TIMER_1S);
+					if(tick_counter_5s++ == 4)
 					{
-						tick_counter_10s = 0;
-						DrvEventAddEvent(CONF_EVENT_TIMER_10S);
+						tick_counter_5s = 0;
+						DrvEventAddEvent(CONF_EVENT_TIMER_5S);
+						if(tick_counter_10s++ == 1)
+						{
+							tick_counter_10s = 0;
+							DrvEventAddEvent(CONF_EVENT_TIMER_10S);
+						}
 					}
 				}
-			}
+			}				
 		}
 	}
 }

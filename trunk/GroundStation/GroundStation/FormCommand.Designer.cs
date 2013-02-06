@@ -52,6 +52,9 @@
             this.ButtonWrite = new System.Windows.Forms.Button();
             this.buttonRepportData = new System.Windows.Forms.Button();
             this.buttonRead = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.label_weather = new System.Windows.Forms.TextBox();
+            this.buttonAltitude = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.PowerTrackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarRoulis)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarTangage)).BeginInit();
@@ -158,7 +161,7 @@
             // 
             // buttonReset
             // 
-            this.buttonReset.Location = new System.Drawing.Point(12, 340);
+            this.buttonReset.Location = new System.Drawing.Point(18, 389);
             this.buttonReset.Name = "buttonReset";
             this.buttonReset.Size = new System.Drawing.Size(120, 23);
             this.buttonReset.TabIndex = 3;
@@ -168,7 +171,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(138, 340);
+            this.button1.Location = new System.Drawing.Point(144, 389);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(120, 23);
             this.button1.TabIndex = 3;
@@ -199,7 +202,7 @@
             // 
             // numericUpDownP
             // 
-            this.numericUpDownP.Location = new System.Drawing.Point(55, 304);
+            this.numericUpDownP.Location = new System.Drawing.Point(61, 353);
             this.numericUpDownP.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -216,7 +219,7 @@
             // 
             // numericUpDownI
             // 
-            this.numericUpDownI.Location = new System.Drawing.Point(147, 304);
+            this.numericUpDownI.Location = new System.Drawing.Point(153, 353);
             this.numericUpDownI.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -233,7 +236,7 @@
             // 
             // numericUpDownD
             // 
-            this.numericUpDownD.Location = new System.Drawing.Point(239, 304);
+            this.numericUpDownD.Location = new System.Drawing.Point(245, 353);
             this.numericUpDownD.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -251,7 +254,7 @@
             // labelP
             // 
             this.labelP.AutoSize = true;
-            this.labelP.Location = new System.Drawing.Point(91, 285);
+            this.labelP.Location = new System.Drawing.Point(97, 334);
             this.labelP.Name = "labelP";
             this.labelP.Size = new System.Drawing.Size(14, 13);
             this.labelP.TabIndex = 7;
@@ -260,7 +263,7 @@
             // labelI
             // 
             this.labelI.AutoSize = true;
-            this.labelI.Location = new System.Drawing.Point(179, 288);
+            this.labelI.Location = new System.Drawing.Point(185, 337);
             this.labelI.Name = "labelI";
             this.labelI.Size = new System.Drawing.Size(39, 13);
             this.labelI.TabIndex = 7;
@@ -269,7 +272,7 @@
             // labelD
             // 
             this.labelD.AutoSize = true;
-            this.labelD.Location = new System.Drawing.Point(274, 285);
+            this.labelD.Location = new System.Drawing.Point(280, 334);
             this.labelD.Name = "labelD";
             this.labelD.Size = new System.Drawing.Size(15, 13);
             this.labelD.TabIndex = 7;
@@ -277,7 +280,7 @@
             // 
             // numericUpDownindex
             // 
-            this.numericUpDownindex.Location = new System.Drawing.Point(8, 304);
+            this.numericUpDownindex.Location = new System.Drawing.Point(14, 353);
             this.numericUpDownindex.Name = "numericUpDownindex";
             this.numericUpDownindex.Size = new System.Drawing.Size(41, 20);
             this.numericUpDownindex.TabIndex = 8;
@@ -285,7 +288,7 @@
             // labelindex
             // 
             this.labelindex.AutoSize = true;
-            this.labelindex.Location = new System.Drawing.Point(12, 285);
+            this.labelindex.Location = new System.Drawing.Point(18, 334);
             this.labelindex.Name = "labelindex";
             this.labelindex.Size = new System.Drawing.Size(33, 13);
             this.labelindex.TabIndex = 7;
@@ -293,7 +296,7 @@
             // 
             // ButtonWrite
             // 
-            this.ButtonWrite.Location = new System.Drawing.Point(331, 301);
+            this.ButtonWrite.Location = new System.Drawing.Point(337, 350);
             this.ButtonWrite.Name = "ButtonWrite";
             this.ButtonWrite.Size = new System.Drawing.Size(75, 23);
             this.ButtonWrite.TabIndex = 9;
@@ -303,7 +306,7 @@
             // 
             // buttonRepportData
             // 
-            this.buttonRepportData.Location = new System.Drawing.Point(264, 340);
+            this.buttonRepportData.Location = new System.Drawing.Point(270, 389);
             this.buttonRepportData.Name = "buttonRepportData";
             this.buttonRepportData.Size = new System.Drawing.Size(120, 23);
             this.buttonRepportData.TabIndex = 10;
@@ -313,7 +316,7 @@
             // 
             // buttonRead
             // 
-            this.buttonRead.Location = new System.Drawing.Point(412, 301);
+            this.buttonRead.Location = new System.Drawing.Point(418, 350);
             this.buttonRead.Name = "buttonRead";
             this.buttonRead.Size = new System.Drawing.Size(75, 23);
             this.buttonRead.TabIndex = 9;
@@ -321,11 +324,41 @@
             this.buttonRead.UseVisualStyleBackColor = true;
             this.buttonRead.Click += new System.EventHandler(this.ButtonRead_Click);
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(12, 284);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 11;
+            this.button2.Text = "Weather";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // label_weather
+            // 
+            this.label_weather.Location = new System.Drawing.Point(100, 287);
+            this.label_weather.Name = "label_weather";
+            this.label_weather.Size = new System.Drawing.Size(100, 20);
+            this.label_weather.TabIndex = 13;
+            // 
+            // buttonAltitude
+            // 
+            this.buttonAltitude.Location = new System.Drawing.Point(270, 287);
+            this.buttonAltitude.Name = "buttonAltitude";
+            this.buttonAltitude.Size = new System.Drawing.Size(75, 23);
+            this.buttonAltitude.TabIndex = 14;
+            this.buttonAltitude.Text = "Set Altitude";
+            this.buttonAltitude.UseVisualStyleBackColor = true;
+            this.buttonAltitude.Click += new System.EventHandler(this.buttonAltitude_Click);
+            // 
             // FormCommand
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(563, 372);
+            this.ClientSize = new System.Drawing.Size(563, 441);
+            this.Controls.Add(this.buttonAltitude);
+            this.Controls.Add(this.label_weather);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.buttonRepportData);
             this.Controls.Add(this.buttonRead);
             this.Controls.Add(this.ButtonWrite);
@@ -396,5 +429,8 @@
         private System.Windows.Forms.Button ButtonWrite;
         private System.Windows.Forms.Button buttonRepportData;
         private System.Windows.Forms.Button buttonRead;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.TextBox label_weather;
+        private System.Windows.Forms.Button buttonAltitude;
     }
 }

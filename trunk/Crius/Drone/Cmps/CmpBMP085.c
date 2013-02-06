@@ -14,7 +14,7 @@
 #include "Drv/DrvTick.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-#define NB_MAX_ALT_TAB			10U
+#define NB_MAX_ALT_TAB			3U
 
 #define STEP_READ_UT			0U
 #define STEP_READ_UP			1U
@@ -52,9 +52,10 @@ static void CmpBMP085ReadUP( void ) ;
 static Int32U pressure;
 
 static Int32U BaroAlt = 0U;
-static Int8U baro_index;
-static Int32U BaroAltTab[NB_MAX_ALT_TAB];
+static Int32U BaroPrev = 0U;
+static float BaroAltTab[NB_MAX_ALT_TAB];
 
+const float p0 = 101325.0f;
 
 static Int8U step_baro = STEP_NONE;
 
@@ -65,8 +66,32 @@ Boolean CmpBMP085Init( void )
 	Boolean o_success = FALSE;
 	pressure = 0U;
 	CmpBMP085ReadCalibration();
+	for (Int8U loop = 0 ; loop < NB_MAX_ALT_TAB - 1 ;loop++)
+	{
+		BaroAltTab[loop] = 0UL;
+	}
+	
 	o_success = TRUE;
 	return o_success;
+}
+
+//Get weather du barometre
+Int8U CmpBMP085GetWeather( void )
+{
+	//DrvEepromReadAltitude
+	const Int16U currentAltitude = 0; 
+	DrvEepromReadAltitude(&currentAltitude);
+	
+	const float ePressure = p0 * pow((1-currentAltitude/443300), 5.255);  // expected pressure (in Pa) at altitude
+	float weatherDiff;
+	weatherDiff = (pressure/10) - (ePressure /10);
+	
+	if(weatherDiff > 250)
+	return (Int8U)WEATHER_SUNNY;
+	else if ((weatherDiff <= 250) && (weatherDiff >= -250))
+	return (Int8U)WEATHER_CLOUDY;
+	else if (weatherDiff < -250)
+	return (Int8U)WEATHER_RAIN;
 }
 
 //Get altitude du barometre
@@ -92,22 +117,30 @@ void CmpBMP085ComputeAltitude( void )
 	{
 		CmpBMP085Compute();
 		pression = pressure;
-		BaroAlt = (Int32U)((1.0f - pow(pressure/101325.0f, 0.190295f)) * 443300.0f);
-		step_baro = STEP_NONE;
-		/*Int8U loop = 0 ;
-		for( loop = 0 ; loop < (NB_MAX_ALT_TAB - 1U) ; loop++ )
+		
+		float current_baro_alt=0;
+		current_baro_alt = (float)((1.0f - pow(pressure/p0, 0.190295f)) * 44330.0f);
+		
+		if(current_baro_alt >= (BaroPrev + 4))
 		{
-			BaroAltTab[ loop ] = BaroAltTab[ loop + 1U ];	
+			BaroPrev = current_baro_alt;
+		}
+		if(current_baro_alt <= (BaroPrev - 4))
+		{
+			BaroPrev = current_baro_alt;
 		}
 		
-		BaroAltTab[ NB_MAX_ALT_TAB - 1U ] = BaroAlt;
-		
-		for( loop = 0 ; loop < NB_MAX_ALT_TAB ; loop++ )
+		Int32U moy_baro_alt=0;
+		BaroAltTab[NB_MAX_ALT_TAB-1] = current_baro_alt;
+		for(Int8U loop = 0;loop < NB_MAX_ALT_TAB - 1; loop++)
 		{
-			BaroAlt	+= BaroAltTab[ loop ];
-		}	
-	    BaroAlt	/= NB_MAX_ALT_TAB;*/
-	}
+			BaroAltTab[loop] = BaroAltTab[loop + 1];
+			moy_baro_alt += BaroAltTab[loop];
+		}
+		BaroAlt = 10 * moy_baro_alt / (NB_MAX_ALT_TAB - 1);
+		
+		step_baro = STEP_NONE;
+	}		
 	else
 	{
 		//		
