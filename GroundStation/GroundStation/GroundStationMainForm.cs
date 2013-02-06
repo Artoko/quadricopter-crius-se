@@ -28,17 +28,17 @@ namespace GroundStation
             tcpserv = new Server();
             GroundStationMainForm.serial.AddCallback(IncommingMessage);
 
-            ProcessStartInfo notepadStartInfo = new ProcessStartInfo("Using3DModels.exe");
+            /*ProcessStartInfo notepadStartInfo = new ProcessStartInfo("Using3DModels.exe");
             Process notepad = new Process();
             notepad.StartInfo = notepadStartInfo;
             notepad.Start();
-            Thread.Sleep(200);  
+            Thread.Sleep(200); */ 
           
-            ProcessStartInfo boussoleStartInfo = new ProcessStartInfo("boussole.exe");
+            /*ProcessStartInfo boussoleStartInfo = new ProcessStartInfo("boussole.exe");
             Process boussole = new Process();
             boussole.StartInfo = boussoleStartInfo;
             boussole.Start();
-            Thread.Sleep(200);
+            Thread.Sleep(200);*/
         }
         private void GroundStationMainForm_FormClosing(object sender, FormClosingEventArgs e)
         {

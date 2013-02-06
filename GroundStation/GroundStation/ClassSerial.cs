@@ -126,12 +126,15 @@ namespace GroundStation
         {
             try
             {
-                rcv_messages.Enqueue(serialPort1.ReadLine());
+                while (serialPort1.BytesToRead != 0)
+                {
+                    rcv_messages.Enqueue(serialPort1.ReadLine());
+                }
+                //serialPort1.DiscardInBuffer();
             }
             catch
             {
             }
-
         }
 
 

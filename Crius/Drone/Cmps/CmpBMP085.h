@@ -41,6 +41,10 @@
 //define oversampling
 #define OSS MODE_HIGHRES
 
+//define weather
+#define WEATHER_SUNNY			0U
+#define WEATHER_CLOUDY			1U
+#define WEATHER_RAIN			2U
 
 ////////////////////////////////////////PUBLIC STRUCTURES/////////////////////////////////////////
 
@@ -52,6 +56,7 @@ Boolean CmpBMP085Init( void );
 void CmpBMP085StartCapture( void );
 void CmpBMP085ComputeAltitude( void );
 Int32U CmpBMP085GetAltitude( void );
+Int8U CmpBMP085GetWeather( void );
 
 #endif /*BMA180_H_*/
 

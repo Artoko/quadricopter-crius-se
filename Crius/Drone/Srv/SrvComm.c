@@ -104,8 +104,21 @@ static void SrvCommExecute ( void )
 	}
 	else if(ma_trame_comm.param[PARAM_0] == COMM_ALTITUDE )
 	{ 
-		//on enregistre l'altitude de depart
-		SrvImuSensorsSetAltitudeDepart();
+		if(  ma_trame_comm.param[PARAM_1] == 1 )
+		{
+			//on enregistre l'altitude de depart
+			SrvImuSensorsSetAltitudeDepart();
+		}
+		else
+		{
+			Char weather_message[ 20U ];
+			Int8U lenght = 0;
+			lenght = sprintf(weather_message
+			,"WEATHER:%i\n"
+			,CmpBMP085GetWeather()
+			);
+			DrvUart0SendMessage( weather_message , lenght );
+		}			
 		
 		//on enregistre l'altitude relative a la position de depart
 		SrvImuSensorsSetAltitudeMaintient(ma_trame_comm.param[PARAM_1]);
@@ -179,7 +192,7 @@ static void SrvCommExecute ( void )
 /************************************************************************/
 static void SrvCommRepportData( void )
 {
-	Char o_message[ 30U ];
+	Char o_message[ 50U ];
 	Int8U lenght = 0;
 	
 	lenght = sprintf(	o_message	

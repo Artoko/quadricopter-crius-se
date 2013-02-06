@@ -80,6 +80,18 @@ Boolean SrvImuInit( void )
 	pid_erreur_altitude = 0;
 	wait_alt = 0U;
 	
+	if(DrvEepromInit())
+	{
+		DrvEepromReadAltitude(&altitude_depart);
+		if(altitude_depart == 0xFFFF)
+		altitude_depart = 0;
+	}
+	else
+	{
+		altitude_depart = 0;
+	}
+	
+	
 	//init des composants	
 	CmpHMC5883Init();
 	CmpBMA180Init();
@@ -133,25 +145,6 @@ void SrvImuDispatcher (Event_t in_event)
 			imu_reel.lacet -= 360.0;
 		}
 		
-		/*if( (Int16S)(accZangle - BMA180_ACC_1G) > (Int16S)5 )
-		{
-			imu_reel.altitude +=(-1 * (accZangle - BMA180_ACC_1G));		
-		}
-		else if( (Int16S)(accZangle - BMA180_ACC_1G) < (Int16S)-5 )
-		{
-			imu_reel.altitude +=(-1 * (accZangle - BMA180_ACC_1G));
-		}*/
-		
-		
-		//imu_reel.altitude 
-		Int16S delta_z = (-1 * (accZangle - (BMA180_ACC_1G)));
-		if(( delta_z > -10 ) && ( delta_z < 10 ))
-		{
-			delta_z = 0U;
-		}
-	    imu_reel.altitude += delta_z;
-		//imu_reel.lacet = SrvKalmanFilterAlt(imu_reel.altitude,-1 * (accZangle - (BMA180_ACC_1G)),  temp_dernier_cycle );
-		
 		
 		// ********************* PID **********************************************
 		pid_erreur_roulis	= SrvPIDCompute( 0U , (float)imu_desire.roulis					, (float)imu_reel.roulis);
@@ -167,10 +160,9 @@ void SrvImuDispatcher (Event_t in_event)
 		speed = SrvMotorGetSpeed();
 		
 	}	
-	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_1S ) == TRUE)
+	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
-		imu_reel.altitude -= altitude_depart;
-		imu_reel.altitude = CmpBMP085GetAltitude();
+		imu_reel.altitude = CmpBMP085GetAltitude() - altitude_depart;
 		//BARO
 		//on start la capture du barometre toutes les 100ms
 		CmpBMP085StartCapture();
@@ -194,7 +186,8 @@ void SrvImuDispatcher (Event_t in_event)
 /************************************************************************/
 void SrvImuSensorsSetAltitudeDepart( void )
 {
-	altitude_depart = imu_reel.altitude;
+	altitude_depart = CmpBMP085GetAltitude();
+	DrvEepromWriteAltitude(altitude_depart);
 }
 
 /************************************************************************/

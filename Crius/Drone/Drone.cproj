@@ -19,7 +19,7 @@
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
     <OverrideVtorValue />
-    <eraseonlaunchrule>1</eraseonlaunchrule>
+    <eraseonlaunchrule>0</eraseonlaunchrule>
     <AsfVersion>2.11.1</AsfVersion>
     <avrtool>com.atmel.avrdbg.tool.jtagicemkii</avrtool>
     <avrtoolinterface>debugWIRE</avrtoolinterface>
@@ -33,7 +33,7 @@
       </OverrideVtorValue>
       <Channel>
         <host>127.0.0.1</host>
-        <port>58894</port>
+        <port>49784</port>
         <ssl>False</ssl>
       </Channel>
       <ToolOptions>
@@ -122,7 +122,7 @@
         <ssl>False</ssl>
       </Channel>
     </com_atmel_avrdbg_tool_simulator>
-    <preserveEEPROM>True</preserveEEPROM>
+    <preserveEEPROM>False</preserveEEPROM>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
@@ -154,6 +154,8 @@
   <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
   <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
   <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+  <avrgcc.compiler.general.SubroutinesFunctionPrologues>True</avrgcc.compiler.general.SubroutinesFunctionPrologues>
+  <avrgcc.compiler.general.ChangeSPWithoutDisablingInterrupts>True</avrgcc.compiler.general.ChangeSPWithoutDisablingInterrupts>
   <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
   <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
   <avrgcc.compiler.directories.IncludePaths>
@@ -161,7 +163,6 @@
       <Value>..</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
-  <avrgcc.compiler.optimization.level>Optimize most (-O3)</avrgcc.compiler.optimization.level>
   <avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
   <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
   <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>

@@ -4,7 +4,7 @@
 #include "DrvEeprom.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-#define ADDR_EEPROM_CHECK_EEPROM	(Int8U*)0U
+#define ADDR_EEPROM_CHECK_EEPROM	( Int8U *)0U
 #define ADDR_EEPROM_ACC_CALIB_X		( Int8U *)1U
 #define ADDR_EEPROM_ACC_CALIB_Y		( Int8U *)3U
 #define ADDR_EEPROM_ACC_CALIB_Z		( Int8U *)5U
@@ -23,6 +23,7 @@
 #define ADDR_EEPROM_PID_3_P			( Int8U *)49U
 #define ADDR_EEPROM_PID_3_I			( Int8U *)53U
 #define ADDR_EEPROM_PID_3_D			( Int8U *)57U
+#define ADDR_EEPROM_ALTITUDE		( Int8U *)60U
 
 
 #define VAL_EEPROM_CHECK_OK			0U
@@ -53,6 +54,7 @@ static Int8U val = 0U;
 Boolean DrvEepromInit ( void )
 {
 	Boolean o_success = FALSE;
+	
 	val = DrvEepromReadByte( ADDR_EEPROM_CHECK_EEPROM );
 	if( val == VAL_EEPROM_CHECK_OK )
 	{
@@ -68,8 +70,11 @@ Boolean DrvEepromInit ( void )
 
 //ecrit l'etat de config de l'eeprom
 void DrvEepromDeconfigure ( void )
-{
-	DrvEepromWriteByte(ADDR_EEPROM_CHECK_EEPROM,VAL_EEPROM_CHECK_NOK);
+{	
+	for(Int16U loop=0 ; loop < 1024 ; loop++)
+	{
+		DrvEepromWriteByte(( Int8U *)loop,VAL_EEPROM_CHECK_NOK);
+	}
 }
 
 //ecrit l'etat de config de l'eeprom
@@ -173,6 +178,20 @@ void DrvEepromWritePID (Int8U index,float P, float I, float D)
 		DrvEepromWriteFloat(ADDR_EEPROM_PID_3_P, D);
 	}
 }
+
+
+//retourne les config du altitude
+void DrvEepromReadAltitude( Int16U *altitude)
+{
+	*altitude = DrvEepromReadShort(ADDR_EEPROM_ALTITUDE);
+}
+
+//enregistre les config du altitude
+void DrvEepromWriteAltitude ( Int16U altitude)
+{
+	DrvEepromWriteShort(ADDR_EEPROM_ALTITUDE, altitude);
+}
+
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 //Fonction de lecture eeprom

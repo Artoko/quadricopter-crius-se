@@ -12,6 +12,7 @@ namespace GroundStation
     public partial class FormCommand : Form
     {
         delegate void FillPIDBox(short value);
+        delegate void FillWeatherBox(string value);
 
 
         public FormCommand()
@@ -45,10 +46,33 @@ namespace GroundStation
                         numericUpDownD.Invoke((FillPIDBox)WritenumericUpDownD, D);
                     }
                 }
+                if (message.Contains("WEATHER:"))
+                {
+                    message = message.Substring(message.IndexOf("WEATHER:"), message.Length - message.IndexOf("WEATHER:"));
+                    string[] tab = message.Remove(0, 8).Split(',');
+                    if (tab.Count() == 1)
+                    {
+                        label_weather.Invoke((FillWeatherBox)WriteWeather, tab[0]);
+                    }
+                }
             }
             catch { }
         }
-
+        void WriteWeather(string value)
+        {
+            if (value == "0")
+            {
+                label_weather.Text = "ensoleil";
+            }
+            else if (value == "1")
+            {
+                label_weather.Text = "nuageux";
+            }
+            else
+            {
+                label_weather.Text = "pluvieux";
+            }
+        }
         void WritenumericUpDownP(short value)
         {
             numericUpDownP.Value = value;
@@ -143,6 +167,12 @@ namespace GroundStation
             {
                 PowerTrackBar.Maximum = 500;
             }
+            if(PowerTrackBar.Value > PowerTrackBar.Maximum)
+            {
+                PowerTrackBar.Value = PowerTrackBar.Maximum;
+               
+            }
+            labelspeed.Text = "speed : " + PowerTrackBar.Value.ToString();
         }
 
         private void ButtonWrite_Click(object sender, EventArgs e)
@@ -214,6 +244,17 @@ namespace GroundStation
                 frame += trackBarLacet.Value + "##";
             }
             return frame;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            GroundStationMainForm.serial.SendMessage("*2+0##");
+
+        }
+
+        private void buttonAltitude_Click(object sender, EventArgs e)
+        {
+            GroundStationMainForm.serial.SendMessage("*2+1##");
         }
 
         
