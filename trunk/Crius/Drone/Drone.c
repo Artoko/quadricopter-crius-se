@@ -96,14 +96,14 @@ int main(void)
 	SrvImuInit();
 	
 	//Wait 2 sec for sensors init
-	DrvTimerDelayMs(3000);
+	DrvTimerDelayMs(1000);
 	LED_OFF();
 		
 	// ********************* Calibration sensors **************************************
 	SrvImuSensorsCalibration();
 	
 	//Wait 2 sec for sensors
-	DrvTimerDelayMs(2000);
+	DrvTimerDelayMs(1000);
 	
 	// ********************* Initialisation services **********************************
 	SrvMotorInit();

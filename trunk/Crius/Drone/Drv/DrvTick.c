@@ -31,12 +31,10 @@ void DrvTickInit(void)
     TIMSK0	|= _BV(TOIE0) ;
 }
 
-	
-
+static Int32U loc_var = 0U;
 //get the tick counter
 Int32U DrvTimerGetTime(void)
 {
-	Int32U loc_var = 0U;
 	cli();
 	loc_var = (Int32U)((drv_timer_tick_counter * TIMER0_OVF) + (TCNT0 * TIMER0_TICK));
 	sei();
@@ -45,14 +43,19 @@ Int32U DrvTimerGetTime(void)
 
 void DrvTimerDelayMs( Int16U delay_ms )
 {
-	drv_timer_start_delay = DrvTimerGetTime() ;
-	while (DrvTimerGetTime() < (Int32U)(drv_timer_start_delay + (Int32U)(delay_ms * 1000)) );
+	static Int32U test = 0UL;
+	drv_timer_start_delay = loc_var ;
+	test = (Int32U)((Int32U)drv_timer_start_delay + (Int32U)((Int32U)delay_ms * 1000UL));
+	while ((Int32U)loc_var < (Int32U)test )
+	{
+		DrvTimerGetTime();
+	}
 }
 
 void DrvTimerDelayUs( Int16U delay_us )
 {
-	drv_timer_start_delay = DrvTimerGetTime() ;
-	while (DrvTimerGetTime() < (Int32U)(drv_timer_start_delay + delay_us) );
+	drv_timer_start_delay = loc_var ;
+	while ((Int32U)DrvTimerGetTime() < (Int32U)(drv_timer_start_delay + (Int32U)delay_us) );
 }
 
 
