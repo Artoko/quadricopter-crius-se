@@ -19,7 +19,7 @@
 Boolean SrvMotorInit (void) ;
 
 //Update des moteurs
-void SrvMotorUpdate(Int16S roulis, Int16S tangage,Int16S lacet) ;
+void SrvMotorUpdate(Int16S roulis, Int16S tangage,Int16S lacet, Int16S altitude) ;
 
 //applique une vittesse aux moteurs
 Boolean SrvMotorApplyAbsoluteSpeed(Int16U speed) ;

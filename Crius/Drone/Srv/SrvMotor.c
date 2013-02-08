@@ -44,7 +44,7 @@ Boolean SrvMotorInit (void)
 /************************************************************************/
 /*Commande des moteurs en fonction de l'angle                           */
 /************************************************************************/
-void SrvMotorUpdate(Int16S roulis, Int16S tangage,Int16S lacet)
+void SrvMotorUpdate(Int16S roulis, Int16S tangage,Int16S lacet, Int16S altitude)
 {
 	if( throttle > OFFCOMMAND)
 	{

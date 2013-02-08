@@ -109,7 +109,7 @@ static void SrvCommExecute ( void )
 			//on enregistre l'altitude de depart
 			SrvImuSensorsSetAltitudeDepart();
 		}
-		else
+		else if(  ma_trame_comm.param[PARAM_1] == 2 )
 		{
 			Char weather_message[ 20U ];
 			Int8U lenght = 0;
@@ -118,10 +118,13 @@ static void SrvCommExecute ( void )
 			,CmpBMP085GetWeather()
 			);
 			DrvUart0SendMessage( weather_message , lenght );
-		}			
+		}	
+		else if(  ma_trame_comm.param[PARAM_1] == 3 )
+		{
+			//on enregistre l'altitude relative a la position de depart
+			SrvImuSensorsSetAltitudeMaintient(ma_trame_comm.param[PARAM_2]);
+		}		
 		
-		//on enregistre l'altitude relative a la position de depart
-		SrvImuSensorsSetAltitudeMaintient(ma_trame_comm.param[PARAM_1]);
 		DrvUart0SendMessage( "OK\n" , 3U );
 	}
 	else if(ma_trame_comm.param[PARAM_0] == COMM_PID )
@@ -155,7 +158,8 @@ static void SrvCommExecute ( void )
 			Char pid_message[ 20U ];
 			Int8U lenght = 0;
 			lenght = sprintf(pid_message
-			,"PID:%i,%i,%i\n"
+			,"PID:%i,%i,%i,%i\n"
+			,index
 			,(Int16S)P
 			,(Int16S)(I*10)
 			,(Int16S)D
@@ -196,19 +200,22 @@ static void SrvCommRepportData( void )
 	Int8U lenght = 0;
 	
 	lenght = sprintf(	o_message	
-						,"%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\n"
+						,"%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\n"
 						,imu_reel.roulis
 						,imu_reel.tangage
 						,imu_reel.lacet	
+						,imu_reel.nord	
 						,imu_reel.altitude
 						,pid_erreur_roulis
 						,pid_erreur_tangage
 						,pid_erreur_lacet
-						,frontMotor_R	
-						,frontMotor_L	
-						,rearMotor_R	
-						,rearMotor_L	
+						,frontMotor_R - 1000	
+						,frontMotor_L - 1000	
+						,rearMotor_R - 1000	
+						,rearMotor_L - 1000
 						,SrvMotorGetSpeed() - 1000
+						,(Int16U)(pression / 10)
+						,temperature
 					);
 	DrvUart0SendMessage( o_message , lenght );
 }
