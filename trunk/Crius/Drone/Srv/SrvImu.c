@@ -153,10 +153,9 @@ void SrvImuDispatcher (Event_t in_event)
 		if(imu_reel.maintient_altitude == TRUE)
 		{
 			pid_erreur_altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.altitude);
-			//SrvMotorApplyRelativeSpeed(pid_erreur_altitude);
 		}
 		// ********************* Moteurs ******************************************
-		SrvMotorUpdate(pid_erreur_roulis, pid_erreur_tangage, pid_erreur_lacet);
+		SrvMotorUpdate(pid_erreur_roulis, pid_erreur_tangage, pid_erreur_lacet , pid_erreur_altitude );
 		speed = SrvMotorGetSpeed();
 		
 	}	

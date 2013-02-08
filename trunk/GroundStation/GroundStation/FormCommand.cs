@@ -11,7 +11,7 @@ namespace GroundStation
 {
     public partial class FormCommand : Form
     {
-        delegate void FillPIDBox(short value);
+        delegate void FillPIDBox(int index,short value);
         delegate void FillWeatherBox(string value);
 
 
@@ -35,15 +35,16 @@ namespace GroundStation
                 {
                     message = message.Substring(message.IndexOf("PID:"), message.Length - message.IndexOf("PID:"));
                     string [] tab = message.Remove(0, 4).Split(',');
-                    if (tab.Count() == 3)
+                    if (tab.Count() == 4)
                     {
-                        short P = Convert.ToInt16(tab[0]);
-                        short I = Convert.ToInt16(tab[1]);
-                        short D = Convert.ToInt16(tab[2]);
+                        short index = Convert.ToInt16(tab[0]);
+                        short P = Convert.ToInt16(tab[1]);
+                        short I = Convert.ToInt16(tab[2]);
+                        short D = Convert.ToInt16(tab[3]);
 
-                        numericUpDownP.Invoke((FillPIDBox)WritenumericUpDownP, P);
-                        numericUpDownI.Invoke((FillPIDBox)WritenumericUpDownI, I);
-                        numericUpDownD.Invoke((FillPIDBox)WritenumericUpDownD, D);
+                        Invoke((FillPIDBox)WritenumericUpDownP, index, P);
+                        Invoke((FillPIDBox)WritenumericUpDownI, index, I);
+                        Invoke((FillPIDBox)WritenumericUpDownD, index, D);
                     }
                 }
                 if (message.Contains("WEATHER:"))
@@ -52,7 +53,7 @@ namespace GroundStation
                     string[] tab = message.Remove(0, 8).Split(',');
                     if (tab.Count() == 1)
                     {
-                        label_weather.Invoke((FillWeatherBox)WriteWeather, tab[0]);
+                        label4.Invoke((FillWeatherBox)WriteWeather, tab[0]);
                     }
                 }
             }
@@ -62,28 +63,49 @@ namespace GroundStation
         {
             if (value == "0")
             {
-                label_weather.Text = "ensoleil";
+                label4.Text = "ensoleil";
             }
             else if (value == "1")
             {
-                label_weather.Text = "nuageux";
+                label4.Text = "nuageux";
             }
             else
             {
-                label_weather.Text = "pluvieux";
+                label4.Text = "pluvieux";
             }
         }
-        void WritenumericUpDownP(short value)
+        void WritenumericUpDownP(int index, short value)
         {
-            numericUpDownP.Value = value;
+            if (index == 0)
+                numericUpDownP.Value = value;
+            if (index == 1)
+                numericUpDown4.Value = value;
+            if (index == 2)
+                numericUpDown6.Value = value;
+            if (index == 3)
+                numericUpDown9.Value = value;
         }
-        void WritenumericUpDownI(short value)
+        void WritenumericUpDownI(int index, short value)
         {
-            numericUpDownI.Value = value;
+            if (index == 0)
+                numericUpDownI.Value = value;
+            if (index == 1)
+                numericUpDown3.Value = value;
+            if (index == 2)
+                numericUpDown5.Value = value;
+            if (index == 3)
+                numericUpDown8.Value = value;
         }
-        void WritenumericUpDownD(short value)
+        void WritenumericUpDownD(int index, short value)
         {
-            numericUpDownD.Value = value;
+            if (index == 0)
+                numericUpDownD.Value = value;
+            if (index == 1)
+                numericUpDown2.Value = value;
+            if (index == 2)
+                numericUpDown1.Value = value;
+            if (index == 3)
+                numericUpDown7.Value = value;
         }
 
         private void Speedbutton_Click(object sender, EventArgs e)
@@ -177,7 +199,7 @@ namespace GroundStation
 
         private void ButtonWrite_Click(object sender, EventArgs e)
         {
-            string frame = "*3+1+" + numericUpDownindex.Value;
+            string frame = "*3+1+0";
             if (numericUpDownP.Value >= 0)
             {
                 frame += "+" + numericUpDownP.Value;
@@ -207,7 +229,7 @@ namespace GroundStation
 
         private void ButtonRead_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*3+0+" + numericUpDownindex.Value + "##");
+            GroundStationMainForm.serial.SendMessage("*3+0+0##");
         }
 
         private void buttonRepportData_Click(object sender, EventArgs e)
@@ -248,14 +270,130 @@ namespace GroundStation
 
         private void button2_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*2+0##");
-
+            GroundStationMainForm.serial.SendMessage("*2+2##");
         }
 
         private void buttonAltitude_Click(object sender, EventArgs e)
         {
             GroundStationMainForm.serial.SendMessage("*2+1##");
         }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            GroundStationMainForm.serial.SendMessage("*2+3+" + numericUpDown10.Value + "##");
+        }
+
+        private void FormCommand_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            string frame = "*3+1+1";
+            if (numericUpDownP.Value >= 0)
+            {
+                frame += "+" + numericUpDownP.Value;
+            }
+            else
+            {
+                frame += numericUpDownP.Value;
+            }
+            if (numericUpDownI.Value >= 0)
+            {
+                frame += "+" + numericUpDownI.Value;
+            }
+            else
+            {
+                frame += numericUpDownI.Value;
+            }
+            if (numericUpDownD.Value >= 0)
+            {
+                frame += "+" + numericUpDownD.Value + "##";
+            }
+            else
+            {
+                frame += numericUpDownD.Value + "##";
+            }
+            GroundStationMainForm.serial.SendMessage(frame);
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            GroundStationMainForm.serial.SendMessage("*3+0+1##");
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            string frame = "*3+1+2";
+            if (numericUpDownP.Value >= 0)
+            {
+                frame += "+" + numericUpDownP.Value;
+            }
+            else
+            {
+                frame += numericUpDownP.Value;
+            }
+            if (numericUpDownI.Value >= 0)
+            {
+                frame += "+" + numericUpDownI.Value;
+            }
+            else
+            {
+                frame += numericUpDownI.Value;
+            }
+            if (numericUpDownD.Value >= 0)
+            {
+                frame += "+" + numericUpDownD.Value + "##";
+            }
+            else
+            {
+                frame += numericUpDownD.Value + "##";
+            }
+            GroundStationMainForm.serial.SendMessage(frame);
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            string frame = "*3+1+3";
+            if (numericUpDownP.Value >= 0)
+            {
+                frame += "+" + numericUpDownP.Value;
+            }
+            else
+            {
+                frame += numericUpDownP.Value;
+            }
+            if (numericUpDownI.Value >= 0)
+            {
+                frame += "+" + numericUpDownI.Value;
+            }
+            else
+            {
+                frame += numericUpDownI.Value;
+            }
+            if (numericUpDownD.Value >= 0)
+            {
+                frame += "+" + numericUpDownD.Value + "##";
+            }
+            else
+            {
+                frame += numericUpDownD.Value + "##";
+            }
+            GroundStationMainForm.serial.SendMessage(frame);
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            GroundStationMainForm.serial.SendMessage("*3+0+2##");
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            GroundStationMainForm.serial.SendMessage("*3+0+3##");
+        }
+
+        
 
         
 

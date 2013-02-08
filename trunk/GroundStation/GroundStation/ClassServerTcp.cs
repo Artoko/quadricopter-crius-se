@@ -62,12 +62,9 @@ namespace GroundStation
             NetworkStream clientStream = tcpClient.GetStream();
 
             byte[] message = new byte[4096];
-            int bytesRead;
 
             while (client_connect)
             {
-                bytesRead = 0;
-
                 try
                 {
                     //blocks until a client sends a message
