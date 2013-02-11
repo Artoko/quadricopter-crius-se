@@ -34,17 +34,17 @@
 
 #define NO_SMPLRT_DIV					0x00
 
-#define FS_RANGE_2000					0b00011000
-#define ITG3205_PWR_H_RESET_BIT			0b10000000
+#define FS_RANGE_2000					0x18
+#define ITG3205_PWR_H_RESET_BIT			0x80
 
 
-#define LPFBW_256HZ						0b00000000
-#define LPFBW_188HZ						0b00000001
-#define LPFBW_98HZ						0b00000010
-#define LPFBW_42HZ						0b00000011
-#define LPFBW_20HZ						0b00000100
-#define LPFBW_10HZ						0b00000101
-#define LPFBW_5HZ						0b00000110
+#define LPFBW_256HZ						0x00
+#define LPFBW_188HZ						0x01
+#define LPFBW_98HZ						0x02
+#define LPFBW_42HZ						0x03
+#define LPFBW_20HZ						0x04
+#define LPFBW_10HZ						0x05
+#define LPFBW_5HZ						0x06
 
 // Clock Source - user parameters
 #define INTERNALOSC         0   // default
