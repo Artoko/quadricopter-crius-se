@@ -12,6 +12,7 @@
  
 #include "Drv/DrvTwi.h"
 #include "Drv/DrvTick.h"
+#include "Drv/DrvEeprom.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
 #define NB_MAX_ALT_TAB			3U
@@ -79,7 +80,7 @@ Boolean CmpBMP085Init( void )
 Int8U CmpBMP085GetWeather( void )
 {
 	//DrvEepromReadAltitude
-	const Int16U currentAltitude = 0; 
+	Int16U currentAltitude = 0; 
 	DrvEepromReadAltitude(&currentAltitude);
 	
 	const float ePressure = p0 * pow((1-currentAltitude/443300), 5.255);  // expected pressure (in Pa) at altitude

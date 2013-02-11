@@ -43,10 +43,10 @@ Int32U DrvTimerGetTime(void)
 
 void DrvTimerDelayMs( Int16U delay_ms )
 {
-	static Int32U test = 0UL;
+	static Int32U time_test = 0UL;
 	drv_timer_start_delay = loc_var ;
-	test = (Int32U)((Int32U)drv_timer_start_delay + (Int32U)((Int32U)delay_ms * 1000UL));
-	while ((Int32U)loc_var < (Int32U)test )
+	time_test = (Int32U)((Int32U)drv_timer_start_delay + (Int32U)((Int32U)delay_ms * 1000UL));
+	while (((Int16U)(loc_var>>16U) < (Int16U)(time_test>>16U) ) && ((Int16U)loc_var < (Int16U)time_test ))
 	{
 		DrvTimerGetTime();
 	}
@@ -54,8 +54,13 @@ void DrvTimerDelayMs( Int16U delay_ms )
 
 void DrvTimerDelayUs( Int16U delay_us )
 {
+	static Int32U time_test = 0UL;
 	drv_timer_start_delay = loc_var ;
-	while ((Int32U)DrvTimerGetTime() < (Int32U)(drv_timer_start_delay + (Int32U)delay_us) );
+	time_test = (Int32U)(drv_timer_start_delay + (Int32U)delay_us);
+	while (((Int16U)(loc_var>>16U) < (Int16U)(time_test>>16U) ) && ((Int16U)loc_var < (Int16U)time_test ))
+	{
+		DrvTimerGetTime();
+	}
 }
 
 
