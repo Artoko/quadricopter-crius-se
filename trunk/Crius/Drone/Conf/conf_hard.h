@@ -11,6 +11,7 @@
 
 #include <util/atomic.h>
 #include <avr/io.h> 
+#include <avr/fuse.h> 
 #include <avr/eeprom.h> 
 #include <stdlib.h>
 #include <stdio.h>

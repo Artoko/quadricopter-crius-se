@@ -161,12 +161,11 @@ void SrvImuDispatcher (Event_t in_event)
 	}	
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
-		imu_reel.altitude = CmpBMP085GetAltitude() - altitude_depart;
+		imu_reel.altitude = CmpBMP085GetAltitude();
 		//BARO
 		//on start la capture du barometre toutes les 100ms
 		CmpBMP085StartCapture();
-	}
-	CmpBMP085ComputeAltitude();
+	}CmpBMP085ComputeAltitude();
 	
 	// a 10 sec on enregistre l'altitude
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_10S ) == TRUE)

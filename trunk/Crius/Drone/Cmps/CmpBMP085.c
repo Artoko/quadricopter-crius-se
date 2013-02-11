@@ -15,7 +15,7 @@
 #include "Drv/DrvEeprom.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-#define NB_MAX_ALT_TAB			3U
+#define NB_MAX_ALT_TAB			5U
 
 #define STEP_READ_UT			0U
 #define STEP_READ_UP			1U
@@ -53,7 +53,6 @@ static void CmpBMP085ReadUP( void ) ;
 static Int32U pressure;
 
 static Int32U BaroAlt = 0U;
-static Int32U BaroPrev = 0U;
 static float BaroAltTab[NB_MAX_ALT_TAB];
 
 const float p0 = 101325.0f;
@@ -83,7 +82,7 @@ Int8U CmpBMP085GetWeather( void )
 	Int16U currentAltitude = 0; 
 	DrvEepromReadAltitude(&currentAltitude);
 	
-	const float ePressure = p0 * pow((1-currentAltitude/443300), 5.255);  // expected pressure (in Pa) at altitude
+	const float ePressure = p0 * pow((1-currentAltitude/44330), 5.255);  // expected pressure (in Pa) at altitude
 	float weatherDiff;
 	weatherDiff = (pressure/10) - (ePressure /10);
 	
@@ -122,24 +121,18 @@ void CmpBMP085ComputeAltitude( void )
 		float current_baro_alt=0;
 		current_baro_alt = (float)((1.0f - pow(pressure/p0, 0.190295f)) * 44330.0f);
 		
-		if(current_baro_alt >= (BaroPrev + 4))
-		{
-			BaroPrev = current_baro_alt;
-		}
-		if(current_baro_alt <= (BaroPrev - 4))
-		{
-			BaroPrev = current_baro_alt;
-		}
-		
 		Int32U moy_baro_alt=0;
 		BaroAltTab[NB_MAX_ALT_TAB-1] = current_baro_alt;
+		Int32U max_baro_alt =0;
+		Int32U min_baro_alt = 0xFFFFFFFF;
 		for(Int8U loop = 0;loop < NB_MAX_ALT_TAB - 1; loop++)
 		{
 			BaroAltTab[loop] = BaroAltTab[loop + 1];
 			moy_baro_alt += BaroAltTab[loop];
+			if( BaroAltTab[loop] > max_baro_alt ) max_baro_alt =  BaroAltTab[loop];
+			if( BaroAltTab[loop] < min_baro_alt ) min_baro_alt =  BaroAltTab[loop];
 		}
-		BaroAlt = 10 * moy_baro_alt / (NB_MAX_ALT_TAB - 1);
-		
+		BaroAlt =  (moy_baro_alt / (NB_MAX_ALT_TAB - 1) + (max_baro_alt + min_baro_alt)/2)/2 ;
 		step_baro = STEP_NONE;
 	}		
 	else

@@ -49,6 +49,13 @@ Int16U frontMotor_L	= 0U;
 Int16U rearMotor_R	= 0U;
 Int16U rearMotor_L	= 0U;
 
+/*FUSES = 
+    {
+        .low = LFUSE_DEFAULT,
+        .high = (FUSE_SPIEN & FUSE_BOOTSZ0 & FUSE_BOOTSZ1 & FUSE_EESAVE  & FUSE_JTAGEN)
+        .extended = EFUSE_DEFAULT,
+    };*/
+
 int main(void)
 {	
 	// ********************* Interrupt Disable ****************************************
@@ -86,7 +93,7 @@ int main(void)
 	DrvEepromInit();
 	
 	// ********************* PID init *************************************************
-	SrvPIDInit();
+	//SrvPIDInit();
 	
 	// ********************* Interrupt Enable *****************************************
 	DrvInterruptSetAllInterrupts();
@@ -96,7 +103,7 @@ int main(void)
 	SrvImuInit();
 	
 	//Wait 2 sec for sensors init
-	DrvTimerDelayMs(1000);
+	DrvTimerDelayMs(3000);
 	LED_OFF();
 		
 	// ********************* Calibration sensors **************************************
