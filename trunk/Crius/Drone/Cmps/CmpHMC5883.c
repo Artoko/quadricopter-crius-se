@@ -11,10 +11,9 @@
 #include "Drv/DrvTick.h"
 
 ////////////////////////////////////////PRIVATE DEFINES////////////////////////////////////////////
-#define NB_SAMPLE_TO_CALIB_HMC5883 1U
+
+#define HMC5883_1_3GA_SCALE			0.92
 ////////////////////////////////////////PRIVATE VARIABLES//////////////////////////////////////////
-Int8U loop_calibration_hmc5883 = 0;
-static Int8U mag_calib[3] = {0,0,0};
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
@@ -25,25 +24,12 @@ static Int8U mag_calib[3] = {0,0,0};
 Boolean CmpHMC5883Init(void)
 {
 	Boolean o_success = FALSE;
-	DrvTwiWriteReg(HMC5883_ADDRESS,HMC5883_CONFIG_A,HMC5883_15HZ);
-	DrvTimerDelayUs(200);
 	DrvTwiWriteReg(HMC5883_ADDRESS,HMC5883_CONFIG_B,HMC5883_1_3GA);
 	DrvTimerDelayUs(200);
 	DrvTwiWriteReg(HMC5883_ADDRESS,HMC5883_MODE,HMC5883_CONTINUOUS);
-	DrvTimerDelayUs(200);
-	loop_calibration_hmc5883 = NB_SAMPLE_TO_CALIB_HMC5883;
 	DrvTimerDelayMs(5);
 	o_success = TRUE;
 	return o_success;
-}
-
-Boolean CmpHMC5883IsCalibrate(void)
-{
-	if(loop_calibration_hmc5883 == 0)
-	{
-		return TRUE;
-	}
-	return FALSE;
 }
 
 
@@ -61,23 +47,10 @@ Boolean CmpHMC5883GetHeading(S_Mag_Angle *mag)
 		mag->x = (Int16S)((Int16U)(buffer[ 0U ] << 8U) | (Int16U)(buffer[ 1U ]));
 		mag->y = (Int16S)((Int16U)(buffer[ 4U ] << 8U) | (Int16U)(buffer[ 5U ]));
 		mag->z = (Int16S)((Int16U)(buffer[ 2U ] << 8U) | (Int16U)(buffer[ 3U ]));
+		mag->x = mag->x * HMC5883_1_3GA_SCALE;
+		mag->y = mag->y * HMC5883_1_3GA_SCALE;
+		mag->z = mag->z * HMC5883_1_3GA_SCALE;
 		
-		if(loop_calibration_hmc5883 > 0)
-		{
-			if( loop_calibration_hmc5883 == 1 )
-			{
-				mag_calib[0] = mag_calib[0] / NB_SAMPLE_TO_CALIB_HMC5883;
-				mag_calib[1] = mag_calib[1] / NB_SAMPLE_TO_CALIB_HMC5883;
-				mag_calib[2] = mag_calib[2] / NB_SAMPLE_TO_CALIB_HMC5883;
-			}
-			loop_calibration_hmc5883--;
-		}
-		else
-		{
-			mag->x -= mag_calib[0];
-			mag->y -= mag_calib[1];
-			mag->z -= mag_calib[2];
-		}
 		return TRUE;
 	}
 }

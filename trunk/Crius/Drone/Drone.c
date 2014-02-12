@@ -92,13 +92,11 @@ int main(void)
 	DrvUartInit();
 	DrvEepromInit();
 	
-	// ********************* PID init *************************************************
-	//SrvPIDInit();
-	
 	// ********************* Interrupt Enable *****************************************
 	DrvInterruptSetAllInterrupts();
 	
 	// ********************* Composants init ******************************************
+	SrvCommInit();
 	SrvTimerInit();
 	SrvImuInit();
 	
@@ -111,11 +109,6 @@ int main(void)
 	
 	//Wait 2 sec for sensors
 	DrvTimerDelayMs(1000);
-	
-	// ********************* Initialisation services **********************************
-	SrvMotorInit();
-	SrvStartEngineInit();
-	SrvCommInit();	
 	
 	//stop Initialisation
 	LED_ON();
@@ -131,12 +124,8 @@ int main(void)
 		current_main_event = DrvEventGetEvent( current_main_event );
 		// ********************* Compute sensors **************************************
 		SrvImuDispatcher(current_main_event);
-		//DrvAdcDispatcher(current_main_event);
 		// ********************* Receive UART data ************************************
 		SrvCommDispatcher(current_main_event);
-		
-		// *********************Allumage progressif ***********************************
-		//SrvStartEngineDispatcher(current_main_event);
 	}		
 }
 

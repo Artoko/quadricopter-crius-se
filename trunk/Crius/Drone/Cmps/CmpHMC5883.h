@@ -14,7 +14,7 @@
 
 ////////////////////////////////////////PUBLIC DEFINES/////////////////////////////////////////
 
-#define LOCAL_MAGNETIC_DECLINAISON		13.38
+#define LOCAL_MAGNETIC_DECLINAISON		0.01774
 
 #define HMC5883_ADDRESS			0x1E
 
@@ -53,8 +53,6 @@ typedef struct
 
 //fonction init du capteur
 Boolean CmpHMC5883Init(void);
-
-Boolean CmpHMC5883IsCalibrate(void);
 //mag X Y Z
 Boolean CmpHMC5883GetHeading(S_Mag_Angle *mag);
 

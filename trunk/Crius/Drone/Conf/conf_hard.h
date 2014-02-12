@@ -20,6 +20,26 @@
 
 #include "Tools/tools_typedefs.h"
 
+
+////////////////////////////////////////PUBLIC SENSORS BOARD////////////////////////////////////////
+#define DAISY_7		0
+#define CRIUS		1
+
+
+#if ( DAISY_7 == 1 )
+	#define ACC_LIS331DLH	1
+	#define GYR_L3G4200D	1
+	#define MAG_HMC5883		1
+	#define BAR_BMP085		1
+#elif ( CRIUS == 1 )
+	#define ACC_BMA180		1
+	#define GYR_ITG3205		1
+	#define MAG_HMC5883		1
+	#define BAR_BMP085		1
+#endif
+
+
+
 //-----------------------------------------------------------------------------------------------//
 
 #define LED_ON()			(PORTB	|=	(1 << PORTB5))
@@ -36,7 +56,7 @@
 
 ////////////////////////////////////////////PUBLIC TIMER///////////////////////////////////////////
 #define CONF_TIMER_HEARTBEAT			0U
-#define CONF_TIMER_BMP085			1U
+#define CONF_TIMER_BMP085				1U
 #define CONF_TIMER_NB					5U
 
 ////////////////////////////////////////////PUBLIC EVENT///////////////////////////////////////////
