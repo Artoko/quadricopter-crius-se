@@ -13,11 +13,6 @@
 #include "Conf/conf_hard.h"
 #include "Tools/tools_typedefs.h"
 
-#include "Cmps/CmpBMA180.h"
-#include "Cmps/CmpITG3205.h"
-#include "Cmps/CmpHMC5883.h"
-#include "Cmps/CmpBMP085.h"
-
 #include "Drv/DrvEvent.h"
 
 

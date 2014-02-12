@@ -45,7 +45,7 @@ static float DrvEepromReadFloat( const Int8U * addr );
 //enregistre les config du pid
 static void DrvEepromWriteFloat ( Int8U *addr, float value);
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
-static Boolean eeprom_est_configure = FALSE;
+static Boolean eeprom_is_configured = FALSE;
 static Int8U val = 0U;
 
 ////////////////////////////////////////PUBILC FUNCTIONS//////////////////////////////////////////
@@ -58,12 +58,13 @@ Boolean DrvEepromInit ( void )
 	val = DrvEepromReadByte( ADDR_EEPROM_CHECK_EEPROM );
 	if( val == VAL_EEPROM_CHECK_OK )
 	{
-		eeprom_est_configure = TRUE;
+		//eeprom_is_configured = TRUE;
+		eeprom_is_configured = FALSE;
 		o_success = TRUE;	
 	}
 	else
 	{
-		eeprom_est_configure = FALSE;
+		eeprom_is_configured = FALSE;
 	}
 	return o_success;
 }
@@ -86,7 +87,7 @@ void DrvEepromConfigure ( void )
 //retourne l'etat de config de l'eeprom
 Boolean DrvEepromIsConfigured ( void )
 {
-	return eeprom_est_configure;
+	return eeprom_is_configured;
 }
 
 //retourne les config de l'accelerometre

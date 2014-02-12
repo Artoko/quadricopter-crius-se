@@ -16,10 +16,19 @@
 #include "Drv/DrvTick.h"
 #include "Drv/DrvEeprom.h"
 
+
+#if ( DAISY_7 == 1 )
+#include "Cmps/CmpLIS331DLH.h"
+#include "Cmps/CmpL3G4200D.h"
+#include "Cmps/CmpHMC5883.h"
+#include "Cmps/CmpBMP085.h"
+#elif ( CRIUS == 1 )
 #include "Cmps/CmpBMA180.h"
 #include "Cmps/CmpITG3205.h"
 #include "Cmps/CmpHMC5883.h"
 #include "Cmps/CmpBMP085.h"
+#endif
+
 
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
@@ -42,19 +51,12 @@ static float gyroZAngle;
 
 //direction par rapport au nord
 static Int16U direction;
-
-
 //variables de timming
 static Int32U temp_actuel;
 static Int32U temp_dernier_cycle;
 static Int32U temp_max_cycle;
 
-//maintient de l'alitude
-static Int16U altitude_depart;
-static Int32U altitude;
-static Int32U alti_moy;
 
-Int8U wait_alt = 0U;
 /************************************************************************/
 /*Initialisation des composants                                         */
 /************************************************************************/
@@ -71,40 +73,41 @@ Boolean SrvImuInit( void )
 	temp_dernier_cycle = 0;
 	temp_max_cycle = 0;
 	direction = 0;
-	altitude_depart = 0;
-	altitude = 0;
-	alti_moy = 0U;
 	pid_erreur_roulis = 0;
 	pid_erreur_tangage = 0;
 	pid_erreur_lacet = 0;
 	pid_erreur_altitude = 0;
-	wait_alt = 0U;
-	
-	if(DrvEepromInit())
-	{
-		DrvEepromReadAltitude(&altitude_depart);
-		if(altitude_depart == 0xFFFF)
-		altitude_depart = 0;
-	}
-	else
-	{
-		altitude_depart = 0;
-	}
 	
 	
-	//init des composants	
-	CmpHMC5883Init();
-	CmpBMA180Init();
-	CmpITG3205Init();
-	CmpBMP085Init();
+	//init des composants
+	#if ( DAISY_7 == 1 )
 	
-	CmpBMP085StartCapture();
+		CmpLIS331DLHInit();
+		CmpL3G4200DInit();
+		CmpHMC5883Init();
+		CmpBMP085Init();
+		
+	#elif ( CRIUS == 1 )
+	
+		CmpBMA180Init();
+		CmpITG3205Init();
+		CmpHMC5883Init();
+		CmpBMP085Init();
+	
+	#endif
+	
 	return TRUE;
 }
 
 /************************************************************************/
 /*Dispatcher d'evenements                                               */
 /************************************************************************/
+
+static float temp;
+static float pressure;
+static float atm;
+static float altitude;
+static float weather;
 void SrvImuDispatcher (Event_t in_event)
 {
 	//on calcul toutes les 20 millisecondes
@@ -147,62 +150,28 @@ void SrvImuDispatcher (Event_t in_event)
 		
 		
 		// ********************* PID **********************************************
-		pid_erreur_roulis	= SrvPIDCompute( 0U , (float)imu_desire.roulis					, (float)imu_reel.roulis);
-		pid_erreur_tangage	= SrvPIDCompute( 1U , (float)imu_desire.tangage					, (float)imu_reel.tangage);
-		pid_erreur_lacet	= SrvPIDCompute( 2U , (float)(imu_reel.lacet + imu_desire.lacet), (float)imu_reel.lacet);
-		if(imu_reel.maintient_altitude == TRUE)
-		{
-			pid_erreur_altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.altitude);
-		}
+		//pid_erreur_roulis	= SrvPIDCompute( 0U , (float)imu_desire.roulis					, (float)imu_reel.roulis);
+		//pid_erreur_tangage	= SrvPIDCompute( 1U , (float)imu_desire.tangage					, (float)imu_reel.tangage);
+		//pid_erreur_lacet	= SrvPIDCompute( 2U , (float)(imu_reel.lacet + imu_desire.lacet), (float)imu_reel.lacet);
+		//if(imu_reel.maintient_altitude == TRUE)
+		//{
+		//	pid_erreur_altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.altitude);
+		//}
 		// ********************* Moteurs ******************************************
-		SrvMotorUpdate(pid_erreur_roulis, pid_erreur_tangage, pid_erreur_lacet , pid_erreur_altitude );
-		speed = SrvMotorGetSpeed();
+		//SrvMotorUpdate(pid_erreur_roulis, pid_erreur_tangage, pid_erreur_lacet , pid_erreur_altitude );
+		//speed = SrvMotorGetSpeed();
 		
 	}	
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
-		imu_reel.altitude = CmpBMP085GetAltitude();
-		//BARO
-		//on start la capture du barometre toutes les 100ms
-		CmpBMP085StartCapture();
-	}CmpBMP085ComputeAltitude();
-	
-	// a 10 sec on enregistre l'altitude
-	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_10S ) == TRUE)
-	{
-		//si c'est la premiere init
-		if( altitude_depart == 0 )
-		{
-			SrvImuSensorsSetAltitudeDepart();
-		}			
-	}		
-	
-}
-
-/************************************************************************/
-/*Enregistre l altitude de depart                                       */
-/************************************************************************/
-void SrvImuSensorsSetAltitudeDepart( void )
-{
-	altitude_depart = CmpBMP085GetAltitude();
-	DrvEepromWriteAltitude(altitude_depart);
-}
-
-/************************************************************************/
-/*Enregistre l altitude de maintient                                    */
-/************************************************************************/
-void SrvImuSensorsSetAltitudeMaintient( Int8U altitude )
-{
-	if(altitude != 0U)
-	{
-		imu_reel.maintient_altitude = TRUE;
-		imu_desire.altitude = altitude_depart + altitude;
-	}
-	else
-	{
-		imu_reel.maintient_altitude = FALSE;
+		temp = CmpBMP085GetTemperature();
+		pressure = CmpBMP085GetPressure();
+		atm = pressure / 101325.0;
+		altitude = CmpBMP085GetAltitude(pressure);
+		weather = CmpBMP085GetWeather(pressure);
 	}
 }
+
 
 /************************************************************************/
 /*Calibration des capteurs                                              */
@@ -217,18 +186,53 @@ void SrvImuSensorsCalibration( void )
 	Int8U sensors_calibrations = 0U;
 	do
 	{
-		//ACC
-		CmpBMA180GetAcceleration(&acceleration);
-		//GYR
-		CmpITG3205GetRotation(&rotation);
-		//MAG
-		CmpHMC5883GetHeading(&magnet);
+		#if ( DAISY_7 == 1 )
 		
-		sensors_calibrations |= CmpITG3205IsCalibrate();
-		sensors_calibrations |= CmpBMA180IsCalibrate()  << 1U;
-		sensors_calibrations |= CmpHMC5883IsCalibrate() << 2U;
+			//calib accelerometer
+			if( CmpLIS331DLHIsCalibrate() == FALSE)
+			{
+				CmpLIS331DLHGetAcceleration(&acceleration);
+			}
+			else
+			{
+				sensors_calibrations |= 0x01;
+			}
+			
+			//calib gyroscope
+			if( CmpL3G4200DIsCalibrate() == FALSE)
+			{
+				CmpL3G4200DGetRotation(&rotation);
+			}
+			else
+			{
+				sensors_calibrations |= 0x02;
+			}
 		
-		if(	sensors_calibrations == 7U )
+		#elif ( CRIUS == 1 )
+		
+			//calib accelerometer
+			if( CmpBMA180IsCalibrate() == FALSE)
+			{
+				CmpBMA180GetAcceleration(&acceleration);
+			}
+			else
+			{
+				sensors_calibrations |= 0x01;
+			}
+			
+			//calib gyroscope
+			if( CmpITG3205IsCalibrate() == FALSE)
+			{
+				CmpITG3205GetRotation(&rotation);
+			}
+			else
+			{
+				sensors_calibrations |= 0x02;
+			}
+			
+		#endif
+		
+		if(	sensors_calibrations == 0x03 )
 		{
 			//la calibration est fini
 			calibrate = TRUE;
@@ -251,6 +255,10 @@ static void SrvImuComputeSensors(Int32U interval)
 {
 	float gyroRate = 0;	
 	
+	Boolean acc_ok = FALSE;
+	Boolean gyr_ok = FALSE;
+	Boolean mag_ok = FALSE;
+	
 	S_Gyr_Angle rotation;
 	S_Acc_Angle acceleration;
 	S_Mag_Angle magnet;
@@ -265,13 +273,35 @@ static void SrvImuComputeSensors(Int32U interval)
 	magnet.y = 0; 
 	magnet.z = 0; 
 	
-	//ACC
-	if(CmpBMA180GetAcceleration(&acceleration) != FALSE)
-	{
-		//#define ACC_ORIENTATION(X, Y, Z)  {accADC[ROLL]  = -X; accADC[PITCH]  = -Y; accADC[YAW]  =  Z;}
+	
+	#if ( DAISY_7 == 1 )
+	
+		acc_ok = CmpLIS331DLHGetAcceleration(&acceleration);
+		gyr_ok = CmpL3G4200DGetRotation(&rotation);
+		mag_ok = CmpHMC5883GetHeading(&magnet);
+	
+	#elif ( CRIUS == 1 )
+	
+		acc_ok = CmpBMA180GetAcceleration(&acceleration);
 		acceleration.x *= -1;
 		acceleration.y *= -1;
 		acceleration.z *= 1;
+		
+		gyr_ok = CmpITG3205GetRotation(&rotation);
+		rotation.x *= -1;
+		rotation.y *= 1;
+		rotation.z *= -1;
+		
+		mag_ok = CmpHMC5883GetHeading(&magnet);
+		magnet.x *= -1;
+		magnet.y *= 1;
+		magnet.z *= -1;
+	
+	#endif
+	
+	//ACC
+	if(acc_ok != FALSE)
+	{
 		accXangle		= (float)atan2((double)(acceleration.x) , (double)sqrt((double)(pow((double)acceleration.y,2)+pow((double)acceleration.z,2))));
 		accYangle		= (float)atan2((double)(acceleration.y) , (double)sqrt((double)(pow((double)acceleration.x,2)+pow((double)acceleration.z,2))));
 	
@@ -282,31 +312,32 @@ static void SrvImuComputeSensors(Int32U interval)
 			
 	//GYR
 	//sensitivity	=>	14.375
-	if(CmpITG3205GetRotation(&rotation) != FALSE)
-	{	
-		//#define GYRO_ORIENTATION(X, Y, Z) {gyroADC[ROLL] =  Y; gyroADC[PITCH] = -X; gyroADC[YAW] = -Z;}
-		rotation.x *= -1;
-		rotation.y *= 1;
-		rotation.z *= -1;
-			
-		gyroRate				=	rotation.x / 14.375 ;
+	if(gyr_ok != FALSE)
+	{
+		#if ( GYR_L3G4200D == 1 )
+		gyroRate	=	rotation.x * 0.00875 ;
+		#elif ( GYR_ITG3205 == 1 )	
+		gyroRate	=	rotation.x / 14.375 ;
+		#endif
 		gyroYAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
 		
-		gyroRate				=	rotation.y / 14.375 ;
+		#if ( GYR_L3G4200D == 1 )
+		gyroRate	=	rotation.y * 0.00875 ;
+		#elif ( GYR_ITG3205 == 1 )
+		gyroRate	=	rotation.y / 14.375 ;
+		#endif
 		gyroXAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
 		
-		gyroRate				=	rotation.z / 14.375 ;
+		#if ( GYR_L3G4200D == 1 )
+		gyroRate	=	rotation.z * 0.00875 ;
+		#elif ( GYR_ITG3205 == 1 )
+		gyroRate	=	rotation.z / 14.375 ;
+		#endif
 		gyroZAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
 	}		
 	//MAG
-	if(CmpHMC5883GetHeading(&magnet) != FALSE)
+	if(mag_ok != FALSE)
 	{
-		//#define MAG_ORIENTATION(X, Y, Z)  {magADC[ROLL]  =  -X; magADC[PITCH]  =  Y; magADC[YAW]  = -Z;}
-		magnet.x *= -1;
-		magnet.y *= 1;
-		magnet.z *= -1;	
-
-		
 		//on doit etre en dessous des 40 deg
 		if(!(accXangle > 40 || accXangle < -40 || accYangle > 40 || accYangle < -40))
 		{
@@ -318,14 +349,15 @@ static void SrvImuComputeSensors(Int32U interval)
 			
 			float Xh = magnet.x * cosPitch + magnet.z * sinPitch;
 			float Yh = magnet.x * sinRoll * sinPitch + magnet.y * cosRoll - magnet.z * sinRoll * cosPitch;		
-			float heading = atan2(Yh, Xh) - (LOCAL_MAGNETIC_DECLINAISON / 1000);
+			float heading = atan2(Yh, Xh);
+			heading += LOCAL_MAGNETIC_DECLINAISON;
 			if(heading < 0)
 			{
-				heading += 2*M_PI;
+				heading += 2 * M_PI;
 			}
-			if(heading > 2*M_PI)
+			if(heading > 2 * M_PI)
 			{
-				heading -= 2*M_PI;
+				heading -= 2 * M_PI;
 			}
 			direction = ToDeg(heading);
 		}

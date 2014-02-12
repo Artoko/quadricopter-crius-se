@@ -19,8 +19,13 @@
 #include "Cmps/CmpITG3205.h"
 #include "Cmps/CmpHMC5883.h"
 #include "Cmps/CmpBMP085.h"
+//ACC
+#if ( ACC_LIS331DLH == 1 )
+#include "Cmps/CmpLIS331DLH.h"
+#endif
+#if ( ACC_BMA180 == 1 )
 #include "Cmps/CmpBMA180.h"
-#include "Cmps/CmpBMP085.h"
+#endif
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
 #define NB_CHAR_MAX		100U
@@ -91,7 +96,7 @@ static void SrvCommExecute ( void )
 		{
 			//applique la vitesse au moteurs
 			SrvMotorApplyAbsoluteSpeed(ma_trame_comm.param[PARAM_1]);
-			DrvUart0SendMessage( "OK\n" , 3U );
+			DrvUart0SendMessage( "OK\n" , strlen("OK\n") );
 		}
 	}
 	else if(ma_trame_comm.param[PARAM_0] == COMM_ANGLE )
@@ -104,7 +109,7 @@ static void SrvCommExecute ( void )
 	}
 	else if(ma_trame_comm.param[PARAM_0] == COMM_ALTITUDE )
 	{ 
-		if(  ma_trame_comm.param[PARAM_1] == 1 )
+		/*if(  ma_trame_comm.param[PARAM_1] == 1 )
 		{
 			//on enregistre l'altitude de depart
 			SrvImuSensorsSetAltitudeDepart();
@@ -124,8 +129,8 @@ static void SrvCommExecute ( void )
 			//on enregistre l'altitude relative a la position de depart
 			SrvImuSensorsSetAltitudeMaintient(ma_trame_comm.param[PARAM_2]);
 		}		
-		
-		DrvUart0SendMessage( "OK\n" , 3U );
+		*/
+		DrvUart0SendMessage( "OK\n" , strlen("OK\n") );
 	}
 	else if(ma_trame_comm.param[PARAM_0] == COMM_PID )
 	{
@@ -143,7 +148,7 @@ static void SrvCommExecute ( void )
 			D = (float)(Int16S)( ma_trame_comm.param[PARAM_5]);
 			DrvEepromWritePID(index,P,I,D);
 			SrvPIDInit();
-			DrvUart0SendMessage( "OK\n" , 3U );
+			DrvUart0SendMessage( "OK\n" , strlen("OK\n") );
 		}
 		//Read PID
 		else
