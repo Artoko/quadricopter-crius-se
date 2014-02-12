@@ -11,7 +11,6 @@
 #include "Drv/DrvTick.h"
 #include "Drv/DrvTwi.h"
 #include "Drv/DrvUart.h"
-#include "Drv/DrvAdc.h"
 #include "Drv/DrvEvent.h"
 #include "Drv/DrvEeprom.h"
 #include "Drv/DrvInterrupt.h"
@@ -20,7 +19,6 @@
 #include "Srv/SrvComm.h"
 #include "Srv/SrvStartEngine.h"
 #include "Srv/SrvPID.h"
-#include "Srv/SrvMotor.h"
 #include "Srv/SrvTimer.h"
 
 ////////////////////////////////////////PRIVATE FUNCTIONS////////////////////////////////////////
@@ -39,15 +37,6 @@ Int16S pid_erreur_roulis;
 Int16S pid_erreur_tangage;
 Int16S pid_erreur_lacet;
 Int16S pid_erreur_altitude;
-
-Int16U speed;
-Int32U pression;
-Int16S temperature;
-
-Int16U frontMotor_R	= 0U;
-Int16U frontMotor_L	= 0U;
-Int16U rearMotor_R	= 0U;
-Int16U rearMotor_L	= 0U;
 
 /*FUSES = 
     {
@@ -76,19 +65,14 @@ int main(void)
 	imu_desire.tangage  = 0;
 	imu_desire.lacet	= 0;
 	imu_reel.altitude	= 0;
-	imu_reel.roulis	    = 0;
-	imu_reel.tangage	= 0;
-	imu_reel.lacet	    = 0;
-	imu_reel.altitude	= 0;
-	speed				= 0;
-	pression			= 0;
-	temperature			= 0;
+	imu_reel.temperature= 0;
+	imu_reel.pressure	= 0;  
+	imu_reel.weather    = 0;
 	
 	// ********************* Drivers init *********************************************
 	DrvEventInit();
 	DrvTickInit();
 	DrvTwiInit();
-	DrvAdcInit();
 	DrvUartInit();
 	DrvEepromInit();
 	

@@ -57,11 +57,13 @@
 #define L3G4200D_ZYXOR			0x80
 
 #define L3G4200D_WHO_I_AM					0xD3
-#define L3G4200D_CTRL_REG1_400HZ_50LPF		0xAF
+//#define L3G4200D_CTRL_REG1_400HZ_50LPF		0xAF
+#define L3G4200D_CTRL_REG1_400HZ_50LPF		0x8F
 #define L3G4200D_CTRL_REG2_NO_HI_PASS		0x20
 #define L3G4200D_CTRL_REG3_NO_INTERRUPT		0x00
 #define L3G4200D_CTRL_REG4_DEFAULT			0x00
 #define L3G4200D_CTRL_REG5_DISABLE_LPF2		0x00
+#define L3G4200D_CTRL_REG5_ENABLE_LPF2		0x02
 
 ////////////////////////////////////////PUBLIC STRUCTURES////////////////////////////////////////
 typedef struct 
@@ -77,6 +79,5 @@ typedef struct
 Boolean CmpL3G4200DInit(void);
 //Rotation X Y Z
 Boolean CmpL3G4200DGetRotation(S_Gyr_Angle *rot);
-Boolean CmpL3G4200DIsCalibrate(void);
 
 #endif /*CMPL3G4200D_H_*/

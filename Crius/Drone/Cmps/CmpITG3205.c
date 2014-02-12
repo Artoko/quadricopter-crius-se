@@ -12,11 +12,9 @@
 #include "Drv/DrvEeprom.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-#define NB_SAMPLE_TO_CALIB_ITG3205	200
+
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
-Int8U loop_calibration_ITG3205 = 0;
-static Int16S gyro_calib[3] = {0,0,0};
-	
+
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
 
@@ -25,7 +23,6 @@ static Int16S gyro_calib[3] = {0,0,0};
 //fonction init du capteur
 Boolean CmpITG3205Init(void)
 {
-	Boolean conf;
 	if (DrvTwiReadReg(ITG3205_TWI_ADDRESS,ITG3205_RA_WHO_AM_I) == ITG3205_RA_I_AM)
 	{
 		DrvTwiWriteReg(ITG3205_TWI_ADDRESS, ITG3205_RA_PWR_MGM, ITG3205_PWR_H_RESET_BIT);
@@ -33,23 +30,8 @@ Boolean CmpITG3205Init(void)
 		DrvTwiWriteReg(ITG3205_TWI_ADDRESS, ITG3205_RA_DLPF_FS, FS_RANGE_2000 | LPFBW_98HZ );
 		DrvTimerDelayUs(200);
 		DrvTwiWriteReg(ITG3205_TWI_ADDRESS, ITG3205_RA_PWR_MGM, PLL_ZGYRO_REF );
-		DrvTimerDelayMs(1);
+		DrvTimerDelayUs(200);
 		
-		//Calibration du capteur
-		//si l'eeprom est configué
-		conf = DrvEepromIsConfigured();
-		if(conf == FALSE)
-		{
-				loop_calibration_ITG3205 = NB_SAMPLE_TO_CALIB_ITG3205;
-				gyro_calib[0] = 0;
-				gyro_calib[1] = 0;
-				gyro_calib[2] = 0;
-		}
-		else
-		{
-			loop_calibration_ITG3205 = 0;
-			DrvEepromReadGyro(gyro_calib);
-		}
 		return TRUE;
 	}		
 	else
@@ -59,15 +41,6 @@ Boolean CmpITG3205Init(void)
 	
 }
 
-Boolean CmpITG3205IsCalibrate(void)
-{
-	if(loop_calibration_ITG3205 == 0)
-	{
-		DrvEepromWriteGyro(gyro_calib);
-		return TRUE;
-	}
-	return FALSE;
-}
 
 
 //Rotation X Y Z
@@ -85,32 +58,6 @@ Boolean CmpITG3205GetRotation(S_Gyr_Angle *rot)
 		rot->y = (Int16S)((Int16U) buffer[2U] << 8U) | ((Int16U) buffer[3U]);   
 		rot->z = (Int16S)((Int16U) buffer[4U] << 8U) | ((Int16U) buffer[5U]);  
 		
-		if(( rot->z > -6 ) && ( rot->z < 6 ))
-		{
-			rot->z = 0U;
-		}
-		if(loop_calibration_ITG3205 > 0U)
-		{
-			if( loop_calibration_ITG3205 == 1U )
-			{
-				gyro_calib[0U] = gyro_calib[0U] / NB_SAMPLE_TO_CALIB_ITG3205;
-				gyro_calib[1U] = gyro_calib[1U] / NB_SAMPLE_TO_CALIB_ITG3205;
-				gyro_calib[2U] = gyro_calib[2U] / NB_SAMPLE_TO_CALIB_ITG3205;
-			}
-			else
-			{
-				gyro_calib[0U] += rot->x;
-				gyro_calib[1U] += rot->y;
-				gyro_calib[2U] += rot->z;
-			}
-			loop_calibration_ITG3205--;
-		}
-		else
-		{
-			rot->x  -= gyro_calib[0U];
-			rot->y  -= gyro_calib[1U];
-			rot->z  -= gyro_calib[2U];
-		}
 		return TRUE;
 	}	
 }

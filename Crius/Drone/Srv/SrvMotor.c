@@ -24,7 +24,10 @@
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 static Int16U throttle		= 0U;
-
+Int16U frontMotor_R	= 0U;
+Int16U frontMotor_L	= 0U;
+Int16U rearMotor_R	= 0U;
+Int16U rearMotor_L	= 0U;
 
 /************************************************************************/
 /* init des moteurs                                                     */

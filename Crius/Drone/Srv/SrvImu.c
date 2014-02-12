@@ -11,7 +11,6 @@
 #include "SrvImu.h"
 #include "SrvPID.h"
 #include "SrvKalman.h"
-#include "SrvMotor.h"
 
 #include "Drv/DrvTick.h"
 #include "Drv/DrvEeprom.h"
@@ -102,12 +101,6 @@ Boolean SrvImuInit( void )
 /************************************************************************/
 /*Dispatcher d'evenements                                               */
 /************************************************************************/
-
-static float temp;
-static float pressure;
-static float atm;
-static float altitude;
-static float weather;
 void SrvImuDispatcher (Event_t in_event)
 {
 	//on calcul toutes les 20 millisecondes
@@ -148,27 +141,22 @@ void SrvImuDispatcher (Event_t in_event)
 			imu_reel.lacet -= 360.0;
 		}
 		
-		
 		// ********************* PID **********************************************
-		//pid_erreur_roulis	= SrvPIDCompute( 0U , (float)imu_desire.roulis					, (float)imu_reel.roulis);
-		//pid_erreur_tangage	= SrvPIDCompute( 1U , (float)imu_desire.tangage					, (float)imu_reel.tangage);
-		//pid_erreur_lacet	= SrvPIDCompute( 2U , (float)(imu_reel.lacet + imu_desire.lacet), (float)imu_reel.lacet);
-		//if(imu_reel.maintient_altitude == TRUE)
-		//{
-		//	pid_erreur_altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.altitude);
-		//}
-		// ********************* Moteurs ******************************************
-		//SrvMotorUpdate(pid_erreur_roulis, pid_erreur_tangage, pid_erreur_lacet , pid_erreur_altitude );
-		//speed = SrvMotorGetSpeed();
-		
+		pid_erreur_roulis	= SrvPIDCompute( 0U , (float)imu_desire.roulis					, (float)imu_reel.roulis);
+		pid_erreur_tangage	= SrvPIDCompute( 1U , (float)imu_desire.tangage					, (float)imu_reel.tangage);
+		pid_erreur_lacet	= SrvPIDCompute( 2U , (float)(imu_reel.lacet + imu_desire.lacet), (float)imu_reel.lacet);
+		/*if(imu_reel.maintient_altitude == TRUE)
+		{
+			pid_erreur_altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.altitude);
+		}*/		
 	}	
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
-		temp = CmpBMP085GetTemperature();
-		pressure = CmpBMP085GetPressure();
-		atm = pressure / 101325.0;
-		altitude = CmpBMP085GetAltitude(pressure);
-		weather = CmpBMP085GetWeather(pressure);
+		imu_reel.temperature = (Int16S)CmpBMP085GetTemperature();
+		imu_reel.pressure = CmpBMP085GetPressure();
+		//atm = pressure / 101325.0;
+		imu_reel.altitude = (Int16U)CmpBMP085GetAltitude(imu_reel.pressure);
+		imu_reel.weather = CmpBMP085GetWeather(imu_reel.pressure);
 	}
 }
 
@@ -178,16 +166,12 @@ void SrvImuDispatcher (Event_t in_event)
 /************************************************************************/
 void SrvImuSensorsCalibration( void )
 {
-	S_Gyr_Angle rotation;
 	S_Acc_Angle acceleration;
-	S_Mag_Angle magnet;
 
 	Boolean calibrate = FALSE;
-	Int8U sensors_calibrations = 0U;
 	do
 	{
 		#if ( DAISY_7 == 1 )
-		
 			//calib accelerometer
 			if( CmpLIS331DLHIsCalibrate() == FALSE)
 			{
@@ -195,21 +179,10 @@ void SrvImuSensorsCalibration( void )
 			}
 			else
 			{
-				sensors_calibrations |= 0x01;
-			}
-			
-			//calib gyroscope
-			if( CmpL3G4200DIsCalibrate() == FALSE)
-			{
-				CmpL3G4200DGetRotation(&rotation);
-			}
-			else
-			{
-				sensors_calibrations |= 0x02;
-			}
-		
+				DrvEepromConfigure();
+				calibrate = TRUE;
+			}		
 		#elif ( CRIUS == 1 )
-		
 			//calib accelerometer
 			if( CmpBMA180IsCalibrate() == FALSE)
 			{
@@ -217,33 +190,10 @@ void SrvImuSensorsCalibration( void )
 			}
 			else
 			{
-				sensors_calibrations |= 0x01;
-			}
-			
-			//calib gyroscope
-			if( CmpITG3205IsCalibrate() == FALSE)
-			{
-				CmpITG3205GetRotation(&rotation);
-			}
-			else
-			{
-				sensors_calibrations |= 0x02;
-			}
-			
+				DrvEepromConfigure();
+				calibrate = TRUE;
+			}			
 		#endif
-		
-		if(	sensors_calibrations == 0x03 )
-		{
-			//la calibration est fini
-			calibrate = TRUE;
-			//on valide dans l'eeprom les données des capteurs calibrés
-			DrvEepromConfigure();
-		}
-		else
-		{
-			//on attends 20ms
-			DrvTimerDelayMs(STD_LOOP_TIME);
-		}
 	} while (!calibrate);
 }
 

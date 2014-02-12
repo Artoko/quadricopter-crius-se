@@ -234,12 +234,6 @@
     <Compile Include="Drone.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Drv\DrvAdc.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Drv\DrvAdc.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="Drv\DrvEeprom.c">
       <SubType>compile</SubType>
     </Compile>
@@ -256,12 +250,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Drv\DrvInterrupt.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Drv\DrvServo.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Drv\DrvServo.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Drv\DrvTick.c">
@@ -298,12 +286,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Srv\SrvKalman.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Srv\SrvMotor.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Srv\SrvMotor.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Srv\SrvPID.c">
