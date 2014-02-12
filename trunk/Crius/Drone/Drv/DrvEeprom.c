@@ -11,18 +11,18 @@
 #define ADDR_EEPROM_GYRO_CALIB_X	( Int8U *)7U
 #define ADDR_EEPROM_GYRO_CALIB_Y	( Int8U *)9U
 #define ADDR_EEPROM_GYRO_CALIB_Z	( Int8U *)11U
-#define ADDR_EEPROM_PID_0_P			( Int8U *)13U
-#define ADDR_EEPROM_PID_0_I			( Int8U *)17U
-#define ADDR_EEPROM_PID_0_D			( Int8U *)21U
-#define ADDR_EEPROM_PID_1_P			( Int8U *)25U
-#define ADDR_EEPROM_PID_1_I			( Int8U *)29U
-#define ADDR_EEPROM_PID_1_D			( Int8U *)33U
-#define ADDR_EEPROM_PID_2_P			( Int8U *)37U
-#define ADDR_EEPROM_PID_2_I			( Int8U *)41U
-#define ADDR_EEPROM_PID_2_D			( Int8U *)45U
-#define ADDR_EEPROM_PID_3_P			( Int8U *)49U
-#define ADDR_EEPROM_PID_3_I			( Int8U *)53U
-#define ADDR_EEPROM_PID_3_D			( Int8U *)57U
+#define ADDR_EEPROM_PID_X_P			( Int8U *)13U
+#define ADDR_EEPROM_PID_X_I			( Int8U *)17U
+#define ADDR_EEPROM_PID_X_D			( Int8U *)21U
+#define ADDR_EEPROM_PID_Y_P			( Int8U *)25U
+#define ADDR_EEPROM_PID_Y_I			( Int8U *)29U
+#define ADDR_EEPROM_PID_Y_D			( Int8U *)33U
+#define ADDR_EEPROM_PID_Z_P			( Int8U *)37U
+#define ADDR_EEPROM_PID_Z_I			( Int8U *)41U
+#define ADDR_EEPROM_PID_Z_D			( Int8U *)45U
+#define ADDR_EEPROM_PID_ALT_P		( Int8U *)49U
+#define ADDR_EEPROM_PID_ALT_I		( Int8U *)53U
+#define ADDR_EEPROM_PID_ALT_D		( Int8U *)57U
 #define ADDR_EEPROM_ALTITUDE		( Int8U *)60U
 
 
@@ -58,8 +58,8 @@ Boolean DrvEepromInit ( void )
 	val = DrvEepromReadByte( ADDR_EEPROM_CHECK_EEPROM );
 	if( val == VAL_EEPROM_CHECK_OK )
 	{
-		//eeprom_is_configured = TRUE;
-		eeprom_is_configured = FALSE;
+		eeprom_is_configured = TRUE;
+		//eeprom_is_configured = FALSE;
 		o_success = TRUE;	
 	}
 	else
@@ -127,27 +127,27 @@ void DrvEepromReadPID(Int8U index,float *P, float *I, float *D)
 {
 	if( index == 0 )
 	{
-		*P = DrvEepromReadFloat(ADDR_EEPROM_PID_0_P);
-		*I = DrvEepromReadFloat(ADDR_EEPROM_PID_0_I);
-		*D = DrvEepromReadFloat(ADDR_EEPROM_PID_0_D);
+		*P = DrvEepromReadFloat(ADDR_EEPROM_PID_X_P);
+		*I = DrvEepromReadFloat(ADDR_EEPROM_PID_X_I);
+		*D = DrvEepromReadFloat(ADDR_EEPROM_PID_X_D);
 	}
 	else if( index == 1 )
 	{
-		*P = DrvEepromReadFloat(ADDR_EEPROM_PID_1_P);
-		*I = DrvEepromReadFloat(ADDR_EEPROM_PID_1_I);
-		*D = DrvEepromReadFloat(ADDR_EEPROM_PID_1_D);
+		*P = DrvEepromReadFloat(ADDR_EEPROM_PID_Y_P);
+		*I = DrvEepromReadFloat(ADDR_EEPROM_PID_Y_I);
+		*D = DrvEepromReadFloat(ADDR_EEPROM_PID_Y_D);
 	}
 	else if( index == 2 )
 	{
-		*P = DrvEepromReadFloat(ADDR_EEPROM_PID_2_P);
-		*I = DrvEepromReadFloat(ADDR_EEPROM_PID_2_I);
-		*D = DrvEepromReadFloat(ADDR_EEPROM_PID_2_D);
+		*P = DrvEepromReadFloat(ADDR_EEPROM_PID_Z_P);
+		*I = DrvEepromReadFloat(ADDR_EEPROM_PID_Z_I);
+		*D = DrvEepromReadFloat(ADDR_EEPROM_PID_Z_D);
 	}
 	else if( index == 3 )
 	{
-		*P = DrvEepromReadFloat(ADDR_EEPROM_PID_3_P);
-		*I = DrvEepromReadFloat(ADDR_EEPROM_PID_3_I);
-		*D = DrvEepromReadFloat(ADDR_EEPROM_PID_3_D);
+		*P = DrvEepromReadFloat(ADDR_EEPROM_PID_ALT_P);
+		*I = DrvEepromReadFloat(ADDR_EEPROM_PID_ALT_I);
+		*D = DrvEepromReadFloat(ADDR_EEPROM_PID_ALT_D);
 	}
 }
 
@@ -156,27 +156,27 @@ void DrvEepromWritePID (Int8U index,float P, float I, float D)
 {
 	if( index == 0 )
 	{
-		DrvEepromWriteFloat(ADDR_EEPROM_PID_0_P, P);
-		DrvEepromWriteFloat(ADDR_EEPROM_PID_0_I, I);
-		DrvEepromWriteFloat(ADDR_EEPROM_PID_0_D, D);
+		DrvEepromWriteFloat(ADDR_EEPROM_PID_X_P, P);
+		DrvEepromWriteFloat(ADDR_EEPROM_PID_X_I, I);
+		DrvEepromWriteFloat(ADDR_EEPROM_PID_X_D, D);
 	}
 	else if( index == 1 )
 	{
-		DrvEepromWriteFloat(ADDR_EEPROM_PID_1_P, P);
-		DrvEepromWriteFloat(ADDR_EEPROM_PID_1_I, I);
-		DrvEepromWriteFloat(ADDR_EEPROM_PID_1_D, D);
+		DrvEepromWriteFloat(ADDR_EEPROM_PID_Y_P, P);
+		DrvEepromWriteFloat(ADDR_EEPROM_PID_Y_I, I);
+		DrvEepromWriteFloat(ADDR_EEPROM_PID_Y_D, D);
 	}
 	else if( index == 2 )
 	{
-		DrvEepromWriteFloat(ADDR_EEPROM_PID_2_P, P);
-		DrvEepromWriteFloat(ADDR_EEPROM_PID_2_I, I);
-		DrvEepromWriteFloat(ADDR_EEPROM_PID_2_D, D);
+		DrvEepromWriteFloat(ADDR_EEPROM_PID_Z_P, P);
+		DrvEepromWriteFloat(ADDR_EEPROM_PID_Z_I, I);
+		DrvEepromWriteFloat(ADDR_EEPROM_PID_Z_D, D);
 	}
 	else if( index == 3 )
 	{
-		DrvEepromWriteFloat(ADDR_EEPROM_PID_3_P, P);
-		DrvEepromWriteFloat(ADDR_EEPROM_PID_3_P, I);
-		DrvEepromWriteFloat(ADDR_EEPROM_PID_3_P, D);
+		DrvEepromWriteFloat(ADDR_EEPROM_PID_ALT_P, P);
+		DrvEepromWriteFloat(ADDR_EEPROM_PID_ALT_I, I);
+		DrvEepromWriteFloat(ADDR_EEPROM_PID_ALT_D, D);
 	}
 }
 

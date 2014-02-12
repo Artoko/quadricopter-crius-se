@@ -55,18 +55,17 @@
 
 
 ////////////////////////////////////////////PUBLIC TIMER///////////////////////////////////////////
-#define CONF_TIMER_HEARTBEAT			0U
-#define CONF_TIMER_BMP085				1U
-#define CONF_TIMER_NB					5U
+#define		CONF_TIMER_HEARTBEAT			0U
+#define		CONF_TIMER_NB					1U
 
 ////////////////////////////////////////////PUBLIC EVENT///////////////////////////////////////////
-#define		CONF_EVENT_TIMER_20MS		( 1 << 0U )
-#define		CONF_EVENT_TIMER_100MS		( 1 << 1U )
-#define		CONF_EVENT_TIMER_500MS		( 1 << 2U )
-#define		CONF_EVENT_TIMER_1S			( 1 << 3U )
-#define		CONF_EVENT_TIMER_5S			( 1 << 4U )
-#define		CONF_EVENT_TIMER_10S		( 1 << 5U )
-#define		CONF_EVENT_MSG_RCV			( 1 << 6U )
+#define		CONF_EVENT_TIMER_20MS		( 1U << 0U )
+#define		CONF_EVENT_TIMER_100MS		( 1U << 1U )
+#define		CONF_EVENT_TIMER_500MS		( 1U << 2U )
+#define		CONF_EVENT_TIMER_1S			( 1U << 3U )
+#define		CONF_EVENT_TIMER_5S			( 1U << 4U )
+#define		CONF_EVENT_TIMER_10S		( 1U << 5U )
+#define		CONF_EVENT_MSG_RCV			( 1U << 6U )
 
 //PINOUT CRIUS
 // A0	PC0
@@ -102,6 +101,7 @@ typedef struct SSangles
 	Int32U pressure;
 	Int16S temperature;
 	Int8U weather;
+	Boolean maintient_altitude;
 }Simu;
 
 
