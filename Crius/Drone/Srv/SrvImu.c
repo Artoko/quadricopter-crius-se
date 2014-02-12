@@ -122,15 +122,6 @@ void SrvImuDispatcher (Event_t in_event)
 		// ********************* Fusion des capteurs ******************************		
 		imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle ) * 10;
 		imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle ) * 10;
-		imu_reel.nord     = SrvKalmanFilterZ( direction, gyroZAngle, temp_dernier_cycle );
-		if(imu_reel.nord < 0)
-		{
-			imu_reel.nord += 360.0;
-		}
-		else if(imu_reel.nord > 360)
-		{
-			imu_reel.nord -= 360.0;
-		}
 		imu_reel.lacet	  = gyroZAngle;
 		if(imu_reel.lacet < 0.0)
 		{
@@ -140,15 +131,16 @@ void SrvImuDispatcher (Event_t in_event)
 		{
 			imu_reel.lacet -= 360.0;
 		}
+		imu_reel.nord     = direction;
 		
 		// ********************* PID **********************************************
 		pid_erreur_roulis	= SrvPIDCompute( 0U , (float)imu_desire.roulis					, (float)imu_reel.roulis);
 		pid_erreur_tangage	= SrvPIDCompute( 1U , (float)imu_desire.tangage					, (float)imu_reel.tangage);
 		pid_erreur_lacet	= SrvPIDCompute( 2U , (float)(imu_reel.lacet + imu_desire.lacet), (float)imu_reel.lacet);
-		/*if(imu_reel.maintient_altitude == TRUE)
+		if(imu_reel.maintient_altitude == TRUE)
 		{
 			pid_erreur_altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.altitude);
-		}*/		
+		}		
 	}	
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
@@ -195,6 +187,14 @@ void SrvImuSensorsCalibration( void )
 			}			
 		#endif
 	} while (!calibrate);
+}
+
+/************************************************************************/
+/*Set la position de depart                                             */
+/************************************************************************/
+void SrvImuSensorsSetAltitudeDepart( void )
+{
+	DrvEepromWriteAltitude(imu_reel.altitude);
 }
 
 ////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
@@ -310,6 +310,14 @@ static void SrvImuComputeSensors(Int32U interval)
 				heading -= 2 * M_PI;
 			}
 			direction = ToDeg(heading);
+			if(direction < 0)
+			{
+				direction += 360.0;
+			}
+			else if(direction > 360)
+			{
+				direction -= 360.0;
+			}
 		}
 	}
 }

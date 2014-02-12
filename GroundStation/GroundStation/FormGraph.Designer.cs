@@ -38,12 +38,7 @@
             this.checkBoxlacet = new System.Windows.Forms.CheckBox();
             this.checkBoxpidroulis = new System.Windows.Forms.CheckBox();
             this.checkBoxpidtangage = new System.Windows.Forms.CheckBox();
-            this.checkBoxvitesse = new System.Windows.Forms.CheckBox();
             this.checkBoxaltitude = new System.Windows.Forms.CheckBox();
-            this.checkBoxmotorFR = new System.Windows.Forms.CheckBox();
-            this.checkBoxmotorFL = new System.Windows.Forms.CheckBox();
-            this.checkBoxmotorRR = new System.Windows.Forms.CheckBox();
-            this.checkBoxmotorRL = new System.Windows.Forms.CheckBox();
             this.checkBoxpidlacet = new System.Windows.Forms.CheckBox();
             this.checkBoxpression = new System.Windows.Forms.CheckBox();
             this.checkBoxtemperature = new System.Windows.Forms.CheckBox();
@@ -64,7 +59,7 @@
             this.zedGraphControl1.ScrollMinX = 0D;
             this.zedGraphControl1.ScrollMinY = 0D;
             this.zedGraphControl1.ScrollMinY2 = 0D;
-            this.zedGraphControl1.Size = new System.Drawing.Size(710, 375);
+            this.zedGraphControl1.Size = new System.Drawing.Size(748, 254);
             this.zedGraphControl1.TabIndex = 2;
             // 
             // timer_tick
@@ -132,16 +127,6 @@
             this.checkBoxpidtangage.Text = "pid tangage";
             this.checkBoxpidtangage.UseVisualStyleBackColor = true;
             // 
-            // checkBoxvitesse
-            // 
-            this.checkBoxvitesse.AutoSize = true;
-            this.checkBoxvitesse.Location = new System.Drawing.Point(10, 317);
-            this.checkBoxvitesse.Name = "checkBoxvitesse";
-            this.checkBoxvitesse.Size = new System.Drawing.Size(59, 17);
-            this.checkBoxvitesse.TabIndex = 5;
-            this.checkBoxvitesse.Text = "vitesse";
-            this.checkBoxvitesse.UseVisualStyleBackColor = true;
-            // 
             // checkBoxaltitude
             // 
             this.checkBoxaltitude.AutoSize = true;
@@ -151,46 +136,6 @@
             this.checkBoxaltitude.TabIndex = 5;
             this.checkBoxaltitude.Text = "altitude";
             this.checkBoxaltitude.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxmotorFR
-            // 
-            this.checkBoxmotorFR.AutoSize = true;
-            this.checkBoxmotorFR.Location = new System.Drawing.Point(10, 226);
-            this.checkBoxmotorFR.Name = "checkBoxmotorFR";
-            this.checkBoxmotorFR.Size = new System.Drawing.Size(69, 17);
-            this.checkBoxmotorFR.TabIndex = 6;
-            this.checkBoxmotorFR.Text = "motor FR";
-            this.checkBoxmotorFR.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxmotorFL
-            // 
-            this.checkBoxmotorFL.AutoSize = true;
-            this.checkBoxmotorFL.Location = new System.Drawing.Point(10, 249);
-            this.checkBoxmotorFL.Name = "checkBoxmotorFL";
-            this.checkBoxmotorFL.Size = new System.Drawing.Size(67, 17);
-            this.checkBoxmotorFL.TabIndex = 7;
-            this.checkBoxmotorFL.Text = "motor FL";
-            this.checkBoxmotorFL.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxmotorRR
-            // 
-            this.checkBoxmotorRR.AutoSize = true;
-            this.checkBoxmotorRR.Location = new System.Drawing.Point(10, 272);
-            this.checkBoxmotorRR.Name = "checkBoxmotorRR";
-            this.checkBoxmotorRR.Size = new System.Drawing.Size(71, 17);
-            this.checkBoxmotorRR.TabIndex = 8;
-            this.checkBoxmotorRR.Text = "motor RR";
-            this.checkBoxmotorRR.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxmotorRL
-            // 
-            this.checkBoxmotorRL.AutoSize = true;
-            this.checkBoxmotorRL.Location = new System.Drawing.Point(10, 294);
-            this.checkBoxmotorRL.Name = "checkBoxmotorRL";
-            this.checkBoxmotorRL.Size = new System.Drawing.Size(69, 17);
-            this.checkBoxmotorRL.TabIndex = 9;
-            this.checkBoxmotorRL.Text = "motor RL";
-            this.checkBoxmotorRL.UseVisualStyleBackColor = true;
             // 
             // checkBoxpidlacet
             // 
@@ -205,7 +150,7 @@
             // checkBoxpression
             // 
             this.checkBoxpression.AutoSize = true;
-            this.checkBoxpression.Location = new System.Drawing.Point(10, 340);
+            this.checkBoxpression.Location = new System.Drawing.Point(10, 226);
             this.checkBoxpression.Name = "checkBoxpression";
             this.checkBoxpression.Size = new System.Drawing.Size(65, 17);
             this.checkBoxpression.TabIndex = 11;
@@ -215,7 +160,7 @@
             // checkBoxtemperature
             // 
             this.checkBoxtemperature.AutoSize = true;
-            this.checkBoxtemperature.Location = new System.Drawing.Point(10, 363);
+            this.checkBoxtemperature.Location = new System.Drawing.Point(10, 249);
             this.checkBoxtemperature.Name = "checkBoxtemperature";
             this.checkBoxtemperature.Size = new System.Drawing.Size(82, 17);
             this.checkBoxtemperature.TabIndex = 10;
@@ -236,15 +181,10 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(814, 397);
+            this.ClientSize = new System.Drawing.Size(858, 272);
             this.Controls.Add(this.checkBoxnord);
             this.Controls.Add(this.checkBoxpression);
             this.Controls.Add(this.checkBoxtemperature);
-            this.Controls.Add(this.checkBoxmotorRL);
-            this.Controls.Add(this.checkBoxmotorRR);
-            this.Controls.Add(this.checkBoxmotorFL);
-            this.Controls.Add(this.checkBoxmotorFR);
-            this.Controls.Add(this.checkBoxvitesse);
             this.Controls.Add(this.checkBoxpidlacet);
             this.Controls.Add(this.checkBoxpidtangage);
             this.Controls.Add(this.checkBoxpidroulis);
@@ -275,12 +215,7 @@
         private System.Windows.Forms.CheckBox checkBoxlacet;
         private System.Windows.Forms.CheckBox checkBoxpidroulis;
         private System.Windows.Forms.CheckBox checkBoxpidtangage;
-        private System.Windows.Forms.CheckBox checkBoxvitesse;
         private System.Windows.Forms.CheckBox checkBoxaltitude;
-        private System.Windows.Forms.CheckBox checkBoxmotorFR;
-        private System.Windows.Forms.CheckBox checkBoxmotorFL;
-        private System.Windows.Forms.CheckBox checkBoxmotorRR;
-        private System.Windows.Forms.CheckBox checkBoxmotorRL;
         private System.Windows.Forms.CheckBox checkBoxpidlacet;
         private System.Windows.Forms.CheckBox checkBoxpression;
         private System.Windows.Forms.CheckBox checkBoxtemperature;

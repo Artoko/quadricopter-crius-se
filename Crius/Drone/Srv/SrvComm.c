@@ -69,7 +69,7 @@ void SrvCommDispatcher (Event_t in_event)
 		SrvCommExecute();
 	}
 	
-	if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_100MS))
+	if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_20MS))
 	{
 		if( want_repport_data == TRUE )
 		{
@@ -112,7 +112,7 @@ static void SrvCommExecute ( void )
 		if(  ma_trame_comm.param[PARAM_1] == 1 )
 		{
 			//on enregistre l'altitude de depart
-			//SrvImuSensorsSetAltitudeDepart();
+			SrvImuSensorsSetAltitudeDepart();
 		}
 		else if(  ma_trame_comm.param[PARAM_1] == 2 )
 		{
@@ -120,8 +120,7 @@ static void SrvCommExecute ( void )
 			Int8U lenght = 0;
 			lenght = sprintf(weather_message
 			,"WEATHER:%i\n"
-			,CmpBMP085GetWeather(CmpBMP085GetPressure())
-			);
+			,imu_reel.weather);
 			DrvUart0SendMessage( weather_message , lenght );
 		}	
 		else if(  ma_trame_comm.param[PARAM_1] == 3 )
@@ -143,8 +142,7 @@ static void SrvCommExecute ( void )
 			float D = 0;
 			index = ma_trame_comm.param[PARAM_2];
 			P = (float)(Int16S)( ma_trame_comm.param[PARAM_3]);
-			I = (float)(Int16S)( ma_trame_comm.param[PARAM_4]);
-			I /= 10;
+			I = (float)(Int16S)( ma_trame_comm.param[PARAM_4] / 10);
 			D = (float)(Int16S)( ma_trame_comm.param[PARAM_5]);
 			DrvEepromWritePID(index,P,I,D);
 			SrvPIDInit();
@@ -210,7 +208,7 @@ static void SrvCommRepportData( void )
 						,imu_reel.tangage
 						,imu_reel.lacet	
 						,imu_reel.nord	
-						,imu_reel.altitude
+						,(Int16U)imu_reel.altitude
 						,pid_erreur_roulis
 						,pid_erreur_tangage
 						,pid_erreur_lacet

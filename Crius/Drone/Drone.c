@@ -61,13 +61,23 @@ int main(void)
 	LED_ON();
 	
 	// ********************* General variables init *************************************************
-	imu_desire.roulis	= 0;
-	imu_desire.tangage  = 0;
-	imu_desire.lacet	= 0;
-	imu_reel.altitude	= 0;
-	imu_reel.temperature= 0;
-	imu_reel.pressure	= 0;  
-	imu_reel.weather    = 0;
+	imu_reel.roulis				= 0;
+	imu_reel.tangage			= 0;
+	imu_reel.lacet				= 0;
+	imu_reel.altitude			= 0;
+	imu_reel.temperature		= 0;
+	imu_reel.pressure			= 0;  
+	imu_reel.weather		    = 0;
+	imu_reel.maintient_altitude	=FALSE;
+	
+	imu_desire.roulis				= 0;
+	imu_desire.tangage				= 0;
+	imu_desire.lacet				= 0;
+	imu_desire.altitude				= 0;
+	imu_desire.temperature			= 0;
+	imu_desire.pressure				= 0;  
+	imu_desire.weather				= 0;
+	imu_desire.maintient_altitude	=FALSE;
 	
 	// ********************* Drivers init *********************************************
 	DrvEventInit();

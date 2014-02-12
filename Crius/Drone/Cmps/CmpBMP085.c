@@ -15,7 +15,7 @@
 #include "Drv/DrvEeprom.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-
+#define SEA_PRESSURE	101325.0F
 /////////////////////////////////////////PRIVATE STRUCTIURES///////////////////////////////////////
 Int16S ac1;
 Int16S ac2;
@@ -32,11 +32,11 @@ Int32S b5;
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 static void CmpBMP085ReadCalibration( void ) ;
-Int16U CmpBMP085ReadUT ( void );
-Int32U CmpBMP085ReadUP ( void );
+static Int16U CmpBMP085ReadUT ( void );
+static Int32U CmpBMP085ReadUP ( void );
 
 /////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
-const float p0 = 101325.0f;
+
 
 
 //Initialisation du barometre
@@ -67,7 +67,7 @@ Int8U CmpBMP085GetWeather( float pressure )
 	Int16U currentAltitude = 0;
 	DrvEepromReadAltitude(&currentAltitude);
 	
-	const float ePressure = p0 * pow((1-currentAltitude/44330.0), 5.255);  // expected pressure (in Pa) at altitude
+	const float ePressure = SEA_PRESSURE * pow((1-currentAltitude/44330.0), 5.255);  // expected pressure (in Pa) at altitude
 	float weatherDiff;
 	weatherDiff = (pressure / 10.0) - (ePressure / 10.0);
 	
@@ -174,7 +174,7 @@ static void CmpBMP085ReadCalibration( void )
 }
 
 // Read the uncompensated temperature value
-Int16U CmpBMP085ReadUT ( void )
+static Int16U CmpBMP085ReadUT ( void )
 {
 	Int16U ut;
 	
@@ -191,7 +191,7 @@ Int16U CmpBMP085ReadUT ( void )
 }
 
 // Read the uncompensated pressure value
-Int32U CmpBMP085ReadUP ( void )
+static Int32U CmpBMP085ReadUP ( void )
 {
 	
 	Int8U msb, lsb, xlsb;

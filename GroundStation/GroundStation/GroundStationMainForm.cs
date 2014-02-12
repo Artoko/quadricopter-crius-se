@@ -73,7 +73,7 @@ namespace GroundStation
         {
             if (ConnexiontoolStripMenuItem.Text == "Connexion")
             {
-                if ((serial.Connect("COM14") == true) || (serial.Connect("COM3") == true) || (serial.Connect("COM5") == true))
+                if ((serial.Connect("COM14") == true) || (serial.Connect("COM3") == true) || (serial.Connect("COM5") == true) || (serial.Connect("COM22") == true))
                 {
                     ConnexiontoolStripMenuItem.Text = "Deconnexion";
                     StatetoolStripStatusLabel.Text = "Etat : Connecte";
@@ -111,7 +111,7 @@ namespace GroundStation
                 if (!value.Contains("OK") && !value.Contains("PID"))
                 {
                     toolStripStatusButtonMessage.Text = "Messages : " + value;
-                    toolStripStatusButtonMessage.DropDownItems.Add(value);
+                    toolStripStatusButtonMessage.DropDownItems.Add(System.DateTime.Now.Minute + ":" + System.DateTime.Now.Second + "," + System.DateTime.Now.Millisecond + value);
                     toolStripStatusButtonMessage.ToolTipText = "count ( " + Convert.ToString(toolStripStatusButtonMessage.DropDownItems.Count - 1) + " )";
                     if (toolStripStatusButtonMessage.DropDownItems.Count > 20)
                     {
@@ -120,8 +120,8 @@ namespace GroundStation
                     
                     string[] param = value.Replace("\0", "").Replace(" ", "").Split(',');
 
-                    string Z = System.Convert.ToString(-1 * System.Convert.ToInt16(param[2]));
-                    tcpserv.SendMessage("x=0/y=0/z=0/rotx=" + System.Convert.ToInt16(param[0]) + "/roty=" + System.Convert.ToInt16(param[1]) + "/rotz=" + Z + "/vit=" + System.Convert.ToInt16(param[11]) + "##");
+                    //string Z = System.Convert.ToString(-1 * System.Convert.ToInt16(param[2]));
+                    //tcpserv.SendMessage("x=0/y=0/z=0/rotx=" + System.Convert.ToInt16(param[0]) + "/roty=" + System.Convert.ToInt16(param[1]) + "/rotz=" + Z + "/vit=" + System.Convert.ToInt16(param[11]) + "##");
 
                     
                 }
