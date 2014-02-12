@@ -26,7 +26,6 @@ static Int16S accel_calib[ 3U ] = { 0, 0, 0 };
 //fonction init du capteur
 Boolean CmpLIS331DLHInit(void)
 {
-	Int8U control;
 	Boolean conf;
 	Boolean o_success = FALSE;
 	if(LIS331DLH_WHO_I_AM == DrvTwiReadReg(LIS331DLH_ADDRESS, LIS331DLH_WHO_AM_I))

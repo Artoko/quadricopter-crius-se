@@ -71,6 +71,5 @@ typedef struct
 Boolean CmpITG3205Init(void);
 //Rotation X Y Z
 Boolean CmpITG3205GetRotation(S_Gyr_Angle *rot);
-Boolean CmpITG3205IsCalibrate(void);
 
 #endif /*CMPITG3205_H_*/
