@@ -19,6 +19,7 @@
 #include "Srv/SrvComm.h"
 #include "Srv/SrvStartEngine.h"
 #include "Srv/SrvPID.h"
+#include "Srv/SrvMotor.h"
 #include "Srv/SrvTimer.h"
 
 ////////////////////////////////////////PRIVATE FUNCTIONS////////////////////////////////////////
@@ -82,8 +83,8 @@ int main(void)
 	// ********************* Drivers init *********************************************
 	DrvEventInit();
 	DrvTickInit();
-	DrvTwiInit();
-	DrvUartInit();
+	DrvTwiInit( TWI_SPEED_400K );
+	DrvUartInit( UART_SPEED_115200 );
 	DrvEepromInit();
 	
 	// ********************* Interrupt Enable *****************************************
@@ -93,6 +94,7 @@ int main(void)
 	SrvCommInit();
 	SrvTimerInit();
 	SrvImuInit();
+	SrvMotorInit(); 
 	
 	//Wait 2 sec for sensors init
 	DrvTimerDelayMs(3000);

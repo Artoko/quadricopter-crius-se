@@ -21,9 +21,9 @@
 
 /////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 // On clear toutes les ITs 
-void DrvInterruptClearAllInterrupts( void ) ;
+#define DrvInterruptClearAllInterrupts() cli()
 
 // On clear toutes les ITs 
-void DrvInterruptSetAllInterrupts( void ) ;
+#define DrvInterruptSetAllInterrupts() sei()
 
 #endif /* DRV_INTERRUPT_H_ */

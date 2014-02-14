@@ -12,18 +12,16 @@
 #include "DrvTwi.h"
 
 
-uint8_t rawADC[6];
-
 void WaitTransmissionI2C(void);
 
-void DrvTwiInit(void) 
+void DrvTwiInit( Int16U speed ) 
 {
   TWSR = 0;                                    // no prescaler => prescaler = 1
-  TWBR = ((CONF_FOSC_HZ / 400000) - 16) / 2;   // change the I2C clock rate
+  TWBR = ((CONF_FOSC_HZ / (speed * 1000) ) - 16) / 2;   // change the I2C clock rate
   TWCR = 1<<TWEN;                              // enable twi module, no interrupt
 }
 
-void DrvTwiRepStart(uint8_t address) 
+void DrvTwiRepStart(Int8U address) 
 {
   TWCR = (1<<TWINT) | (1<<TWSTA) | (1<<TWEN) ; // send REPEAT START condition
   WaitTransmissionI2C();                       // wait until transmission completed
@@ -38,28 +36,28 @@ void DrvTwiStop(void)
   //  while(TWCR & (1<<TWSTO));                // <- can produce a blocking state with some WMP clones
 }
 
-void DrvTwiWrite(uint8_t data ) 
+void DrvTwiWrite(Int8U data ) 
 {	
   TWDR = data;                                 // send data to the previously addressed device
   TWCR = (1<<TWINT) | (1<<TWEN);
   WaitTransmissionI2C();
 }
 
-uint8_t DrvTwiRead(uint8_t ack) 
+Int8U DrvTwiRead(Int8U ack) 
 {
   TWCR = (1<<TWINT) | (1<<TWEN) | (ack? (1<<TWEA) : 0);
   WaitTransmissionI2C();
-  uint8_t r = TWDR;
+  Int8U r = TWDR;
   if (!ack) DrvTwiStop();
   return r;
 }
 
-uint8_t DrvTwiReadAck() 
+Int8U DrvTwiReadAck() 
 {
   return DrvTwiRead(1);
 }
 
-uint8_t DrvTwireadNak(void) 
+Int8U DrvTwireadNak(void) 
 {
   return DrvTwiRead(0);
 }
@@ -76,11 +74,11 @@ void WaitTransmissionI2C()
   }
 }
 
-Int8U DrvTwiReadToBuf(uint8_t add, void *buf, Int8U size) 
+Int8U DrvTwiReadToBuf(Int8U add, void *buf, Int8U size) 
 {
   DrvTwiRepStart((add<<1) | 1);	// I2C read direction
   Int8U bytes_read = 0;
-  uint8_t *b = (uint8_t*)buf;
+  Int8U *b = (Int8U*)buf;
   while (size--) {
     /* acknowledge all but the final byte */
     *b++ = DrvTwiRead(size > 0);
@@ -90,7 +88,7 @@ Int8U DrvTwiReadToBuf(uint8_t add, void *buf, Int8U size)
   return bytes_read;
 }
 
-Int8U DrvTwiReadRegBuf(uint8_t add, uint8_t reg, void *buf, Int8U size) 
+Int8U DrvTwiReadRegBuf(Int8U add, Int8U reg, void *buf, Int8U size) 
 {
   DrvTwiRepStart(add<<1); // I2C write direction
   DrvTwiWrite(reg);        // register selection
@@ -100,7 +98,7 @@ Int8U DrvTwiReadRegBuf(uint8_t add, uint8_t reg, void *buf, Int8U size)
 
 
 
-void DrvTwiWriteReg(uint8_t add, uint8_t reg, uint8_t val)
+void DrvTwiWriteReg(Int8U add, Int8U reg, Int8U val)
  {
   DrvTwiRepStart(add<<1); // I2C write direction
   DrvTwiWrite(reg);        // register selection
@@ -108,9 +106,9 @@ void DrvTwiWriteReg(uint8_t add, uint8_t reg, uint8_t val)
   DrvTwiStop();
 }
 
-uint8_t DrvTwiReadReg(uint8_t add, uint8_t reg)
+Int8U DrvTwiReadReg(Int8U add, Int8U reg)
  {
-  uint8_t val;
+  Int8U val;
   DrvTwiReadRegBuf(add, reg, &val, 1);
   return val;
 }

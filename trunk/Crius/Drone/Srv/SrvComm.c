@@ -8,7 +8,7 @@
 #include "Conf/conf_hard.h"
 
 #include "SrvComm.h"
-//#include "SrvMotor.h"
+#include "SrvMotor.h"
 #include "SrvImu.h"
 #include "SrvPID.h"
 
@@ -95,8 +95,8 @@ static void SrvCommExecute ( void )
 		  )
 		{
 			//applique la vitesse au moteurs
-			//SrvMotorApplyAbsoluteSpeed(ma_trame_comm.param[PARAM_1]);
-			//DrvUart0SendMessage( "OK\n" , strlen("OK\n") );
+			SrvMotorApplyAbsoluteSpeed(ma_trame_comm.param[PARAM_1]);
+			DrvUart0SendMessage( "OK\n" , strlen("OK\n") );
 		}
 	}
 	else if(ma_trame_comm.param[PARAM_0] == COMM_ANGLE )
@@ -126,7 +126,7 @@ static void SrvCommExecute ( void )
 		else if(  ma_trame_comm.param[PARAM_1] == 3 )
 		{
 			//on enregistre l'altitude relative a la position de depart
-			//SrvImuSensorsSetAltitudeMaintient(ma_trame_comm.param[PARAM_2]);
+			SrvImuSensorsSetAltitudeMaintient(ma_trame_comm.param[PARAM_2]);
 		}		
 		
 		DrvUart0SendMessage( "OK\n" , strlen("OK\n") );
@@ -201,19 +201,24 @@ static void SrvCommRepportData( void )
 {
 	Char o_message[ 50U ];
 	Int8U lenght = 0;
-	
-	lenght = sprintf(	o_message	
-						,"%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\n"
-						,imu_reel.roulis
-						,imu_reel.tangage
-						,imu_reel.lacet	
-						,imu_reel.nord	
-						,(Int16U)imu_reel.altitude
-						,pid_erreur_roulis
-						,pid_erreur_tangage
-						,pid_erreur_lacet
-						,(Int16U)(imu_reel.pressure / 10)
-						,(Int16S)imu_reel.temperature
+
+	lenght = sprintf(       o_message
+					,"%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\n"
+					,imu_reel.roulis
+					,imu_reel.tangage
+					,imu_reel.lacet
+					,imu_reel.nord
+					,(Int16U)imu_reel.altitude
+					,pid_erreur_roulis
+					,pid_erreur_tangage
+					,pid_erreur_lacet
+					,frontMotor_R - 1000
+					,frontMotor_L - 1000
+					,rearMotor_R - 1000
+					,rearMotor_L - 1000
+					,SrvMotorGetSpeed() - 1000
+					,(Int16U)(imu_reel.pressure / 10)
+					,(Int16S)imu_reel.temperature
 					);
 	DrvUart0SendMessage( o_message , lenght );
 }

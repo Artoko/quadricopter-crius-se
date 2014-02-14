@@ -11,11 +11,16 @@
  #include "Tools/tools_typedefs.h"
 
 
+////////////////////////////////////////PUBLIC DEFINES/////////////////////////////////////////
+
+#define TWI_SPEED_100K		100U
+#define TWI_SPEED_400K		400U
+
  //on init le driver
- void DrvTwiInit(void);
+ void DrvTwiInit( Int16U speed );
  //on lit plusieurs octets
-Int8U DrvTwiReadRegBuf(uint8_t add, uint8_t reg, void *buf, Int8U size) ;
-uint8_t DrvTwiReadReg(uint8_t add, uint8_t reg);
-void DrvTwiWriteReg(uint8_t add, uint8_t reg, uint8_t val);
+Int8U DrvTwiReadRegBuf(Int8U add, Int8U reg, void *buf, Int8U size) ;
+Int8U DrvTwiReadReg(Int8U add, Int8U reg);
+void DrvTwiWriteReg(Int8U add, Int8U reg, Int8U val);
 
 #endif /* DRVTWI_H_ */

@@ -45,12 +45,13 @@ STrame trame_uart;
   
 /////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 // Init du Drv Uart 
-void DrvUartInit( )
+void DrvUartInit( Int32U baud_rate )
 {
 	//on fixe les registres
 	#ifdef USE_UART_0
-		//UBRR0L = 0x08U;		//115200 baud
-		UBRR0L = 0x19U;		//38400 baud
+		UBRR0H = 0x00U;		//115200 baud
+		UBRR0L = 0x0CU;		//115200 baud
+		//UBRR0L = 0x19U;		//38400 baud
 		UCSR0B |= (1<<RXEN0);	//enable RX
 		UCSR0B |= (1<<TXEN0);	//enable TX 
 		UCSR0B |= (1<<RXCIE0);	//enable RX interrupt 
@@ -60,7 +61,8 @@ void DrvUartInit( )
 	#endif
 			
 	#ifdef USE_UART_1
-		UBRR1 = 0x000CU;		//38400 baud
+		UBRR1H = ((CONF_FOSC_HZ  / 4 / baud_rate -1) / 2) >> 8;
+		UBRR1L = ((CONF_FOSC_HZ  / 4 / baud_rate -1) / 2);
 		UCSR1B |= (1<<RXEN1);	//enable RX
 		UCSR1B |= (1<<TXEN1);	//enable TX 
 		UCSR1B |= (1<<RXCIE1);	//enable RX interrupt 
@@ -89,11 +91,6 @@ void DrvUart0ReadMessage( STrame *trame )
 //on recupere le message
 void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
 {
-	/*for ( Int8U loop_send = 0U ; loop_send < i_message_len ; loop_send++)
-	{
-		while ( !( UCSR0A & (1<<UDRE0)) );
-		UDR0 = i_message[ loop_send ];
-	} */
 	//on enregistre le message 
 	for ( Int8U loop_send = in_message_len_0 ; loop_send < i_message_len ; loop_send++)
 	{

@@ -12,7 +12,10 @@
 
 #include "Tools/tools_typedefs.h"
 
-
+extern Int16U frontMotor_R;
+extern Int16U frontMotor_L;
+extern Int16U rearMotor_R;
+extern Int16U rearMotor_L;
 
 
 //init des moteurs
