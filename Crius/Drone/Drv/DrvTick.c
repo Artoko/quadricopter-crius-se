@@ -34,8 +34,8 @@ void DrvTickInit(void)
 //get the tick counter
 Int32U DrvTimerGetTime(void)
 {
-	cli();
 	static Int32U loc_var = 0;
+	cli();
 	loc_var = (Int32U)((drv_timer_tick_counter * TIMER0_OVF) + (TCNT0 * TIMER0_TICK));
 	sei();
 	return loc_var;

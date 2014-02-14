@@ -22,8 +22,11 @@
 #define PARAM_4	4U
 #define PARAM_5	5U
 
-
 #define NB_PARAM	6U
+
+#define UART_SPEED_9600			9600U
+#define UART_SPEED_38400		38400U
+#define UART_SPEED_115200		115200U
 
 /////////////////////////////////////////PUBLIC STRUCTURES/////////////////////////////////////////
 typedef struct SSTrame
@@ -39,7 +42,7 @@ typedef struct SSTrame
 
 /////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 // Init du Drv Uart 
-void DrvUartInit( void ) ;
+void DrvUartInit( Int32U baud_rate ) ;
 
 //************************************
 // Method:    DrvUart0SendMessage

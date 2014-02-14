@@ -11,6 +11,7 @@
 #include "SrvImu.h"
 #include "SrvPID.h"
 #include "SrvKalman.h"
+#include "SrvMotor.h"
 
 #include "Drv/DrvTick.h"
 #include "Drv/DrvEeprom.h"
@@ -36,7 +37,7 @@
 ////////////////////////////////////////PRIVATE STRUCTIURES///////////////////////////////////////
 
 ////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
-static void SrvImuComputeSensors( Int32U interval );
+static void SrvImuComputeSensors( void );
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 
@@ -47,13 +48,6 @@ static float accZangle;
 static float gyroXAngle;
 static float gyroYAngle;
 static float gyroZAngle;
-
-//direction par rapport au nord
-static Int16U direction;
-//variables de timming
-static Int32U temp_actuel;
-static Int32U temp_dernier_cycle;
-static Int32U temp_max_cycle;
 
 
 /************************************************************************/
@@ -68,10 +62,6 @@ Boolean SrvImuInit( void )
 	gyroXAngle = 0;
 	gyroYAngle = 0;
 	gyroZAngle = 0;
-	temp_actuel = 0;
-	temp_dernier_cycle = 0;
-	temp_max_cycle = 0;
-	direction = 0;
 	pid_erreur_roulis = 0;
 	pid_erreur_tangage = 0;
 	pid_erreur_lacet = 0;
@@ -105,33 +95,9 @@ void SrvImuDispatcher (Event_t in_event)
 {
 	//on calcul toutes les 20 millisecondes
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_20MS ) == TRUE)
-	{
-		// ********************* Calcul du temps de cycle *************************
-		temp_dernier_cycle = DrvTimerGetTime() - temp_actuel;
-		temp_actuel = DrvTimerGetTime();
-		
-		//Get max cycle
-		if(temp_dernier_cycle > temp_max_cycle)
-		{
-			temp_max_cycle = temp_dernier_cycle;
-		}
-		
+	{		
 		// ********************* Mesure des capteurs ******************************
-		SrvImuComputeSensors( temp_dernier_cycle );
-		
-		// ********************* Fusion des capteurs ******************************		
-		imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, temp_dernier_cycle ) * 10;
-		imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, temp_dernier_cycle ) * 10;
-		imu_reel.lacet	  = gyroZAngle;
-		if(imu_reel.lacet < 0.0)
-		{
-			imu_reel.lacet += 360.0;
-		}
-		else if(imu_reel.lacet > 360.0)
-		{
-			imu_reel.lacet -= 360.0;
-		}
-		imu_reel.nord     = direction;
+		SrvImuComputeSensors();
 		
 		// ********************* PID **********************************************
 		pid_erreur_roulis	= SrvPIDCompute( 0U , (float)imu_desire.roulis					, (float)imu_reel.roulis);
@@ -140,15 +106,18 @@ void SrvImuDispatcher (Event_t in_event)
 		if(imu_reel.maintient_altitude == TRUE)
 		{
 			pid_erreur_altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.altitude);
-		}		
+		}	
+		
+		// *********************Mise à jour des Moteurs ***************************
+		SrvMotorUpdate(pid_erreur_roulis , pid_erreur_tangage,pid_erreur_lacet, pid_erreur_altitude )	;
 	}	
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
-		imu_reel.temperature = (Int16S)CmpBMP085GetTemperature();
+		/*imu_reel.temperature = (Int16S)CmpBMP085GetTemperature();
 		imu_reel.pressure = CmpBMP085GetPressure();
 		//atm = pressure / 101325.0;
 		imu_reel.altitude = (Int16U)CmpBMP085GetAltitude(imu_reel.pressure);
-		imu_reel.weather = CmpBMP085GetWeather(imu_reel.pressure);
+		imu_reel.weather = CmpBMP085GetWeather(imu_reel.pressure);*/
 	}
 }
 
@@ -190,24 +159,45 @@ void SrvImuSensorsCalibration( void )
 }
 
 /************************************************************************/
-/*Set la position de depart                                             */
+/*Enregistre la position de depart                                      */
 /************************************************************************/
 void SrvImuSensorsSetAltitudeDepart( void )
 {
 	DrvEepromWriteAltitude(imu_reel.altitude);
 }
 
+/************************************************************************/
+/*Enregistre l altitude de maintient                                    */
+/************************************************************************/
+void SrvImuSensorsSetAltitudeMaintient( Int8U altitude )
+{
+	if(altitude != 0U)
+	{
+		Int16U alt = 0U;
+		DrvEepromReadAltitude(&alt);
+		imu_reel.maintient_altitude = TRUE;
+		imu_desire.altitude = alt + altitude;
+	}
+	else
+	{
+		imu_reel.maintient_altitude = FALSE;
+	}
+}
 ////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
 /************************************************************************/
 /*Recuperation des données des capteurs et mise en forme  des données   */
 /************************************************************************/
-static void SrvImuComputeSensors(Int32U interval)
+static void SrvImuComputeSensors( void )
 {
+	//variables de timming
+	static Int32U previous_time;
+	static Int32U interval;
+	
 	float gyroRate = 0;	
 	
-	Boolean acc_ok = FALSE;
-	Boolean gyr_ok = FALSE;
-	Boolean mag_ok = FALSE;
+	Boolean acc_read_ok = FALSE;
+	Boolean gyr_read_ok = FALSE;
+	Boolean mag_read_ok = FALSE;
 	
 	S_Gyr_Angle rotation;
 	S_Acc_Angle acceleration;
@@ -224,25 +214,29 @@ static void SrvImuComputeSensors(Int32U interval)
 	magnet.z = 0; 
 	
 	
+	// ********************* Calcul du temps de cycle *************************
+	interval = DrvTimerGetTime() - previous_time;
+	
+	// ********************* Lecture des capteurs *****************************
 	#if ( DAISY_7 == 1 )
 	
-		acc_ok = CmpLIS331DLHGetAcceleration(&acceleration);
-		gyr_ok = CmpL3G4200DGetRotation(&rotation);
-		mag_ok = CmpHMC5883GetHeading(&magnet);
+		acc_read_ok = CmpLIS331DLHGetAcceleration(&acceleration);
+		gyr_read_ok = CmpL3G4200DGetRotation(&rotation);
+		mag_read_ok = CmpHMC5883GetHeading(&magnet);
 	
 	#elif ( CRIUS == 1 )
 	
-		acc_ok = CmpBMA180GetAcceleration(&acceleration);
+		acc_read_ok = CmpBMA180GetAcceleration(&acceleration);
 		acceleration.x *= -1;
 		acceleration.y *= -1;
 		acceleration.z *= 1;
 		
-		gyr_ok = CmpITG3205GetRotation(&rotation);
+		gyr_read_ok = CmpITG3205GetRotation(&rotation);
 		rotation.x *= -1;
 		rotation.y *= 1;
 		rotation.z *= -1;
 		
-		mag_ok = CmpHMC5883GetHeading(&magnet);
+		mag_read_ok = CmpHMC5883GetHeading(&magnet);
 		magnet.x *= -1;
 		magnet.y *= 1;
 		magnet.z *= -1;
@@ -250,7 +244,7 @@ static void SrvImuComputeSensors(Int32U interval)
 	#endif
 	
 	//ACC
-	if(acc_ok != FALSE)
+	if(acc_read_ok != FALSE)
 	{
 		accXangle		= (float)atan2((double)(acceleration.x) , (double)sqrt((double)(pow((double)acceleration.y,2)+pow((double)acceleration.z,2))));
 		accYangle		= (float)atan2((double)(acceleration.y) , (double)sqrt((double)(pow((double)acceleration.x,2)+pow((double)acceleration.z,2))));
@@ -262,8 +256,9 @@ static void SrvImuComputeSensors(Int32U interval)
 			
 	//GYR
 	//sensitivity	=>	14.375
-	if(gyr_ok != FALSE)
+	if(gyr_read_ok != FALSE)
 	{
+		
 		#if ( GYR_L3G4200D == 1 )
 		gyroRate	=	rotation.x * 0.00875 ;
 		#elif ( GYR_ITG3205 == 1 )	
@@ -286,7 +281,7 @@ static void SrvImuComputeSensors(Int32U interval)
 		gyroZAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
 	}		
 	//MAG
-	if(mag_ok != FALSE)
+	if(mag_read_ok != FALSE)
 	{
 		//on doit etre en dessous des 40 deg
 		if(!(accXangle > 40 || accXangle < -40 || accYangle > 40 || accYangle < -40))
@@ -309,16 +304,24 @@ static void SrvImuComputeSensors(Int32U interval)
 			{
 				heading -= 2 * M_PI;
 			}
-			direction = ToDeg(heading);
-			if(direction < 0)
-			{
-				direction += 360.0;
-			}
-			else if(direction > 360)
-			{
-				direction -= 360.0;
-			}
+			imu_reel.nord  = ToDeg(heading);
 		}
 	}
+	
+	// ********************* Fusion des capteurs ******************************
+	imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval ) * 10;
+	imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval ) * 10;
+	imu_reel.lacet	  = gyroZAngle;
+	if(imu_reel.lacet < 0.0)
+	{
+		imu_reel.lacet += 360.0;
+	}
+	else if(imu_reel.lacet > 360.0)
+	{
+		imu_reel.lacet -= 360.0;
+	}
+	
+	// ********************* Calcul du temps de cycle *************************
+	previous_time = DrvTimerGetTime();
 }
 
