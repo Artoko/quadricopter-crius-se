@@ -59,7 +59,6 @@ Boolean DrvEepromInit ( void )
 	if( val == VAL_EEPROM_CHECK_OK )
 	{
 		eeprom_is_configured = TRUE;
-		//eeprom_is_configured = FALSE;
 		o_success = TRUE;	
 	}
 	else
@@ -87,7 +86,7 @@ void DrvEepromConfigure ( void )
 //retourne l'etat de config de l'eeprom
 Boolean DrvEepromIsConfigured ( void )
 {
-	return eeprom_is_configured;
+	return FALSE;//eeprom_is_configured;
 }
 
 //retourne les config de l'accelerometre

@@ -20,7 +20,7 @@ namespace GroundStation
         {
             bool ret = false;
             serialPort1.PortName = port_name;
-            serialPort1.BaudRate = 76800;
+            serialPort1.BaudRate = 115200;
             try
             {
                 serialPort1.Open();

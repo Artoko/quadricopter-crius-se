@@ -15,6 +15,9 @@
 
 
 ////////////////////////////////////////////PUBLIC DEFINES/////////////////////////////////////////
+#define UART_0	0U
+#define UART_1	1U
+
 #define PARAM_0	0U
 #define PARAM_1	1U
 #define PARAM_2	2U
@@ -26,7 +29,14 @@
 
 #define UART_SPEED_9600			9600U
 #define UART_SPEED_38400		38400U
+#define UART_SPEED_76800		76800U
 #define UART_SPEED_115200		115200U
+
+#define BUFFER_MAX				25U
+
+
+#define ComputeBaudRate( baud )				( CONF_FOSC_HZ / ( baud * 16 ) - 1 )
+#define ComputeBaudRateDoubleSpeed( baud )	( CONF_FOSC_HZ / ( baud * 8 ) - 1 )
 
 /////////////////////////////////////////PUBLIC STRUCTURES/////////////////////////////////////////
 typedef struct SSTrame
@@ -42,7 +52,7 @@ typedef struct SSTrame
 
 /////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 // Init du Drv Uart 
-void DrvUartInit( Int32U baud_rate ) ;
+void DrvUartInit( Int8U index_uart, Int32U baud_rate ) ;
 
 //************************************
 // Method:    DrvUart0SendMessage

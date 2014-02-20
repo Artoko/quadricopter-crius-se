@@ -5,9 +5,9 @@
  *  Author: berryer
  */ 
 
-#include "DrvUart.h"
 #include "Conf/conf_hard.h"
 
+#include "DrvUart.h"
 #include "DrvEvent.h"
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
@@ -19,75 +19,70 @@
 	//UART 0
 	//-------
 	//message stocke
-	volatile Int8U in_message_0[50U];
+	volatile Int8U in_message_0[ BUFFER_MAX ];
 	volatile Int8U in_message_sent = 0U;
 	volatile Int8U in_message_len_0 = 0U;
 	
 	//buffer de reception de message uart 0
-	volatile Int8U buff_uart_0[50U];
+	volatile Int8U buff_uart_0[ BUFFER_MAX ];
 	volatile Int8U ctr_buff_uart_0 = 0U;
-	volatile Boolean start_frame_uart_0 = FALSE;
 #endif
 
 #ifdef USE_UART_1
 	//UART 1
 	//-------
 	//message stocke
-	volatile Int8U in_message_1[100U];
+	volatile Int8U in_message_1[ BUFFER_MAX ];
 	volatile Int8U in_message_len_1 = 0U;
 	//buffer de reception de message uart 0
-	volatile Int8U buff_uart_1[100U];
+	volatile Int8U buff_uart_1[BUFFER_MAX];
 	volatile Int8U ptr_buff_uart_1 = 0U;
 	volatile Boolean start_frame_uart_1 = FALSE;
 #endif
-
-STrame trame_uart;
+  
+  
+volatile STrame m_trame;
   
 /////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 // Init du Drv Uart 
-void DrvUartInit( Int32U baud_rate )
+void DrvUartInit( Int8U index_uart, Int32U baud_rate )
 {
+	Int16U m_baud_rate = ComputeBaudRateDoubleSpeed(baud_rate);
 	//on fixe les registres
-	#ifdef USE_UART_0
-		UBRR0H = 0x00U;		//115200 baud
-		UBRR0L = 0x0CU;		//115200 baud
-		//UBRR0L = 0x19U;		//38400 baud
+	if(index_uart == UART_0)
+	{
+		UBRR0H = m_baud_rate >> 8;
+		UBRR0L = m_baud_rate & 0x00FFU;
+		UCSR0A |= (1<<U2X0);	//double speed mode
 		UCSR0B |= (1<<RXEN0);	//enable RX
 		UCSR0B |= (1<<TXEN0);	//enable TX 
 		UCSR0B |= (1<<RXCIE0);	//enable RX interrupt 
 		UCSR0B |= (1<<TXCIE0);	//enable TX interrupt 
-		UCSR0C|= (1<<UCSZ00); 	//8 bits, no parity, 1 stop 
-		UCSR0C|= (1<<UCSZ01); 
-	#endif
-			
-	#ifdef USE_UART_1
-		UBRR1H = ((CONF_FOSC_HZ  / 4 / baud_rate -1) / 2) >> 8;
-		UBRR1L = ((CONF_FOSC_HZ  / 4 / baud_rate -1) / 2);
+		UCSR0C |= (1<<UCSZ00); 	//8 bits, no parity, 1 stop 
+		UCSR0C |= (1<<UCSZ01); 
+	}
+	if(index_uart == UART_1)
+	{
+		UBRR1H = m_baud_rate >> 8;
+		UBRR1L = m_baud_rate & 0x00FFU;
 		UCSR1B |= (1<<RXEN1);	//enable RX
 		UCSR1B |= (1<<TXEN1);	//enable TX 
 		UCSR1B |= (1<<RXCIE1);	//enable RX interrupt 
 		UCSR1C|= (1<<UCSZ10); 	//8 bits, no parity, 1 stop 
 		UCSR1C|= (1<<UCSZ11);  
-	#endif
-		
-	for(Int8U loop = 0U; loop < NB_PARAM ; loop++)
-	{
-		trame_uart.param[loop] = 0;
 	}
 }
 
 //on recupere le message
 void DrvUart0ReadMessage( STrame *trame )
 {
-	for(Int8U loop = 0U; loop < NB_PARAM ; loop++)
+	for( Int8U loop = 0U; loop < NB_PARAM ; loop++)
 	{
-		trame->param[loop] = trame_uart.param[loop] ;
-		trame_uart.param[loop] = 0;
+		trame->param[ loop ] = m_trame.param[ loop ];
+		m_trame.param[ loop ] = 0U;
 	}
-	
-	//on attend le start frame
-	start_frame_uart_0 = FALSE;
 }
+
 //on recupere le message
 void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
 {
@@ -108,6 +103,7 @@ void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
 		in_message_sent = 1U;
 	}
 }
+
 //on recupere le message
 void DrvUart0SendDirectMessage( Char *i_message, Int8U i_message_len )
 {
@@ -148,99 +144,102 @@ void DrvUart1SendMessage(Char *i_message,Int8U i_message_len )
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
-
 /////////////////////////////////////ISR PRIVATE FUNCTIONS////////////////////////////////////////
 
 #ifdef USE_UART_0	
 //UART0
 //-------------------
 //ISR uart octet recu
-volatile Int8U decade = 1U;
-volatile Int8U index_param = 0U;
 volatile Char rcv_byte = 0U;
 volatile Char last_rcv_byte = 0U;
-volatile Int8S signe = 0;
+
+#if defined (__AVR_ATmega328P__)
 ISR(USART_RX_vect)
+#elif defined (__AVR_ATmega1284P__)
+ISR(USART0_RX_vect)
+#endif
 {
 	//on enregistre l'octet recu
 	rcv_byte = UDR0;
-	//si on a deja recu le start frame
-	if( start_frame_uart_0 == FALSE )
-    {
-		//si c'est un debut de trame
-		if(rcv_byte == '*' )
-		{
-			buff_uart_0[ 0U ] = '*';
-			ctr_buff_uart_0 = 1U;
-			//on a recu le start frame
-			start_frame_uart_0 = TRUE;
-			signe = 0;
-		}
-	}
-	else
+	//start of frame
+	if( rcv_byte == '*' )
 	{
-		//on charge le message dans le buff_uart_0
-		buff_uart_0[ctr_buff_uart_0] = rcv_byte;
-		last_rcv_byte = buff_uart_0[ctr_buff_uart_0 - 1U];
-		ctr_buff_uart_0++;	
+		buff_uart_0[ 0U ] = '*';
+		ctr_buff_uart_0 = 1U;
+	}
+	//end of frame
+	else if(( buff_uart_0[ ctr_buff_uart_0 - 1U ] == '#' ) && ( rcv_byte == '#' ) && ( buff_uart_0[ 0U ] == '*' ))
+	{
+		buff_uart_0[ ctr_buff_uart_0 ] = rcv_byte;
+		
+		Int8U index_fin_de_trame = ctr_buff_uart_0;
 			
-		//si fin de trame
-		if(( last_rcv_byte == '#' ) && ( rcv_byte == '#' ))
+		Int8S signe = 1;
+		Char in_message[ 10U ];
+		Int8U cpt_message = 0U;
+		Int8U cpt_field = 0U;
+		//on parse le premier champ du message
+		for( Int8U loop = 1U; loop <= index_fin_de_trame ; loop++)
 		{
-			index_param = 0;
-			decade = 1;
-			//on lance l'event
-			DrvEventAddEvent( CONF_EVENT_MSG_RCV );
-		}
-		else
-		{
-			//si on a pas recu de nouvelle '*'
-			if(rcv_byte == '*' )
+			//on cherche le + ou le -
+			if( ! ( ( buff_uart_0[ loop ] == '-' ) || ( buff_uart_0[ loop ] == '+' ) || ( buff_uart_0[ loop ] == '#' ) ) )
 			{
-				//on attend le start frame
-				start_frame_uart_0 = FALSE;
-				index_param = 0;
-				decade = 1;
+				in_message[ cpt_message ] = buff_uart_0[ loop ];
+				cpt_message ++;
 			}
 			else
 			{
-				//on discossie les params
-				if( last_rcv_byte == '+' )
+				in_message[ cpt_message ] = '\0';
+				m_trame.param[ cpt_field ] = atoi(in_message) * signe;
+				//on met a zero le compteur
+				cpt_message = 0;
+				//on incremente pour remplir le prochain champ
+				cpt_field++;
+				//on determine le signe du prochain champ
+				if( buff_uart_0[ loop ] == '-' )
 				{
-					index_param++;
-					decade = 1;
-					signe = 0;
-				}
-				else if( last_rcv_byte == '-' )
-				{
-					index_param++;
-					decade = 1;		
-					signe = 1;
+					signe = -1;
 				}
 				else
 				{
-					if(last_rcv_byte != '*')
-					{
-						trame_uart.param[index_param] *= decade;
-						if(signe == 1)
-						{
-							trame_uart.param[index_param] -= (last_rcv_byte - 0x30);
-						}
-						else
-						{
-							trame_uart.param[index_param] += (last_rcv_byte - 0x30);
-						}
-						decade = 10;
-					}
+					signe = 1;
 				}
-			}				
-		}		
-	}	
-}	
+			}
+		}
+			
+		//on efface la trame recu
+		for(Int8U loop = 0U; loop <= index_fin_de_trame ; loop++)
+		{
+			buff_uart_0[ loop ] = 0U ;
+		}
+		DrvEventAddEvent( CONF_EVENT_MSG_RCV );
+
+	}
+	//body of frame
+	else
+	{
+		buff_uart_0[ ctr_buff_uart_0 ] = rcv_byte;
+		if( ctr_buff_uart_0 < BUFFER_MAX)
+		{
+			ctr_buff_uart_0++;
+		}
+		else
+		{
+			ctr_buff_uart_0 = 0U;
+			last_rcv_byte = 0U;
+		}
+	}
+}
 #endif
+	
+	
 
 //ISR uart octet envoyé 
+#if defined (__AVR_ATmega328P__)
 ISR(USART_TX_vect)
+#elif defined (__AVR_ATmega1284P__)
+ISR(USART0_TX_vect)
+#endif
 {
 	if( in_message_len_0 > 0U)
 	{
@@ -258,7 +257,11 @@ ISR(USART_TX_vect)
 //UART1
 //-------------------
 //ISR uart octet recu 
+#if defined (__AVR_ATmega328P__)
+ISR(USART_RX_vect)
+#elif defined (__AVR_ATmega1284P__)
 ISR(USART1_RX_vect)
+#endif
 {
 	
 }
