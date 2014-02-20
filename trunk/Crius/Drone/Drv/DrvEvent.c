@@ -10,7 +10,6 @@
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 volatile Event_t event_flags = 0U;
-
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
   
@@ -27,29 +26,28 @@ Boolean DrvEventInit( void )
 /************************************************************************/
 /*On recupere l'evenement en cours                                      */
 /************************************************************************/
-inline Event_t DrvEventGetEvent(Event_t in_event)
+inline Event_t DrvEventGetEvent( void )
 {
+	Event_t temp_added_flags = 0U;
 	ATOMIC
 	(
-		//on kill l'ancien event
-		event_flags = ~(in_event | ~event_flags);
-	)
-	return event_flags;
+		//on kill
+		temp_added_flags = event_flags ;
+		event_flags = 0U;
+	);
+	return temp_added_flags;
 }
 
 /************************************************************************/
 /*On test l'evenement en cours                                          */
 /************************************************************************/
-inline Boolean DrvEventTestEvent(Event_t in_event,Int8U conf_event ) 
+inline Boolean DrvEventTestEvent( Event_t in_event, Int8U conf_event ) 
 {
 	if (( in_event & conf_event) > 0 )
 	{
 		return TRUE;
 	}
-	else
-	{
-		return FALSE;
-	}
+	return FALSE;
 }
 
 /************************************************************************/
@@ -57,7 +55,10 @@ inline Boolean DrvEventTestEvent(Event_t in_event,Int8U conf_event )
 /************************************************************************/
 inline Boolean DrvEventAddEvent(Event_t event)
 {
-	event_flags |= event ;
+	ATOMIC
+	(
+		event_flags |= event ;
+	);
 	return TRUE;
 }
 

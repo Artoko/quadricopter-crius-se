@@ -84,7 +84,7 @@ int main(void)
 	DrvEventInit();
 	DrvTickInit();
 	DrvTwiInit( TWI_SPEED_400K );
-	DrvUartInit( UART_SPEED_115200 );
+	DrvUartInit( UART_0, UART_SPEED_115200 );
 	DrvEepromInit();
 	
 	// ********************* Interrupt Enable *****************************************
@@ -117,7 +117,7 @@ int main(void)
 	
     while(TRUE)
     {			
-		current_main_event = DrvEventGetEvent( current_main_event );
+		current_main_event = DrvEventGetEvent();
 		// ********************* Compute sensors **************************************
 		SrvImuDispatcher(current_main_event);
 		// ********************* Receive UART data ************************************

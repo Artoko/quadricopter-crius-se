@@ -73,7 +73,7 @@ namespace GroundStation
         {
             if (ConnexiontoolStripMenuItem.Text == "Connexion")
             {
-                if ((serial.Connect("COM14") == true) || (serial.Connect("COM3") == true) || (serial.Connect("COM5") == true) || (serial.Connect("COM22") == true))
+                if ((serial.Connect("COM14") == true) || (serial.Connect("COM3") == true) || (serial.Connect("COM5") == true) || (serial.Connect("COM22") == true) || (serial.Connect("COM1") == true))
                 {
                     ConnexiontoolStripMenuItem.Text = "Deconnexion";
                     StatetoolStripStatusLabel.Text = "Etat : Connecte";
@@ -111,7 +111,7 @@ namespace GroundStation
                 if (!value.Contains("OK") && !value.Contains("PID"))
                 {
                     toolStripStatusButtonMessage.Text = "Messages : " + value;
-                    toolStripStatusButtonMessage.DropDownItems.Add(System.DateTime.Now.Minute + ":" + System.DateTime.Now.Second + "," + System.DateTime.Now.Millisecond + value);
+                    toolStripStatusButtonMessage.DropDownItems.Add(System.DateTime.Now.Minute + ":" + System.DateTime.Now.Second + "," + System.DateTime.Now.Millisecond + "\t" + value);
                     toolStripStatusButtonMessage.ToolTipText = "count ( " + Convert.ToString(toolStripStatusButtonMessage.DropDownItems.Count - 1) + " )";
                     if (toolStripStatusButtonMessage.DropDownItems.Count > 20)
                     {

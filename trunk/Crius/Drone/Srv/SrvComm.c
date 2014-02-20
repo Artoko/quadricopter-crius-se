@@ -20,10 +20,9 @@
 #include "Cmps/CmpHMC5883.h"
 #include "Cmps/CmpBMP085.h"
 //ACC
-#if ( ACC_LIS331DLH == 1 )
+#if defined( ACC_LIS331DLH )
 #include "Cmps/CmpLIS331DLH.h"
-#endif
-#if ( ACC_BMA180 == 1 )
+#elif defined( ACC_BMA180 )
 #include "Cmps/CmpBMA180.h"
 #endif
 
@@ -47,11 +46,10 @@ static Boolean want_repport_data = TRUE;
 /************************************************************************/
 Boolean SrvCommInit (void) 
 {
-	ma_trame_comm.param[PARAM_0] = 0U;
-	ma_trame_comm.param[PARAM_1] = 0U;
-	ma_trame_comm.param[PARAM_2] = 0U;
-	ma_trame_comm.param[PARAM_3] = 0U;
-	ma_trame_comm.param[PARAM_4] = 0U;
+	for( Int8U loop = 0U; loop < NB_PARAM ; loop++)
+	{
+		ma_trame_comm.param[ loop ] = 0U;
+	}
 	want_repport_data = TRUE;
 	return TRUE;
 }	
@@ -67,13 +65,18 @@ void SrvCommDispatcher (Event_t in_event)
 		DrvUart0ReadMessage(&ma_trame_comm);
 		//dispatche trame
 		SrvCommExecute();
+		//ready for new frame
+		for( Int8U loop = 0U; loop < NB_PARAM ; loop++)
+		{
+			ma_trame_comm.param[ loop ] = 0U;
+		}
 	}
 	
 	if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_20MS))
 	{
 		if( want_repport_data == TRUE )
 		{
-			SrvCommRepportData();
+			//SrvCommRepportData();
 		}
 	}
 }

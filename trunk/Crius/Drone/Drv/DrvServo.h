@@ -12,6 +12,10 @@
 #include "Tools/tools_typedefs.h"
 
 ////////////////////////////////////////////PUBLIC DEFINES///////////////////////////////////////////
+
+//calcule la vitesse en fonction de la puissance desiré
+#define ConvertPowerToTick(power_const) (Int16U)(map( power_const , 0U		,1000U	,MIN_PULSE_WIDTH	,MAX_PULSE_WIDTH ) / 4U)
+
 #define MIN_ANGLE				0U      
 #define MAX_ANGLE				180U 
 
@@ -26,6 +30,8 @@
 
 #define MIN_PULSE_WIDTH			1000U   //us  
 #define MAX_PULSE_WIDTH			2000U   //us  
+
+#define PERIOD_SERVO_MAX		ConvertPowerToTick( 500 + ( MAX_SERVOS * MAX_PULSE_WIDTH ) );   //ticks  => 5ms period 0.02 / ( ( 1/16000000 ) * 64)
  	
 #define MAX_SERVOS				4U
 

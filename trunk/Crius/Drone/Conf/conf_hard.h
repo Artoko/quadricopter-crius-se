@@ -22,8 +22,8 @@
 
 
 ////////////////////////////////////////PUBLIC SENSORS BOARD////////////////////////////////////////
-#define DAISY_7		0
-#define CRIUS		1
+#define DAISY_7		1
+#define CRIUS		0
 
 
 #if ( DAISY_7 == 1 )
