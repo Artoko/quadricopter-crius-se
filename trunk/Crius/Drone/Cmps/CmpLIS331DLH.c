@@ -79,7 +79,7 @@ Boolean CmpLIS331DLHIsCalibrate(void)
 //Rotation X Y Z
 Boolean CmpLIS331DLHGetAcceleration(S_Acc_Angle *acc)
 {
-	Int8U buffer[ 6U ] = { 0, 0, 0, 0, 0, 0 };
+	Int8U buffer[ 6U ] = {0U, 0U, 0U, 0U, 0U, 0U};
 
 	if( DrvTwiReadRegBuf( LIS331DLH_ADDRESS, LIS331DLH_OUT_X_L, buffer, 6U ) != TRUE )
 	{

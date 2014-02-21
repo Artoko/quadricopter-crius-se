@@ -120,7 +120,7 @@ int main(void)
 		current_main_event = DrvEventGetEvent();
 		// ********************* Compute sensors **************************************
 		SrvImuDispatcher(current_main_event);
-		// ********************* Receive UART data ************************************
+		// ********************* Receive transmit data ********************************
 		SrvCommDispatcher(current_main_event);
 	}		
 }
