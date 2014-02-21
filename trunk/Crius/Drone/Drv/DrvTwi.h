@@ -16,11 +16,15 @@
 #define TWI_SPEED_100K		100U
 #define TWI_SPEED_400K		400U
 
- //on init le driver
- void DrvTwiInit( Int16U speed );
- //on lit plusieurs octets
-Int8U DrvTwiReadRegBuf(Int8U add, Int8U reg, void *buf, Int8U size) ;
-Int8U DrvTwiReadReg(Int8U add, Int8U reg);
-void DrvTwiWriteReg(Int8U add, Int8U reg, Int8U val);
+//on init le driver
+Boolean DrvTwiInit( Int16U speed );
+//read register
+Boolean DrvTwiReadReg( Int8U slave_address , Int8U slave_register, Int8U *data ) ;
+//write register
+Boolean DrvTwiWriteReg( Int8U slave_address , Int8U slave_register, Int8U data ) ;
+//read many register
+Boolean DrvTwiReadRegBuf(Int8U slave_address, Int8U slave_register, Int8U *buffer, Int8U buffer_size) ;
+//write many register
+Boolean DrvTwiWriteRegBuf(Int8U slave_address, Int8U slave_register, Int8U *buffer, Int8U buffer_size) ;
 
 #endif /* DRVTWI_H_ */

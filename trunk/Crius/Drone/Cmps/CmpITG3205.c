@@ -23,7 +23,10 @@
 //fonction init du capteur
 Boolean CmpITG3205Init(void)
 {
-	if (DrvTwiReadReg(ITG3205_TWI_ADDRESS,ITG3205_RA_WHO_AM_I) == ITG3205_RA_I_AM)
+	Int8U datum = 0U;
+	
+	DrvTwiReadReg(ITG3205_TWI_ADDRESS, ITG3205_RA_WHO_AM_I, &datum );
+	if(ITG3205_RA_I_AM == datum)
 	{
 		DrvTwiWriteReg(ITG3205_TWI_ADDRESS, ITG3205_RA_PWR_MGM, ITG3205_PWR_H_RESET_BIT);
 		DrvTimerDelayUs(200);
@@ -48,7 +51,7 @@ Boolean CmpITG3205GetRotation(S_Gyr_Angle *rot)
 {	
 	Int8U buffer[ 6U ] = {0U, 0U, 0U, 0U, 0U, 0U};
 		
-	if(DrvTwiReadRegBuf(ITG3205_TWI_ADDRESS, ITG3205_RA_GYRO_XOUT_H, buffer, 6U) != 6U)
+	if(DrvTwiReadRegBuf(ITG3205_TWI_ADDRESS, ITG3205_RA_GYRO_XOUT_H, buffer, 6U) != TRUE )
 	{
 		return FALSE;
 	}

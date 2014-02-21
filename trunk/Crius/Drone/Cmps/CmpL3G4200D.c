@@ -25,7 +25,10 @@
 //fonction init du capteur
 Boolean CmpL3G4200DInit(void)
 {
-	if (DrvTwiReadReg(L3G4200D_ADDRESS, L3G4200D_WHO_AM_I) == L3G4200D_WHO_I_AM)
+	Int8U datum = 0U;
+
+	DrvTwiReadReg(L3G4200D_ADDRESS, L3G4200D_WHO_AM_I, &datum );
+	if(L3G4200D_WHO_I_AM == datum)
 	{
 		DrvTwiWriteReg(L3G4200D_ADDRESS, L3G4200D_CTRL_REG1, L3G4200D_CTRL_REG1_400HZ_50LPF);
 		DrvTimerDelayUs(200);
@@ -54,7 +57,7 @@ Boolean CmpL3G4200DGetRotation(S_Gyr_Angle *rot)
 {	
 	Int8U buffer[ 6U ] = {0U, 0U, 0U, 0U, 0U, 0U};
 		
-	if(DrvTwiReadRegBuf(L3G4200D_ADDRESS, L3G4200D_OUT_X_L, buffer, 6U) != 6U)
+	if(DrvTwiReadRegBuf(L3G4200D_ADDRESS, L3G4200D_OUT_X_L, buffer, 6U) != TRUE )
 	{
 		return FALSE;
 	}

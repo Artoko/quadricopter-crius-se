@@ -1,114 +1,214 @@
 /*
- * DrvTwi.c
+ * drv_twi.c
  *
- * Created: 26/04/2012 14:32:07
+ * Created: 28/06/2011 15:52:35
  *  Author: berryer
  */ 
-
-
-
-#include "Conf\conf_hard.h"
+#include "Conf/conf_hard.h"
 #include "util\twi.h"
 #include "DrvTwi.h"
 
+////////////////////////////////////////PRIVATE STRUCTURES/////////////////////////////////////////
 
-void WaitTransmissionI2C(void);
 
-void DrvTwiInit( Int16U speed ) 
+////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
+
+
+////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
+//On attend la transmission   
+static void DrvTwiWaitTransmission( void );
+  
+/////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
+/************************************************************************/
+/*Init du Drv Twi                                                       */
+/************************************************************************/
+Boolean DrvTwiInit( Int16U speed ) 
 {
-  TWSR = 0;                                    // no prescaler => prescaler = 1
-  TWBR = ((CONF_FOSC_HZ / (speed * 1000) ) - 16) / 2;   // change the I2C clock rate
-  TWCR = 1<<TWEN;                              // enable twi module, no interrupt
+	Boolean o_success = TRUE;
+	TWBR =  ((CONF_FOSC_HZ / (speed * 1000) ) - 16) / 2;	// change the I2C clock rate
+	TWSR =  0U;	                                        	// Not used. Driver presumes prescaler to be 00.
+	TWCR =	(1U<<TWEN) |                                	// Enable TWI-interface and release TWI pins.
+			(0U<<TWIE) | (0U<<TWINT) |                    	// Disable Interupt.
+			(0U<<TWEA) | (0U<<TWSTA) | (0U<<TWSTO) |      	// No Signal requests.
+			(0U<<TWWC);  
+	return o_success;		 
 }
 
-void DrvTwiRepStart(Int8U address) 
+
+/************************************************************************/
+/*Read register                                                         */
+/************************************************************************/
+Boolean DrvTwiReadReg( Int8U slave_address , Int8U slave_register, Int8U *data )
 {
-  TWCR = (1<<TWINT) | (1<<TWSTA) | (1<<TWEN) ; // send REPEAT START condition
-  WaitTransmissionI2C();                       // wait until transmission completed
-  TWDR = address;                              // send device address
-  TWCR = (1<<TWINT) | (1<<TWEN);
-  WaitTransmissionI2C();                       // wail until transmission completed
+	Boolean read_no_error = FALSE;
+	//Send start
+	TWCR = (1U<<TWINT)|(1U<<TWSTA)|(1U<<TWEN);           
+	DrvTwiWaitTransmission();
+
+	if (((TWSR==TW_START) || (TWSR==TW_REP_START)) )
+	{
+		//send slave address write
+		TWDR =  slave_address & TW_WRITE;
+		TWCR = (1U<<TWINT) | (1U<<TWEN);
+		DrvTwiWaitTransmission();
+
+		if( (TWSR == TW_MT_SLA_ACK) )
+		{
+			//send register address
+			TWDR = slave_register;
+			TWCR = (1U<<TWINT) | (1U<<TWEN);
+			DrvTwiWaitTransmission();
+
+			if ( (TWSR == TW_MT_DATA_ACK) )
+			{
+				//repeat start
+				TWCR = (1U<<TWINT)|(1U<<TWSTA)|(1U<<TWEN);
+				DrvTwiWaitTransmission();
+				
+				//send slave address read
+				if ( (TWSR == TW_REP_START) )
+				{
+					TWDR =  slave_address | TW_READ;                   
+					TWCR = (1U<<TWINT) | (1U<<TWEN);
+					DrvTwiWaitTransmission();
+					
+					//send clock 
+					if ( (TWSR==TW_MT_SLA_ACK) )
+					{
+						TWCR = (1U<<TWINT) | (1U<<TWEN);                    
+						DrvTwiWaitTransmission();
+						
+						//read data
+						if ( ( TWSR==TW_MR_DATA_NACK) )
+						{
+							//record data
+							data[ 0U ] = TWDR;
+							
+							//send stop
+							TWCR = (1U<<TWINT) | (1U<<TWEN) | (1U<<TWSTO);
+							if (TWSR==TW_NO_INFO)
+							{
+								//no error
+								read_no_error = TRUE;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	return read_no_error;
 }
 
-void DrvTwiStop(void) 
+/************************************************************************/
+/*Write register                                                        */
+/************************************************************************/
+Boolean DrvTwiWriteReg( Int8U slave_address , Int8U slave_register, Int8U data )
 {
-  TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO);
-  //  while(TWCR & (1<<TWSTO));                // <- can produce a blocking state with some WMP clones
+	Boolean write_no_error = FALSE;
+	
+	TWCR = (1U<<TWINT)|(1U<<TWSTA)|(1U<<TWEN);           // SEND START
+	DrvTwiWaitTransmission();
+
+	if  ( ((TWSR==TW_START) || (TWSR==TW_REP_START)) )
+	{
+		//send slave address
+		TWDR =  slave_address & TW_WRITE;
+		TWCR = (1U<<TWINT) | (1U<<TWEN);
+		DrvTwiWaitTransmission();
+
+		if ( (TWSR==TW_MT_SLA_ACK) )
+		{
+			//send register address
+			TWDR = slave_register;
+			TWCR = (1U<<TWINT) | (1U<<TWEN);
+			DrvTwiWaitTransmission();
+
+			if ( (TWSR==TW_MT_DATA_ACK) )
+			{
+				//write data to register
+				TWDR = data;
+				TWCR = (1U<<TWINT) | (1U<<TWEN);
+				DrvTwiWaitTransmission();
+
+				if ( (TWSR==TW_MT_DATA_ACK) )
+				{
+					//send stop
+					TWCR = (1U<<TWINT)|(1U<<TWEN)| (1U<<TWSTO);
+
+					if (TWSR==TW_NO_INFO)
+					{
+						write_no_error = TRUE;
+					}
+				}
+			}
+		}
+	}
+	
+	return write_no_error;
 }
 
-void DrvTwiWrite(Int8U data ) 
-{	
-  TWDR = data;                                 // send data to the previously addressed device
-  TWCR = (1<<TWINT) | (1<<TWEN);
-  WaitTransmissionI2C();
-}
 
-Int8U DrvTwiRead(Int8U ack) 
+/************************************************************************/
+/*Read many register                                                    */
+/************************************************************************/
+Boolean DrvTwiReadRegBuf(Int8U slave_address, Int8U slave_register, Int8U *buffer, Int8U buffer_size) 
 {
-  TWCR = (1<<TWINT) | (1<<TWEN) | (ack? (1<<TWEA) : 0);
-  WaitTransmissionI2C();
-  Int8U r = TWDR;
-  if (!ack) DrvTwiStop();
-  return r;
+	Boolean o_success = TRUE;
+	
+	for( Int8U i = 0 ; i < buffer_size ; i++ )
+	{
+		Int8U datum = 0U;
+		if( TRUE == DrvTwiReadReg( slave_address , slave_register + i , &datum ))
+		{
+			buffer[ i ] = datum;
+		}
+		else
+		{
+			o_success = FALSE;
+			i = buffer_size;
+		}
+	}
+	
+	return o_success;
 }
 
-Int8U DrvTwiReadAck() 
+/************************************************************************/
+/*Write many register                                                   */
+/************************************************************************/
+Boolean DrvTwiWriteRegBuf(Int8U slave_address, Int8U slave_register, Int8U *buffer, Int8U buffer_size)
 {
-  return DrvTwiRead(1);
+	Boolean o_success = TRUE;
+	
+	for( Int8U i = 0 ; i < buffer_size ; i++ )
+	{
+		if( FALSE == DrvTwiWriteReg( slave_address , slave_register + i , buffer[ i ] ))
+		{
+			o_success = FALSE;
+			i = buffer_size;
+		}
+	}
+	
+	return o_success;
 }
 
-Int8U DrvTwireadNak(void) 
+
+////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
+
+/************************************************************************/
+/*On attend la transmission                                             */
+/************************************************************************/
+static void DrvTwiWaitTransmission( void )
 {
-  return DrvTwiRead(0);
-}
-
-void WaitTransmissionI2C() 
-{
-  uint16_t count = 255;
-  while (!(TWCR & (1<<TWINT))) {
-    count--;
-    if (count==0) {              //we are in a blocking state => we don't insist
-      TWCR = 0;                  //and we force a reset on TWINT register
-      break;
-    }
-  }
-}
-
-Int8U DrvTwiReadToBuf(Int8U add, void *buf, Int8U size) 
-{
-  DrvTwiRepStart((add<<1) | 1);	// I2C read direction
-  Int8U bytes_read = 0;
-  Int8U *b = (Int8U*)buf;
-  while (size--) {
-    /* acknowledge all but the final byte */
-    *b++ = DrvTwiRead(size > 0);
-    /* TODO catch I2C errors here and abort */
-    bytes_read++;
-  }
-  return bytes_read;
-}
-
-Int8U DrvTwiReadRegBuf(Int8U add, Int8U reg, void *buf, Int8U size) 
-{
-  DrvTwiRepStart(add<<1); // I2C write direction
-  DrvTwiWrite(reg);        // register selection
-  return DrvTwiReadToBuf(add, buf, size);
-}
-
-
-
-
-void DrvTwiWriteReg(Int8U add, Int8U reg, Int8U val)
- {
-  DrvTwiRepStart(add<<1); // I2C write direction
-  DrvTwiWrite(reg);        // register selection
-  DrvTwiWrite(val);        // value to write in register
-  DrvTwiStop();
-}
-
-Int8U DrvTwiReadReg(Int8U add, Int8U reg)
- {
-  Int8U val;
-  DrvTwiReadRegBuf(add, reg, &val, 1);
-  return val;
+	Int8U count = 0xFFU;
+	while ( ! (TWCR & (1<<TWINT) ) ) 
+	{
+		count--;
+		if ( count == 0) 
+		{
+			TWCR = 0;
+			break;
+		}
+	}
 }
