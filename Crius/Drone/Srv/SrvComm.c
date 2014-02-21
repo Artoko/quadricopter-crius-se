@@ -65,18 +65,13 @@ void SrvCommDispatcher (Event_t in_event)
 		DrvUart0ReadMessage(&ma_trame_comm);
 		//dispatche trame
 		SrvCommExecute();
-		//ready for new frame
-		for( Int8U loop = 0U; loop < NB_PARAM ; loop++)
-		{
-			ma_trame_comm.param[ loop ] = 0U;
-		}
 	}
 	
 	if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_20MS))
 	{
 		if( want_repport_data == TRUE )
 		{
-			//SrvCommRepportData();
+			SrvCommRepportData();
 		}
 	}
 }

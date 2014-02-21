@@ -25,32 +25,34 @@ static Int16S accel_calib[ 3U ] = { 0, 0, 0 };
 //fonction init du capteur
 Boolean CmpBMA180Init(void)
 {
-	Int8U control;
 	Boolean conf;
 	Boolean o_success = FALSE;
-	if(BMA180_CHIP_ID == DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_CHIP_ID))
+	Int8U datum = 0U;
+
+	DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_CHIP_ID, &datum );
+	if(BMA180_CHIP_ID == datum)
 	{
 		DrvTimerDelayUs(200);
 		//Write on EEPROM enable
 		DrvTwiWriteReg(BMA180_ADDRESS,BMA180_REG_CTRL_REG0, 1U<<4U );
 		DrvTimerDelayUs(200);
 		//Bandwidth filters: 20Hz
-		control = DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_BW_TCS);
-		control = control & 0x0F;        
-		control = control | (0x01 << 4); 
-		DrvTwiWriteReg(BMA180_ADDRESS, BMA180_REG_BW_TCS, control);
+		DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_BW_TCS, &datum );
+		datum = datum & 0x0F;        
+		datum = datum | (0x01 << 4); 
+		DrvTwiWriteReg(BMA180_ADDRESS, BMA180_REG_BW_TCS, datum);
 		DrvTimerDelayUs(200);
 		//Mode: Low-Noise
-		control = DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_TC0_Z);
-		control = control & 0xFC;
-		control = control | 0x00; 
-		DrvTwiWriteReg(BMA180_ADDRESS, BMA180_REG_TC0_Z, control);
+		DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_TC0_Z, &datum );
+		datum = datum & 0xFC;
+		datum = datum | 0x00; 
+		DrvTwiWriteReg(BMA180_ADDRESS, BMA180_REG_TC0_Z, datum);
 		DrvTimerDelayUs(200);
 		//Range: +-8G
-		control = DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_OFFSET_LSB1);
-		control = control & 0xF1;
-		control = control | (0x05 << 1); 
-		DrvTwiWriteReg(BMA180_ADDRESS, BMA180_REG_OFFSET_LSB1, control);
+		DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_OFFSET_LSB1, &datum );
+		datum = datum & 0xF1;
+		datum = datum | (0x05 << 1); 
+		DrvTwiWriteReg(BMA180_ADDRESS, BMA180_REG_OFFSET_LSB1, datum);
 		DrvTimerDelayUs(200);
 		
 		//Calibration du capteur
@@ -89,7 +91,7 @@ Boolean CmpBMA180GetAcceleration(S_Acc_Angle *acc)
 {
 	Int8U buffer[ 6U ] = { 0, 0, 0, 0, 0, 0 };
 
-	if( DrvTwiReadRegBuf( BMA180_ADDRESS, BMA180_REG_ACC_X_LSB, buffer, 6U ) != 6U )
+	if( DrvTwiReadRegBuf( BMA180_ADDRESS, BMA180_REG_ACC_X_LSB, buffer, 6U ) != TRUE )
 	{
 		return FALSE;
 	}

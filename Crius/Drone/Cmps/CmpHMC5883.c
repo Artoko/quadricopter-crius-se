@@ -38,7 +38,7 @@ Boolean CmpHMC5883Init(void)
 Boolean CmpHMC5883GetHeading(S_Mag_Angle *mag)
 {	
 	Int8U buffer[ 6U ] = {0U, 0U, 0U, 0U, 0U, 0U};
-	if(DrvTwiReadRegBuf(HMC5883_ADDRESS, HMC5883_X_MSB, buffer, 6U) != 6U)
+	if(DrvTwiReadRegBuf(HMC5883_ADDRESS, HMC5883_X_MSB, buffer, 6U) != TRUE )
 	{
 		return FALSE;
 	}

@@ -147,30 +147,64 @@ Int32S CmpBMP085GetPressure( void )
 static void CmpBMP085ReadCalibration( void )
 {
   //read calibration
-  ac1 = DrvTwiReadReg( BMP085_ADDRESS, CAL_AC1 ) << 8;
-  ac1 |= DrvTwiReadReg( BMP085_ADDRESS, CAL_AC1 + 1 );
-  ac2 = DrvTwiReadReg( BMP085_ADDRESS, CAL_AC2 ) << 8;
-  ac2 |= DrvTwiReadReg( BMP085_ADDRESS, CAL_AC2 + 1 );
-  ac3 = DrvTwiReadReg( BMP085_ADDRESS, CAL_AC3 ) << 8;
-  ac3 |= DrvTwiReadReg( BMP085_ADDRESS, CAL_AC3 + 1 );
-  ac4 = DrvTwiReadReg( BMP085_ADDRESS, CAL_AC4 ) << 8;
-  ac4 |= DrvTwiReadReg( BMP085_ADDRESS, CAL_AC4 + 1 );
-  ac5 = DrvTwiReadReg( BMP085_ADDRESS, CAL_AC5 ) << 8;
-  ac5 |= DrvTwiReadReg( BMP085_ADDRESS, CAL_AC5 + 1 );
-  ac6 = DrvTwiReadReg( BMP085_ADDRESS, CAL_AC6 ) << 8;
-  ac6 |= DrvTwiReadReg( BMP085_ADDRESS, CAL_AC6 + 1 );
-  b1 = DrvTwiReadReg( BMP085_ADDRESS, CAL_B1 ) << 8;
-  b1 |= DrvTwiReadReg( BMP085_ADDRESS, CAL_B1 + 1 );
-  b2 = DrvTwiReadReg( BMP085_ADDRESS, CAL_B2 ) << 8;
-  b2 |= DrvTwiReadReg( BMP085_ADDRESS, CAL_B2 + 1 );
+  Int8U datum = 0U;
+  
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_AC1, &datum );
+  ac1 = datum << 8;
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_AC1 + 1, &datum );
+  ac1 |= datum;
+  
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_AC2, &datum );
+  ac2 = datum << 8;
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_AC2 + 1, &datum );
+  ac2 |= datum;
+  
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_AC3, &datum );
+  ac3 = datum << 8;
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_AC3 + 1, &datum );
+  ac3 |= datum;
+  
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_AC4, &datum );
+  ac4 = datum << 8;
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_AC4 + 1, &datum );
+  ac4 |= datum;
+  
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_AC5, &datum );
+  ac5 = datum << 8;
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_AC5 + 1, &datum );
+  ac5 |= datum;
+  
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_AC6, &datum );
+  ac6 = datum << 8;
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_AC6 + 1, &datum );
+  ac6|= datum;
+  
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_B1, &datum );
+  b1 = datum << 8;
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_B1 + 1, &datum );
+  b1|= datum;
+  
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_B2, &datum );
+  b2 = datum << 8;
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_B2 + 1, &datum );
+  b2|= datum;
+  
   b5 = 0;
-  mb = DrvTwiReadReg( BMP085_ADDRESS, CAL_MB ) << 8;
-  mb |= DrvTwiReadReg( BMP085_ADDRESS, CAL_MB + 1 );
-  mc = DrvTwiReadReg( BMP085_ADDRESS, CAL_MC ) << 8;
-  mc |= DrvTwiReadReg( BMP085_ADDRESS, CAL_MC + 1 );
-  md = DrvTwiReadReg( BMP085_ADDRESS, CAL_MD ) << 8;
-  md |= DrvTwiReadReg( BMP085_ADDRESS, CAL_MD + 1 );
-
+  
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_MB, &datum );
+  mb = datum << 8;
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_MB + 1, &datum );
+  mb|= datum;
+  
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_MC, &datum );
+  mc = datum << 8;
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_MC + 1, &datum );
+  mc|= datum;
+  
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_MD, &datum );
+  md = datum << 8;
+  DrvTwiReadReg( BMP085_ADDRESS, CAL_MD + 1, &datum );
+  md|= datum;
 }
 
 // Read the uncompensated temperature value
@@ -185,8 +219,11 @@ static Int16U CmpBMP085ReadUT ( void )
 	DrvTimerDelayMs(5);
 	
 	// Read two uint8_ts from registers 0xF6 and 0xF7
-	ut = DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT ) << 8;
-	ut |= DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT + 1 );
+	Int8U msb, lsb;
+	DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT, &msb );
+	DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT + 1, &lsb );
+	ut = (Int16U)(((Int16U) msb << 8) | ((Int16U)lsb) );
+	
 	return ut;
 }
 
@@ -205,9 +242,9 @@ static Int32U CmpBMP085ReadUP ( void )
 	DrvTimerDelayMs(2 + (3<<OSS));
 	
 	// Read register 0xF6 (MSB), 0xF7 (LSB), and 0xF8 (XLSB)
-	msb = DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT );
-	lsb = DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT + 1 );
-	xlsb = DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT + 2 );
+	DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT, &msb );
+	DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT + 1, &lsb );
+	DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT + 2, &xlsb );
 	
 	up = (((Int32U) msb << 16) | ((Int32U) lsb << 8) | (Int32U) xlsb) >> (8-OSS);
 	

@@ -28,7 +28,10 @@ Boolean CmpLIS331DLHInit(void)
 {
 	Boolean conf;
 	Boolean o_success = FALSE;
-	if(LIS331DLH_WHO_I_AM == DrvTwiReadReg(LIS331DLH_ADDRESS, LIS331DLH_WHO_AM_I))
+	Int8U datum = 0U;
+
+	DrvTwiReadReg(LIS331DLH_ADDRESS, LIS331DLH_WHO_AM_I, &datum );
+	if(LIS331DLH_WHO_I_AM == datum)
 	{
 		DrvTimerDelayUs(200);
 		//400Hz
@@ -78,7 +81,7 @@ Boolean CmpLIS331DLHGetAcceleration(S_Acc_Angle *acc)
 {
 	Int8U buffer[ 6U ] = { 0, 0, 0, 0, 0, 0 };
 
-	if( DrvTwiReadRegBuf( LIS331DLH_ADDRESS, LIS331DLH_OUT_X_L, buffer, 6U ) != 6U )
+	if( DrvTwiReadRegBuf( LIS331DLH_ADDRESS, LIS331DLH_OUT_X_L, buffer, 6U ) != TRUE )
 	{
 		return FALSE;
 	}

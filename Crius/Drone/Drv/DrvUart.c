@@ -175,7 +175,7 @@ ISR(USART0_RX_vect)
 		Int8U index_fin_de_trame = ctr_buff_uart_0;
 			
 		Int8S signe = 1;
-		Char in_message[ 10U ];
+		Char field_in_message[ 10U ];
 		Int8U cpt_message = 0U;
 		Int8U cpt_field = 0U;
 		//on parse le premier champ du message
@@ -184,13 +184,15 @@ ISR(USART0_RX_vect)
 			//on cherche le + ou le -
 			if( ! ( ( buff_uart_0[ loop ] == '-' ) || ( buff_uart_0[ loop ] == '+' ) || ( buff_uart_0[ loop ] == '#' ) ) )
 			{
-				in_message[ cpt_message ] = buff_uart_0[ loop ];
+				field_in_message[ cpt_message ] = buff_uart_0[ loop ];
 				cpt_message ++;
+				//on efface au fur et à mesure
+				buff_uart_0[ loop ] = 0U ;
 			}
 			else
 			{
-				in_message[ cpt_message ] = '\0';
-				m_trame.param[ cpt_field ] = atoi(in_message) * signe;
+				field_in_message[ cpt_message ] = '\0';
+				m_trame.param[ cpt_field ] = atoi(field_in_message) * signe;
 				//on met a zero le compteur
 				cpt_message = 0;
 				//on incremente pour remplir le prochain champ
@@ -205,12 +207,6 @@ ISR(USART0_RX_vect)
 					signe = 1;
 				}
 			}
-		}
-			
-		//on efface la trame recu
-		for(Int8U loop = 0U; loop <= index_fin_de_trame ; loop++)
-		{
-			buff_uart_0[ loop ] = 0U ;
 		}
 		DrvEventAddEvent( CONF_EVENT_MSG_RCV );
 
