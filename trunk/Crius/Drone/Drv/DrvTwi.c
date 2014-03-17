@@ -48,14 +48,14 @@ Boolean DrvTwiReadReg( Int8U slave_address , Int8U slave_register, Int8U *data )
 	if (((TWSR==TW_START) || (TWSR==TW_REP_START)) )
 	{
 		//send slave address write
-		TWDR =  slave_address & TW_WRITE;
+		TWDR =  (slave_address << 1U ) & TW_WRITE;
 		TWCR = (1U<<TWINT) | (1U<<TWEN);
 		DrvTwiWaitTransmission();
 
 		if( (TWSR == TW_MT_SLA_ACK) )
 		{
 			//send register address
-			TWDR = slave_register;
+			TWDR = (slave_address << 1U );
 			TWCR = (1U<<TWINT) | (1U<<TWEN);
 			DrvTwiWaitTransmission();
 
@@ -68,7 +68,7 @@ Boolean DrvTwiReadReg( Int8U slave_address , Int8U slave_register, Int8U *data )
 				//send slave address read
 				if ( (TWSR == TW_REP_START) )
 				{
-					TWDR =  slave_address | TW_READ;                   
+					TWDR =  (slave_address << 1U ) | TW_READ;                   
 					TWCR = (1U<<TWINT) | (1U<<TWEN);
 					DrvTwiWaitTransmission();
 					
@@ -114,14 +114,14 @@ Boolean DrvTwiWriteReg( Int8U slave_address , Int8U slave_register, Int8U data )
 	if  ( ((TWSR==TW_START) || (TWSR==TW_REP_START)) )
 	{
 		//send slave address
-		TWDR =  slave_address & TW_WRITE;
-		TWCR = (1U<<TWINT) | (1U<<TWEN);
+		TWDR =  (slave_address << 1U ) & TW_WRITE;
+		TWCR = (1U << TWINT) | (1U << TWEN);
 		DrvTwiWaitTransmission();
 
 		if ( (TWSR==TW_MT_SLA_ACK) )
 		{
 			//send register address
-			TWDR = slave_register;
+			TWDR = (slave_address << 1U );
 			TWCR = (1U<<TWINT) | (1U<<TWEN);
 			DrvTwiWaitTransmission();
 
@@ -151,7 +151,7 @@ Boolean DrvTwiWriteReg( Int8U slave_address , Int8U slave_register, Int8U data )
 
 
 /************************************************************************/
-/*Read many register                                                    */
+/*Read many registers                                                   */
 /************************************************************************/
 Boolean DrvTwiReadRegBuf(Int8U slave_address, Int8U slave_register, Int8U *buffer, Int8U buffer_size) 
 {
@@ -175,7 +175,7 @@ Boolean DrvTwiReadRegBuf(Int8U slave_address, Int8U slave_register, Int8U *buffe
 }
 
 /************************************************************************/
-/*Write many register                                                   */
+/*Write many registers                                                  */
 /************************************************************************/
 Boolean DrvTwiWriteRegBuf(Int8U slave_address, Int8U slave_register, Int8U *buffer, Int8U buffer_size)
 {

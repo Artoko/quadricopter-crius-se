@@ -9,9 +9,6 @@
 #ifndef TOOLS_TYPEDEFS_H_
 #define TOOLS_TYPEDEFS_H_
 
-
-//ack? (1<<TWEA) : 0);
-
 #ifndef IAR
   #include <avr/interrupt.h> 
   

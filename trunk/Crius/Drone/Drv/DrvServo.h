@@ -35,8 +35,6 @@
  	
 #define MAX_SERVOS				4U
 
-#define PORT_DIR_SERVO			DDRC
-#define PORT_SERVO				PORTC
 
 
 
@@ -51,7 +49,7 @@ typedef struct {
 Boolean DrvServo( void ) ;
 
 // bouge le servo a la position voulu en angle
-Boolean DrvServoMoveToPosition( Int8U index, Int16U angle) ;
+Boolean DrvServoUpdate( Int8U index, Int16U angle) ;
 
 
 #endif /* DRV_SERVO_H_ */
