@@ -11,9 +11,9 @@
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 //index du servo controllé lors de l'IT
-static volatile Int8S pin_servo = -1;
+volatile Int8S pin_servo = -1;
 //tableau des servos actifs
-static volatile servo_t MesServos[ MAX_SERVOS ];
+volatile servo_t MesServos[ MAX_SERVOS ];
 Int16U ServoPosTics = 0U;
 Int16U ServoPeriodTics = MAX_PULSE_WIDTH;
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
@@ -28,14 +28,14 @@ Boolean DrvServo( void )
 	for(Int8U index_servo = 0; index_servo < MAX_SERVOS ; index_servo++)
 	{	
 		MesServos[ index_servo ].pin = index_servo;
-		MesServos[ index_servo ].ticks = ConvertPowerToTick( 0U );
+		MesServos[ index_servo ].ticks = MIN_PULSE_WIDTH * 16;
 		PORT_DIR_SERVO |= (1 << index_servo);
 	}
 	ServoPosTics = 0U;
 	ServoPeriodTics = PERIOD_SERVO_MAX ;
 	//on init le timer 1 tick = 4us
 	TCCR1A	= 0U;             
-    TCCR1B	|= PRESCALER_64 ; //64
+    TCCR1B	|= PRESCALER_64 ;
     TIMSK1	|= _BV(OCIE1A) ;
     TCNT1	= 0U;  
 	
@@ -45,10 +45,14 @@ Boolean DrvServo( void )
 /************************************************************************/
 /*Bouge le servo a la position voulu                                    */
 /************************************************************************/
-Boolean DrvServoMoveToPosition( Int8U index, Int16U power)
+Boolean DrvServoUpdate( Int8U index, Int16U power)
 {
 	//consigne
-	MesServos[ index ].ticks = ConvertPowerToTick(power);
+	MesServos[ index ].ticks = ((Int16U)power * ( MAX_PULSE_WIDTH - MIN_PULSE_WIDTH ) / MAX_ANGLE) + MIN_PULSE_WIDTH;
+	MesServos[ index ].ticks = MesServos[ index ].ticks * 16;
+	MesServos[ index ].ticks = MAX(MesServos[ index ].ticks, MAX_PULSE_WIDTH);
+    MesServos[ index ].ticks = MIN(MesServos[ index ].ticks, MIN_PULSE_WIDTH);
+	//MesServos[ index ].ticks = ConvertPowerToTick(power);
 	return TRUE;
 }
 

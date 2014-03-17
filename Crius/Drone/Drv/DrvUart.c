@@ -61,6 +61,7 @@ void DrvUartInit( Int8U index_uart, Int32U baud_rate )
 		UCSR0C |= (1<<UCSZ00); 	//8 bits, no parity, 1 stop 
 		UCSR0C |= (1<<UCSZ01); 
 	}
+	#if defined (__AVR_ATmega1284P__)
 	if(index_uart == UART_1)
 	{
 		UBRR1H = m_baud_rate >> 8;
@@ -71,6 +72,7 @@ void DrvUartInit( Int8U index_uart, Int32U baud_rate )
 		UCSR1C|= (1<<UCSZ10); 	//8 bits, no parity, 1 stop 
 		UCSR1C|= (1<<UCSZ11);  
 	}
+	#endif
 }
 
 //on recupere le message

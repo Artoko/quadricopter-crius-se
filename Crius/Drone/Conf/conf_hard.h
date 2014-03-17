@@ -22,8 +22,8 @@
 
 
 ////////////////////////////////////////PUBLIC SENSORS BOARD////////////////////////////////////////
-#define DAISY_7		1
-#define CRIUS		0
+#define DAISY_7		0
+#define CRIUS		1
 
 
 #if ( DAISY_7 == 1 )
@@ -38,10 +38,9 @@
 	#define BAR_BMP085		1
 #endif
 
-
-
 //-----------------------------------------------------------------------------------------------//
 
+/////////////////////////////////////PUBLIC LED MANAGMENT///////////////////////////////////////////
 #define LED_ON()			(PORTB	|=	(1 << PORTB5))
 #define LED_OFF()			(PORTB	&=~	(1 << PORTB5))
 #define LED_TOGGLE()		(PORTB	^=	(1 << PORTB5))
@@ -66,6 +65,16 @@
 #define		CONF_EVENT_TIMER_5S			( 1U << 4U )
 #define		CONF_EVENT_TIMER_10S		( 1U << 5U )
 #define		CONF_EVENT_MSG_RCV			( 1U << 6U )
+
+////////////////////////////////////PUBLIC SERVOS PORTS///////////////////////////////////////////
+#if ( DAISY_7 == 1 )
+	#define PORT_DIR_SERVO			DDRB
+	#define PORT_SERVO				PORTB
+#elif ( CRIUS == 1 )
+	#define PORT_DIR_SERVO			DDRC
+	#define PORT_SERVO				PORTC
+#endif
+
 
 //PINOUT CRIUS
 // A0	PC0

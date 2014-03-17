@@ -64,10 +64,10 @@ void SrvMotorUpdate(Int16S roulis, Int16S tangage,Int16S lacet, Int16S altitude)
 		frontMotor_R = constrain(throttle + roulis + tangage + lacet, OFFCOMMAND, MAXCOMMAND);
 		rearMotor_R  = constrain(throttle + roulis - tangage - lacet, OFFCOMMAND, MAXCOMMAND);
 		
-		DrvServoMoveToPosition( 0U , (rearMotor_R  - OFFCOMMAND) );
-		DrvServoMoveToPosition( 1U , (frontMotor_R - OFFCOMMAND) );
-		DrvServoMoveToPosition( 2U , (rearMotor_L  - OFFCOMMAND) );
-		DrvServoMoveToPosition( 3U , (frontMotor_L - OFFCOMMAND) );
+		DrvServoUpdate( 0U , (rearMotor_R  - OFFCOMMAND) );
+		DrvServoUpdate( 1U , (frontMotor_R - OFFCOMMAND) );
+		DrvServoUpdate( 2U , (rearMotor_L  - OFFCOMMAND) );
+		DrvServoUpdate( 3U , (frontMotor_L - OFFCOMMAND) );
 	}
 	else
 	{
@@ -76,10 +76,10 @@ void SrvMotorUpdate(Int16S roulis, Int16S tangage,Int16S lacet, Int16S altitude)
 		frontMotor_R = throttle;
 		rearMotor_L  = throttle;
 		frontMotor_L = throttle;
-		DrvServoMoveToPosition( 0U , 0U );
-		DrvServoMoveToPosition( 1U , 0U );
-		DrvServoMoveToPosition( 2U , 0U );
-		DrvServoMoveToPosition( 3U , 0U );
+		DrvServoUpdate( 0U , 0U );
+		DrvServoUpdate( 1U , 0U );
+		DrvServoUpdate( 2U , 0U );
+		DrvServoUpdate( 3U , 0U );
 	}
 }	
 
