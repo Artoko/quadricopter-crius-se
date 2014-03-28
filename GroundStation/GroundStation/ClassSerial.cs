@@ -48,7 +48,9 @@ namespace GroundStation
         {
             if(serialPort1.IsOpen)
             {
+                serialPort1.DiscardInBuffer();
                 serialPort1.Close();
+                serialPort1.Dispose();
                 return true;
             }
             return false;
