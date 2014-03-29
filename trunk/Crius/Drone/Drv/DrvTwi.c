@@ -48,14 +48,14 @@ Boolean DrvTwiReadReg( Int8U slave_address , Int8U slave_register, Int8U *data )
 	if (((TWSR==TW_START) || (TWSR==TW_REP_START)) )
 	{
 		//send slave address write
-		TWDR =  (slave_address ) & TW_WRITE;
+		TWDR =  (slave_address << 1) | TW_WRITE;
 		TWCR = (1U<<TWINT) | (1U<<TWEN);
 		DrvTwiWaitTransmission();
 
 		if( (TWSR == TW_MT_SLA_ACK) )
 		{
 			//send register address
-			TWDR = (slave_address);
+			TWDR = slave_register;
 			TWCR = (1U<<TWINT) | (1U<<TWEN);
 			DrvTwiWaitTransmission();
 
@@ -68,22 +68,22 @@ Boolean DrvTwiReadReg( Int8U slave_address , Int8U slave_register, Int8U *data )
 				//send slave address read
 				if ( (TWSR == TW_REP_START) )
 				{
-					TWDR =  (slave_address  ) | TW_READ;                   
+					TWDR =  (slave_address << 1 ) | TW_READ;                   
 					TWCR = (1U<<TWINT) | (1U<<TWEN);
 					DrvTwiWaitTransmission();
 					
 					//send clock 
-					if ( (TWSR==TW_MT_SLA_ACK) )
+					if ( (TWSR==TW_MR_SLA_ACK) )
 					{
 						TWCR = (1U<<TWINT) | (1U<<TWEN);                    
 						DrvTwiWaitTransmission();
 						
+						//record data
+						data[ 0U ] = TWDR;
+						
 						//read data
 						if ( ( TWSR==TW_MR_DATA_NACK) )
 						{
-							//record data
-							data[ 0U ] = TWDR;
-							
 							//send stop
 							TWCR = (1U<<TWINT) | (1U<<TWEN) | (1U<<TWSTO);
 							if (TWSR==TW_NO_INFO)
@@ -114,14 +114,14 @@ Boolean DrvTwiWriteReg( Int8U slave_address , Int8U slave_register, Int8U data )
 	if  ( ((TWSR==TW_START) || (TWSR==TW_REP_START)) )
 	{
 		//send slave address
-		TWDR =  (slave_address ) & TW_WRITE;
+		TWDR =  (slave_address << 1 ) | TW_WRITE;
 		TWCR = (1U << TWINT) | (1U << TWEN);
 		DrvTwiWaitTransmission();
 
 		if ( (TWSR==TW_MT_SLA_ACK) )
 		{
 			//send register address
-			TWDR = (slave_address );
+			TWDR = slave_register;
 			TWCR = (1U<<TWINT) | (1U<<TWEN);
 			DrvTwiWaitTransmission();
 
@@ -201,7 +201,7 @@ Boolean DrvTwiWriteRegBuf(Int8U slave_address, Int8U slave_register, Int8U *buff
 /************************************************************************/
 static void DrvTwiWaitTransmission( void )
 {
-	Int8U count = 0xFFU;
+	Int16U count = 0x3FFU;
 	while ( ! (TWCR & (1<<TWINT) ) ) 
 	{
 		count--;

@@ -50,7 +50,7 @@ int main(void)
 {	
 	// ********************* Interrupt Disable ****************************************
 	DrvInterruptClearAllInterrupts();
-
+ 
 	// ********************* Stop Timers **********************************************
 	TCCR0B = 0U;
 	TCCR1B = 0U;
