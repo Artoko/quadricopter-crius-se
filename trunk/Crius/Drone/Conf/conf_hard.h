@@ -99,31 +99,60 @@
 
 
 
+
 //-----------------------------------------------------------------------------------------------//
-typedef struct SSangles
+typedef struct SS_moteur
+{
+	Int16U throttle;
+	Int16U frontMotor_R;
+	Int16U frontMotor_L;
+	Int16U rearMotor_R;
+	Int16U rearMotor_L;
+}S_moteur;
+
+//-----------------------------------------------------------------------------------------------//
+typedef struct SS_pid
+{
+	Int16S roulis;
+	Int16S tangage;
+	Int16S lacet;
+	Int16S altitude;
+}S_pid;
+
+//-----------------------------------------------------------------------------------------------//
+typedef struct SS_angles
 {
 	Int16S roulis;
 	Int16S tangage;
 	Int16S lacet;
 	Int16S nord;
-	Int16U altitude;
-	Int32U pressure;
-	Int16S temperature;
-	Int8U weather;
-	Boolean maintient_altitude;
-}Simu;
+}S_angles;
+
+//-----------------------------------------------------------------------------------------------//
+typedef struct SS_imu
+{
+	S_moteur	moteurs;
+	S_pid		pid_error;
+	S_angles	angles;
+	Int16U		altitude;
+	Int32U		pressure;
+	Int16S		temperature;
+	Int8U		weather;
+}S_imu;
+
+//-----------------------------------------------------------------------------------------------//
+typedef struct SS_imu_desiree
+{
+	S_angles	angles;
+	Int16S		altitude;
+	Boolean		maintient_altitude;
+}S_imu_desiree;
 
 
-extern Simu imu_desire;
-extern Simu imu_reel;
 
 
-
-//erreur retournee par le calcul du PID
-extern Int16S pid_erreur_roulis;
-extern Int16S pid_erreur_tangage;
-extern Int16S pid_erreur_lacet;
-extern Int16S pid_erreur_altitude;
+extern S_imu_desiree imu_desire;
+extern S_imu imu_reel;
 
 
 

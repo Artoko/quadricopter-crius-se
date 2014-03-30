@@ -23,33 +23,30 @@
 ////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
-Int16U throttle		= 0U;
-Int16U frontMotor_R	= 0U;
-Int16U frontMotor_L	= 0U;
-Int16U rearMotor_R	= 0U;
-Int16U rearMotor_L	= 0U;
 
 /************************************************************************/
 /* init des moteurs                                                     */
 /************************************************************************/
-Boolean SrvMotorInit (void) 
+Boolean SrvMotorInit ( void ) 
 {
 	//init des variateurs brushless
 	DrvServo();
-	throttle = OFFCOMMAND;
-	rearMotor_R	 = throttle;
-	frontMotor_R = throttle;
-	rearMotor_L  = throttle;
-	frontMotor_L = throttle;
+	
+	imu_reel.moteurs.throttle		= OFFCOMMAND;
+	imu_reel.moteurs.rearMotor_R	= OFFCOMMAND;
+	imu_reel.moteurs.frontMotor_R	= OFFCOMMAND;
+	imu_reel.moteurs.rearMotor_L	= OFFCOMMAND;
+	imu_reel.moteurs.frontMotor_L	= OFFCOMMAND;
+	
 	return TRUE;
 }	
 
 /************************************************************************/
 /*Commande des moteurs en fonction de l'angle                           */
 /************************************************************************/
-void SrvMotorUpdate(Int16S roulis, Int16S tangage,Int16S lacet, Int16S altitude)
+void SrvMotorUpdate(S_pid pid_error)
 {
-	if( throttle > OFFCOMMAND)
+	if( imu_reel.moteurs.throttle > OFFCOMMAND)
 	{
 
 		//#define QUAD_X_MIX(X,Y,Z) throttle + roulis * X + tangage * Y + lacet * Z
@@ -59,23 +56,23 @@ void SrvMotorUpdate(Int16S roulis, Int16S tangage,Int16S lacet, Int16S altitude)
 		//motor[3] = PIDMIX(+1,-1,-1); //FRONT_L
 		
 		// calcul de la vitesse pour chaque moteur
-		frontMotor_L = constrain(throttle - roulis + tangage - lacet, OFFCOMMAND, MAXCOMMAND);
-		rearMotor_L  = constrain(throttle - roulis - tangage + lacet, OFFCOMMAND, MAXCOMMAND);
-		frontMotor_R = constrain(throttle + roulis + tangage + lacet, OFFCOMMAND, MAXCOMMAND);
-		rearMotor_R  = constrain(throttle + roulis - tangage - lacet, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.frontMotor_L = constrain(imu_reel.moteurs.throttle - pid_error.roulis + pid_error.tangage - pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.rearMotor_L  = constrain(imu_reel.moteurs.throttle - pid_error.roulis - pid_error.tangage + pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.frontMotor_R = constrain(imu_reel.moteurs.throttle + pid_error.roulis + pid_error.tangage + pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.rearMotor_R  = constrain(imu_reel.moteurs.throttle + pid_error.roulis - pid_error.tangage - pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
 		
-		DrvServoUpdate( 0U , (rearMotor_R  - OFFCOMMAND) );
-		DrvServoUpdate( 1U , (frontMotor_R - OFFCOMMAND) );
-		DrvServoUpdate( 2U , (rearMotor_L  - OFFCOMMAND) );
-		DrvServoUpdate( 3U , (frontMotor_L - OFFCOMMAND) );
+		DrvServoUpdate( 0U , (imu_reel.moteurs.rearMotor_R  - OFFCOMMAND) );
+		DrvServoUpdate( 1U , (imu_reel.moteurs.frontMotor_R - OFFCOMMAND) );
+		DrvServoUpdate( 2U , (imu_reel.moteurs.rearMotor_L  - OFFCOMMAND) );
+		DrvServoUpdate( 3U , (imu_reel.moteurs.frontMotor_L - OFFCOMMAND) );
 	}
 	else
 	{
 		//on met la vitesse de tout les moteurs à zeros 
-		rearMotor_R	 = throttle;
-		frontMotor_R = throttle;
-		rearMotor_L  = throttle;
-		frontMotor_L = throttle;
+		imu_reel.moteurs.rearMotor_R	= OFFCOMMAND;
+		imu_reel.moteurs.frontMotor_R	= OFFCOMMAND;
+		imu_reel.moteurs.rearMotor_L	= OFFCOMMAND;
+		imu_reel.moteurs.frontMotor_L	= OFFCOMMAND;
 		DrvServoUpdate( 0U , 0U );
 		DrvServoUpdate( 1U , 0U );
 		DrvServoUpdate( 2U , 0U );
@@ -89,7 +86,7 @@ void SrvMotorUpdate(Int16S roulis, Int16S tangage,Int16S lacet, Int16S altitude)
 /************************************************************************/
 Int16U SrvMotorGetSpeed( void ) 
 {
-	return throttle;
+	return imu_reel.moteurs.throttle;
 }
 
 /************************************************************************/
@@ -99,7 +96,7 @@ Boolean SrvMotorApplyAbsoluteSpeed(Int16U speed)
 {
 	if( speed <= OFFCOMMAND )
 	{
-		throttle = speed + OFFCOMMAND;
+		imu_reel.moteurs.throttle = speed + OFFCOMMAND;
 	}
 	return TRUE;
 }
@@ -110,9 +107,9 @@ Boolean SrvMotorApplyAbsoluteSpeed(Int16U speed)
 Boolean SrvMotorApplyRelativeSpeed(Int16U speed)
 {
 	//la somme doit etre inferieur 
-	if( (throttle + speed) <= MAXCOMMAND )
+	if( (imu_reel.moteurs.throttle + speed) <= MAXCOMMAND )
 	{
-		throttle += speed;
+		imu_reel.moteurs.throttle += speed;
 	}
 	return TRUE;
 }

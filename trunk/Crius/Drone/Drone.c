@@ -30,22 +30,10 @@ static void HeartbeatIsrCallbackTimer( void ) ;
 //event main
 volatile Event_t current_main_event = 0;
 
-Simu imu_desire;
-Simu imu_reel;
+S_imu_desiree imu_desire;
+S_imu imu_reel;
 
-//erreur retournee par le calcul du PID
-Int16S pid_erreur_roulis;
-Int16S pid_erreur_tangage;
-Int16S pid_erreur_lacet;
-Int16S pid_erreur_altitude;
-
-/*FUSES = 
-    {
-        .low = LFUSE_DEFAULT,
-        .high = (FUSE_SPIEN & FUSE_BOOTSZ0 & FUSE_BOOTSZ1 & FUSE_EESAVE  & FUSE_JTAGEN)
-        .extended = EFUSE_DEFAULT,
-    };*/
-
+//fonction principale
 int main(void)
 {	
 	// ********************* Interrupt Disable ****************************************
@@ -62,23 +50,23 @@ int main(void)
 	LED_ON();
 	
 	// ********************* General variables init *************************************************
-	imu_reel.roulis				= 0;
-	imu_reel.tangage			= 0;
-	imu_reel.lacet				= 0;
+	imu_reel.angles.roulis		= 0;
+	imu_reel.angles.tangage		= 0;
+	imu_reel.angles.lacet		= 0;
 	imu_reel.altitude			= 0;
 	imu_reel.temperature		= 0;
 	imu_reel.pressure			= 0;  
 	imu_reel.weather		    = 0;
-	imu_reel.maintient_altitude	=FALSE;
+	imu_reel.pid_error.altitude = 0;
+	imu_reel.pid_error.roulis	= 0;
+	imu_reel.pid_error.tangage	= 0;
+	imu_reel.pid_error.lacet	= 0;
 	
-	imu_desire.roulis				= 0;
-	imu_desire.tangage				= 0;
-	imu_desire.lacet				= 0;
+	imu_desire.angles.roulis		= 0;
+	imu_desire.angles.tangage		= 0;
+	imu_desire.angles.lacet			= 0;
 	imu_desire.altitude				= 0;
-	imu_desire.temperature			= 0;
-	imu_desire.pressure				= 0;  
-	imu_desire.weather				= 0;
-	imu_desire.maintient_altitude	=FALSE;
+	imu_desire.maintient_altitude	= FALSE;
 	
 	// ********************* Drivers init *********************************************
 	DrvEventInit();
@@ -113,7 +101,7 @@ int main(void)
 	SrvTimerTickReset();
 	
 	// ********************* Start Heartbeat ******************************************
-	SrvTimerAddTimer(CONF_TIMER_HEARTBEAT, 500U, E_TIMER_MODE_PERIODIC, HeartbeatIsrCallbackTimer);
+	SrvTimerAddTimer(CONF_TIMER_HEARTBEAT, 500, E_TIMER_MODE_PERIODIC, HeartbeatIsrCallbackTimer);
 	
     while(TRUE)
     {			
@@ -122,12 +110,42 @@ int main(void)
 		SrvImuDispatcher(current_main_event);
 		// ********************* Receive transmit data ********************************
 		SrvCommDispatcher(current_main_event);
-	}		
+	}	
 }
 
 //fct appele par le timer
 void HeartbeatIsrCallbackTimer( void)
 {
-	//heartbeat
 	LED_TOGGLE();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*FUSES = 
+    {
+        .low = LFUSE_DEFAULT,
+        .high = (FUSE_SPIEN & FUSE_BOOTSZ0 & FUSE_BOOTSZ1 & FUSE_EESAVE  & FUSE_JTAGEN)
+        .extended = EFUSE_DEFAULT,
+    };*/
+

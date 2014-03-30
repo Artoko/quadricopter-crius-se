@@ -78,12 +78,12 @@ Boolean DrvTwiReadReg( Int8U slave_address , Int8U slave_register, Int8U *data )
 						TWCR = (1U<<TWINT) | (1U<<TWEN);                    
 						DrvTwiWaitTransmission();
 						
-						//record data
-						data[ 0U ] = TWDR;
-						
 						//read data
 						if ( ( TWSR==TW_MR_DATA_NACK) )
-						{
+						{						
+							//record data
+							data[ 0U ] = TWDR;
+							
 							//send stop
 							TWCR = (1U<<TWINT) | (1U<<TWEN) | (1U<<TWSTO);
 							if (TWSR==TW_NO_INFO)

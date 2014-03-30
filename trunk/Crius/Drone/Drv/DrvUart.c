@@ -20,7 +20,7 @@
 	//-------
 	//message stocke
 	volatile Int8U in_message_0[ BUFFER_MAX ];
-	volatile Int8U in_message_sent = 0U;
+	volatile Int8U in_message_sent_0 = 0U;
 	volatile Int8U in_message_len_0 = 0U;
 	
 	//buffer de reception de message uart 0
@@ -88,33 +88,43 @@ void DrvUart0ReadMessage( STrame *trame )
 //on recupere le message
 void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
 {
-	//on enregistre le message 
-	for ( Int8U loop_send = in_message_len_0 ; loop_send < i_message_len ; loop_send++)
+	Int8U start_index = in_message_len_0;
+	if( (start_index + i_message_len) <= BUFFER_MAX )
 	{
-		in_message_0[loop_send] = i_message[loop_send];
-	} 
+		//on enregistre le message 
+		for ( Int8U loop_send = 0 ; loop_send < i_message_len ; loop_send++)
+		{
+			in_message_0[ start_index + loop_send] = i_message[ loop_send ];
+		} 
 	
-	in_message_len_0 += i_message_len ;
-	in_message_0[in_message_len_0] = 0U;
-	//premier message de la pile
-	if(i_message_len == in_message_len_0)
-	{
-		//on envoie le premier caractere
-		while ( !( UCSR0A & (1<<UDRE0)) );
-		UDR0 = in_message_0[ 0U ];
-		in_message_sent = 1U;
+		start_index += i_message_len ;
+		in_message_0[start_index] = 0U;
+		in_message_len_0 = start_index;
+		//premier message de la pile
+		if(i_message_len == in_message_len_0)
+		{
+			in_message_sent_0 = 0U;
+			//on envoie le premier caractere
+			while ( !( UCSR0A & (1<<UDRE0)) );
+			UDR0 = in_message_0[ 0U ];
+			in_message_0[ 0U ] = 0;
+			in_message_sent_0++;
+		}
 	}
 }
 
 //on recupere le message
 void DrvUart0SendDirectMessage( Char *i_message, Int8U i_message_len )
 {
+	
+	UCSR0B &= ~(1<<TXCIE0);	//disable TX interrupt
 	//on enregistre le message
 	for ( Int8U loop_send = 0U ; loop_send < i_message_len ; loop_send++)
 	{
 		while ( !( UCSR0A & (1<<UDRE0)) );
 		UDR0 = i_message[ loop_send ];
 	}
+	UCSR0B |= (1<<TXCIE0);	//enable TX interrupt
 }
 
 #ifdef USE_UART_1
@@ -239,15 +249,16 @@ ISR(USART_TX_vect)
 ISR(USART0_TX_vect)
 #endif
 {
-	if( in_message_len_0 > 0U)
+	if( in_message_sent_0 < in_message_len_0)
 	{
-		UDR0 = in_message_0[in_message_sent++];
-		in_message_len_0--;
+		UDR0 = in_message_0[in_message_sent_0];
+		in_message_0[in_message_sent_0] = 0;
+		in_message_sent_0++;
 	}
 	else
 	{
 		in_message_len_0 = 0;
-		in_message_sent= 0;
+		in_message_sent_0= 0;
 	}
 }	
 

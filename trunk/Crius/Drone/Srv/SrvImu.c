@@ -37,7 +37,7 @@
 ////////////////////////////////////////PRIVATE STRUCTIURES///////////////////////////////////////
 
 ////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
-static void SrvImuComputeSensors( void );
+static void SrvImuReadAndComputeSensors( void );
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 
@@ -61,12 +61,7 @@ Boolean SrvImuInit( void )
 	accZangle = 0;
 	gyroXAngle = 0;
 	gyroYAngle = 0;
-	gyroZAngle = 0;
-	pid_erreur_roulis = 0;
-	pid_erreur_tangage = 0;
-	pid_erreur_lacet = 0;
-	pid_erreur_altitude = 0;
-	
+	gyroZAngle = 0;	
 	
 	//init des composants
 	#if ( DAISY_7 == 1 )
@@ -97,27 +92,27 @@ void SrvImuDispatcher (Event_t in_event)
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_20MS ) == TRUE)
 	{		
 		// ********************* Mesure des capteurs ******************************
-		SrvImuComputeSensors();
+		SrvImuReadAndComputeSensors();
 		
 		// ********************* PID **********************************************
-		pid_erreur_roulis	= SrvPIDCompute( 0U , (float)imu_desire.roulis					, (float)imu_reel.roulis);
-		pid_erreur_tangage	= SrvPIDCompute( 1U , (float)imu_desire.tangage					, (float)imu_reel.tangage);
-		pid_erreur_lacet	= SrvPIDCompute( 2U , (float)(imu_reel.lacet + imu_desire.lacet), (float)imu_reel.lacet);
-		if(imu_reel.maintient_altitude == TRUE)
+		imu_reel.pid_error.roulis	= SrvPIDCompute( 0U , (float)imu_desire.angles.roulis	, (float)imu_reel.angles.roulis);
+		imu_reel.pid_error.tangage	= SrvPIDCompute( 1U , (float)imu_desire.angles.tangage	, (float)imu_reel.angles.tangage);
+		imu_reel.pid_error.lacet	= SrvPIDCompute( 2U , (float)(imu_reel.angles.lacet + imu_desire.angles.lacet)	, (float)imu_reel.angles.lacet);
+		if(imu_desire.maintient_altitude == TRUE)
 		{
-			pid_erreur_altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.altitude);
+			imu_reel.pid_error.altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.altitude);
 		}	
 		
 		// *********************Mise à jour des Moteurs ***************************
-		SrvMotorUpdate(pid_erreur_roulis , pid_erreur_tangage,pid_erreur_lacet, pid_erreur_altitude )	;
+		SrvMotorUpdate( imu_reel.pid_error );
 	}	
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
-		/*imu_reel.temperature = (Int16S)CmpBMP085GetTemperature();
+		imu_reel.temperature = (Int16S)CmpBMP085GetTemperature();
 		imu_reel.pressure = CmpBMP085GetPressure();
 		//atm = pressure / 101325.0;
-		imu_reel.altitude = (Int16U)CmpBMP085GetAltitude(imu_reel.pressure);
-		imu_reel.weather = CmpBMP085GetWeather(imu_reel.pressure);*/
+		imu_reel.altitude = (Int16S)CmpBMP085GetAltitude(imu_reel.pressure);
+		imu_reel.weather = CmpBMP085GetWeather(imu_reel.pressure, imu_reel.altitude);
 	}
 }
 
@@ -173,21 +168,21 @@ void SrvImuSensorsSetAltitudeMaintient( Int8U altitude )
 {
 	if(altitude != 0U)
 	{
-		Int16U alt = 0U;
+		Int16S alt = 0U;
 		DrvEepromReadAltitude(&alt);
-		imu_reel.maintient_altitude = TRUE;
+		imu_desire.maintient_altitude = TRUE;
 		imu_desire.altitude = alt + altitude;
 	}
 	else
 	{
-		imu_reel.maintient_altitude = FALSE;
+		imu_desire.maintient_altitude = FALSE;
 	}
 }
 ////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
 /************************************************************************/
 /*Recuperation des données des capteurs et mise en forme  des données   */
 /************************************************************************/
-static void SrvImuComputeSensors( void )
+static void SrvImuReadAndComputeSensors( void )
 {
 	//variables de timming
 	static Int32U previous_time;
@@ -246,8 +241,8 @@ static void SrvImuComputeSensors( void )
 	//ACC
 	if(acc_read_ok != FALSE)
 	{
-		accXangle		= (float)atan2((double)(acceleration.x) , (double)sqrt((double)(pow((double)acceleration.y,2)+pow((double)acceleration.z,2))));
-		accYangle		= (float)atan2((double)(acceleration.y) , (double)sqrt((double)(pow((double)acceleration.x,2)+pow((double)acceleration.z,2))));
+		accXangle = (float)atan2((double)(acceleration.x) , (double)sqrt((double)(pow((double)acceleration.y,2)+pow((double)acceleration.z,2))));
+		accYangle = (float)atan2((double)(acceleration.y) , (double)sqrt((double)(pow((double)acceleration.x,2)+pow((double)acceleration.z,2))));
 	
 		accXangle = ToDeg(accXangle);
 		accYangle = ToDeg(accYangle);
@@ -287,10 +282,10 @@ static void SrvImuComputeSensors( void )
 		if(!(accXangle > 40 || accXangle < -40 || accYangle > 40 || accYangle < -40))
 		{
 			//compensation avec l'accelerometre
-			float cosRoll = cos(ToRad(accYangle));
-			float sinRoll = sin(ToRad(accYangle));  
-			float cosPitch = cos(ToRad(accXangle));
-			float sinPitch = sin(ToRad(accXangle));
+			float cosRoll  = cos( ToRad( accYangle ) );
+			float sinRoll  = sin( ToRad( accYangle ) );  
+			float cosPitch = cos( ToRad( accXangle ) );
+			float sinPitch = sin( ToRad( accXangle ) );
 			
 			float Xh = magnet.x * cosPitch + magnet.z * sinPitch;
 			float Yh = magnet.x * sinRoll * sinPitch + magnet.y * cosRoll - magnet.z * sinRoll * cosPitch;		
@@ -304,21 +299,21 @@ static void SrvImuComputeSensors( void )
 			{
 				heading -= 2 * M_PI;
 			}
-			imu_reel.nord  = ToDeg(heading);
+			imu_reel.angles.nord  = ToDeg(heading);
 		}
 	}
 	
 	// ********************* Fusion des capteurs ******************************
-	imu_reel.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval ) * 10;
-	imu_reel.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval ) * 10;
-	imu_reel.lacet	  = gyroZAngle;
-	if(imu_reel.lacet < 0.0)
+	imu_reel.angles.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval ) * 10;
+	imu_reel.angles.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval ) * 10;
+	imu_reel.angles.lacet	  = gyroZAngle;
+	if(imu_reel.angles.lacet < 0.0)
 	{
-		imu_reel.lacet += 360.0;
+		imu_reel.angles.lacet += 360.0;
 	}
-	else if(imu_reel.lacet > 360.0)
+	else if(imu_reel.angles.lacet > 360.0)
 	{
-		imu_reel.lacet -= 360.0;
+		imu_reel.angles.lacet -= 360.0;
 	}
 	
 	// ********************* Calcul du temps de cycle *************************

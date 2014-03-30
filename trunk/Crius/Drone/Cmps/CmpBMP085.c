@@ -49,28 +49,25 @@ Boolean CmpBMP085Init( void )
 }
 
 //Get Altitude
-float CmpBMP085GetAltitude(float pressure)
+Int16U CmpBMP085GetAltitude(float pressure)
 {
-	float A = pressure/101325;
-	float B = 1/5.25588;
+	float A = pressure/101325.0;
+	float B = 1.0/5.25588;
 	float C = pow(A,B);
 	C = 1 - C;
 	C = C /0.0000225577;
 	
-	return C;
+	return (Int16U)C;
 }
 
 //Get weather 
-Int8U CmpBMP085GetWeather( float pressure )
-{
-	//DrvEepromReadAltitude
-	Int16U currentAltitude = 0;
-	DrvEepromReadAltitude(&currentAltitude);
-	
-	const float ePressure = SEA_PRESSURE * pow((1-currentAltitude/44330.0), 5.255);  // expected pressure (in Pa) at altitude
-	float weatherDiff;
-	weatherDiff = (pressure / 10.0) - (ePressure / 10.0);
-	
+Int8U CmpBMP085GetWeather( float pressure , Int16U altitude )
+{	
+	// calcul de la presion attendu a notre altitude
+	float ePressure = SEA_PRESSURE * pow((1-altitude/44330.0), 5.255);
+	// on compare par rapport a la pression mesurée
+	Int16S weatherDiff = (Int16S)( (Int16S)(pressure / 10.0) - (Int16S)(ePressure / 10.0));
+	//on retourne le type de temps
 	if(weatherDiff > 250)
 	{
 		return (Int8U)WEATHER_SUNNY;

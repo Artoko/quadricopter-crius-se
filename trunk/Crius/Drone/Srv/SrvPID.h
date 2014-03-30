@@ -26,6 +26,7 @@ typedef struct
 //init des valeurs du PID
 void SrvPIDInit(void );
 
+//calcul des valeurs PID
 Int16S SrvPIDCompute(Int8U index, float targetPosition, float currentPosition );
 
 
