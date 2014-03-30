@@ -53,11 +53,11 @@ inline Boolean DrvEventTestEvent( Event_t in_event, Int8U conf_event )
 /************************************************************************/
 /*On ajoute un evenement aux evenements en cours                        */
 /************************************************************************/
-inline Boolean DrvEventAddEvent(Event_t event)
+inline Boolean DrvEventAddEvent(Event_t in_event)
 {
 	ATOMIC
 	(
-		event_flags |= event ;
+		event_flags |= in_event ;
 	);
 	return TRUE;
 }

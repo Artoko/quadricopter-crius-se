@@ -9,20 +9,13 @@
 #ifndef SRVMOTOR_H_
 #define SRVMOTOR_H_
 
-
 #include "Tools/tools_typedefs.h"
 
-extern Int16U frontMotor_R;
-extern Int16U frontMotor_L;
-extern Int16U rearMotor_R;
-extern Int16U rearMotor_L;
-
-
 //init des moteurs
-Boolean SrvMotorInit (void) ;
+Boolean SrvMotorInit( void ) ;
 
 //Update des moteurs
-void SrvMotorUpdate(Int16S roulis, Int16S tangage,Int16S lacet, Int16S altitude) ;
+void SrvMotorUpdate(S_pid pid_error) ;
 
 //applique une vittesse aux moteurs
 Boolean SrvMotorApplyAbsoluteSpeed(Int16U speed) ;

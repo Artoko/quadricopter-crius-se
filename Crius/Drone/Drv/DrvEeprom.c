@@ -181,7 +181,7 @@ void DrvEepromWritePID (Int8U index,float P, float I, float D)
 
 
 //retourne les config du altitude
-void DrvEepromReadAltitude( Int16U *altitude)
+void DrvEepromReadAltitude( Int16S *altitude)
 {
 	*altitude = DrvEepromReadShort(ADDR_EEPROM_ALTITUDE);
 }

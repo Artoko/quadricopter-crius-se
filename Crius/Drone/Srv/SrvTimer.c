@@ -115,7 +115,6 @@ void SrvTimerDelayTimer( Int8U index_timer , Int16U delay)
 //on reset tt les timers
 void SrvTimerTickReset(void)
 {
-	cli();
 	//on configure les timers autre que le timer event
 	for(Int8U loop_index = 0U; loop_index < CONF_TIMER_NB ; loop_index++ )
 	{
@@ -131,7 +130,6 @@ void SrvTimerTickReset(void)
 	tick_counter_10s = 0U;
 	TCNT2	= 0U;
 	OCR2A   = TIMER2_OFFSET_COMPA;
-	sei();
 }
 
 

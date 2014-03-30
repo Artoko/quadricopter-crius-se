@@ -13,8 +13,6 @@
 
 ////////////////////////////////////////////PUBLIC DEFINES///////////////////////////////////////////
 
-//calcule la vitesse en fonction de la puissance desiré
-#define ConvertPowerToTick(power_const) (Int16U)(map( power_const , 0U		,1000U	,MIN_PULSE_WIDTH	,MAX_PULSE_WIDTH ) / 4U)
 
 #define MIN_ANGLE				0U      
 #define MAX_ANGLE				180U 
@@ -35,8 +33,8 @@
  	
 #define MAX_SERVOS				4U
 
-
-
+//calcule la vitesse en fonction de la puissance desiré
+#define ConvertPowerToTick(power_const) (Int16U)(map( power_const , 0U		,1000U	,MIN_PULSE_WIDTH	,MAX_PULSE_WIDTH ) / 4U)
 
 /////////////////////////////////////////PUBLIC STRUCTURES/////////////////////////////////////////
 typedef struct {
@@ -49,7 +47,7 @@ typedef struct {
 Boolean DrvServo( void ) ;
 
 // bouge le servo a la position voulu en angle
-Boolean DrvServoUpdate( Int8U index, Int16U angle) ;
+Boolean DrvServoUpdate( Int8U index, Int16U angle ) ;
 
 
 #endif /* DRV_SERVO_H_ */

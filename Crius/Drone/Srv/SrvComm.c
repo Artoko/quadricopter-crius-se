@@ -100,9 +100,9 @@ static void SrvCommExecute ( void )
 	else if(ma_trame_comm.param[PARAM_0] == COMM_ANGLE )
 	{ 
 		//applique les angle souhaité
-		imu_desire.roulis = (Int16S)ma_trame_comm.param[PARAM_1];
-		imu_desire.tangage = (Int16S)ma_trame_comm.param[PARAM_2];
-		imu_desire.lacet = (Int16S)ma_trame_comm.param[PARAM_3];
+		imu_desire.angles.roulis	= (Int16S)ma_trame_comm.param[PARAM_1];
+		imu_desire.angles.tangage	= (Int16S)ma_trame_comm.param[PARAM_2];
+		imu_desire.angles.lacet		= (Int16S)ma_trame_comm.param[PARAM_3];
 		DrvUart0SendMessage( "OK\n" , 3U );
 	}
 	else if(ma_trame_comm.param[PARAM_0] == COMM_ALTITUDE )
@@ -202,18 +202,18 @@ static void SrvCommRepportData( void )
 
 	lenght = sprintf(       o_message
 					,"%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\n"
-					,imu_reel.roulis
-					,imu_reel.tangage
-					,imu_reel.lacet
-					,imu_reel.nord
-					,(Int16U)imu_reel.altitude
-					,pid_erreur_roulis
-					,pid_erreur_tangage
-					,pid_erreur_lacet
-					,frontMotor_R - 1000
-					,frontMotor_L - 1000
-					,rearMotor_R - 1000
-					,rearMotor_L - 1000
+					,imu_reel.angles.roulis
+					,imu_reel.angles.tangage
+					,imu_reel.angles.lacet
+					,imu_reel.angles.nord
+					,imu_reel.altitude
+					,imu_reel.pid_error.roulis
+					,imu_reel.pid_error.tangage
+					,imu_reel.pid_error.lacet
+					,imu_reel.moteurs.frontMotor_R - 1000
+					,imu_reel.moteurs.frontMotor_L - 1000
+					,imu_reel.moteurs.rearMotor_R - 1000
+					,imu_reel.moteurs.rearMotor_L - 1000
 					,SrvMotorGetSpeed() - 1000
 					,(Int16U)(imu_reel.pressure / 10)
 					,(Int16S)imu_reel.temperature

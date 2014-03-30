@@ -50,7 +50,7 @@ void DrvEepromReadPID(Int8U index,float *P, float *I, float *D);
 void DrvEepromWritePID (Int8U index,float P, float I, float D);
 
 //retourne les config du altitude
-void DrvEepromReadAltitude( Int16U *altitude);
+void DrvEepromReadAltitude( Int16S *altitude);
 
 //enregistre les config du altitude
 void DrvEepromWriteAltitude ( Int16U altitude);
