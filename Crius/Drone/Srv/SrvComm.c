@@ -67,7 +67,7 @@ void SrvCommDispatcher (Event_t in_event)
 		SrvCommExecute();
 	}
 	
-	if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_20MS))
+	else if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_20MS))
 	{
 		if( want_repport_data == TRUE )
 		{

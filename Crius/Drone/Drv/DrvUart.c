@@ -101,7 +101,7 @@ void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
 		in_message_0[start_index] = 0U;
 		in_message_len_0 = start_index;
 		//premier message de la pile
-		if(i_message_len == in_message_len_0)
+		if( i_message_len == start_index )
 		{
 			in_message_sent_0 = 0U;
 			//on envoie le premier caractere
@@ -117,14 +117,14 @@ void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
 void DrvUart0SendDirectMessage( Char *i_message, Int8U i_message_len )
 {
 	
-	UCSR0B &= ~(1<<TXCIE0);	//disable TX interrupt
+	//UCSR0B &= ~(1<<TXCIE0);	//disable TX interrupt
 	//on enregistre le message
 	for ( Int8U loop_send = 0U ; loop_send < i_message_len ; loop_send++)
 	{
 		while ( !( UCSR0A & (1<<UDRE0)) );
 		UDR0 = i_message[ loop_send ];
 	}
-	UCSR0B |= (1<<TXCIE0);	//enable TX interrupt
+	//UCSR0B |= (1<<TXCIE0);	//enable TX interrupt
 }
 
 #ifdef USE_UART_1
