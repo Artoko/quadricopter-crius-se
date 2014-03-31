@@ -90,14 +90,25 @@ namespace GroundStation
         {
             try
             {
-                /*while (serialPort1.BytesToRead != 0)
+                int tt = serialPort1.BytesToRead;
+                while (tt != 0)
                 {
-                    rcv_messages.Enqueue(serialPort1.ReadLine());
-                }*/
-                for (int loop = 0; loop < list_callback_messages.Count; loop++)
-                {
-                    list_callback_messages[loop](serialPort1.ReadLine());
+                    string dd = serialPort1.ReadLine();
+                    for (int loop = 0; loop < list_callback_messages.Count; loop++)
+                    {
+                        list_callback_messages[loop](dd);
+                        tt -= dd.Length;
+                    }
                 }
+                /*string dd = "";
+                for (int loop = 0; loop < tt; loop++)
+                {
+                    if(  )
+                }*/
+
+                
+                tt = 0;
+                
                 //serialPort1.DiscardInBuffer();
             }
             catch
