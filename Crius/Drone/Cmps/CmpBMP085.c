@@ -30,14 +30,16 @@ Int16S mc;
 Int16S md;
 Int32S b5;  
 
+
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 static void CmpBMP085ReadCalibration( void ) ;
 static Int16U CmpBMP085ReadUT ( void );
+static void CmpBMP085TimeoutReadUT ( void );
 static Int32U CmpBMP085ReadUP ( void );
-
+static void CmpBMP085TimeoutReadUP ( void );
 /////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
-
-
+Int16U ut = 0; 
+Int32U up = 0;
 
 //Initialisation du barometre
 Boolean CmpBMP085Init( void )
@@ -207,43 +209,45 @@ static void CmpBMP085ReadCalibration( void )
 // Read the uncompensated temperature value
 static Int16U CmpBMP085ReadUT ( void )
 {
-	Int16U ut;
-	
 	// This requests a temperature reading
 	DrvTwiWriteReg( BMP085_ADDRESS, CONTROL, READ_TEMPERATURE );
 	
 	// Wait at least 4.5ms
-	DrvTimerDelayMs(5);
+	SrvTimerAddTimer(CONF_TIMER_BMP085, 5U, E_TIMER_MODE_ONE_SHOT, CmpBMP085TimeoutReadUT);
 	
+	return ut;
+}
+
+// Read the uncompensated temperature value
+static void CmpBMP085TimeoutReadUT ( void )
+{
 	// Read two uint8_ts from registers 0xF6 and 0xF7
 	Int8U msb, lsb;
 	DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT, &msb );
 	DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT + 1, &lsb );
 	ut = (Int16U)(((Int16U) msb << 8) | ((Int16U)lsb) );
-	
-	return ut;
 }
 
 // Read the uncompensated pressure value
 static Int32U CmpBMP085ReadUP ( void )
 {
-	
-	Int8U msb, lsb, xlsb;
-	Int32U up = 0;
-	
 	// Write 0x34+(OSS<<6) into register 0xF4
 	// Request a pressure reading w/ oversampling setting
 	DrvTwiWriteReg( BMP085_ADDRESS, CONTROL, READ_PRESSURE + (OSS<<6) );
 		
 	// Wait for conversion, delay time dependent on OSS
-	DrvTimerDelayMs(2 + (3<<OSS));
-	
+	SrvTimerAddTimer(CONF_TIMER_BMP085, 2 + (3<<OSS), E_TIMER_MODE_ONE_SHOT, CmpBMP085TimeoutReadUP);
+	return up;
+}
+
+// Read the uncompensated pressure value
+static void CmpBMP085TimeoutReadUP ( void )
+{
+	Int8U msb, lsb, xlsb;
 	// Read register 0xF6 (MSB), 0xF7 (LSB), and 0xF8 (XLSB)
 	DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT, &msb );
 	DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT + 1, &lsb );
 	DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT + 2, &xlsb );
 	
 	up = (((Int32U) msb << 16) | ((Int32U) lsb << 8) | (Int32U) xlsb) >> (8-OSS);
-	
-	return up;
 }

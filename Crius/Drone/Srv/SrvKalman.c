@@ -118,7 +118,7 @@ double KZ_0, KZ_1;
 
 double SrvKalmanFilterZ(double newAngle, double newRate, double dtime)
 {
-	dtZ = dtime / 100000.0; // Convert from microseconds to seconds
+	dtZ = dtime / 1000000.0; // Convert from microseconds to seconds
 
 	// Discrete Kalman filter time update equations - Time Update ("Predict")
 	// Update xhat - Project the state ahead
@@ -164,7 +164,7 @@ double KALT_0, KALT_1;
 
 double SrvKalmanFilterAlt(double newAngle, double newRate, double dtime)
 {
-	dtALT = dtime / 100000.0; // Convert from microseconds to seconds
+	dtALT = dtime / 1000000.0; // Convert from microseconds to seconds
 
 	// Discrete Kalman filter time update equations - Time Update ("Predict")
 	// Update xhat - Project the state ahead

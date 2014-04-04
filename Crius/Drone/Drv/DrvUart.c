@@ -98,8 +98,7 @@ void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
 		} 
 	
 		start_index += i_message_len ;
-		in_message_0[start_index] = 0U;
-		in_message_len_0 = start_index;
+		in_message_len_0 = start_index; 
 		//premier message de la pile
 		if( i_message_len == start_index )
 		{

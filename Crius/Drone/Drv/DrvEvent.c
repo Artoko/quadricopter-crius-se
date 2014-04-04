@@ -9,7 +9,7 @@
 #include "DrvEvent.h"
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
-volatile Event_t event_flags = 0U;
+static Event_t event_flags = 0U;
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
   
@@ -43,11 +43,12 @@ inline Event_t DrvEventGetEvent( void )
 /************************************************************************/
 inline Boolean DrvEventTestEvent( Event_t in_event, Int8U conf_event ) 
 {
-	if (( in_event & conf_event) > 0 )
-	{
-		return TRUE;
-	}
-	return FALSE;
+	Boolean return_value = FALSE;
+	ATOMIC
+	(
+		if(( in_event & conf_event) > 0 ) return_value = TRUE; 
+	);
+	return return_value;
 }
 
 /************************************************************************/
