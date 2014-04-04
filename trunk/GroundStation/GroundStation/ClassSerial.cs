@@ -14,7 +14,9 @@ namespace GroundStation
         
         public delegate void callback_message_receive(string message);
         List<callback_message_receive> list_callback_messages = new List<callback_message_receive>();
-        
+        public static bool Thread_Listener_flag = false;
+
+        static Thread Thread_Listener;
 
         public bool Connect (string port_name)
         {
@@ -24,7 +26,7 @@ namespace GroundStation
             try
             {
                 serialPort1.Open();
-                serialPort1.DataReceived += serialPort1_DataReceived;
+                
                 ret = true;
             }
             catch
@@ -34,21 +36,27 @@ namespace GroundStation
             try
             {
                 serialPort1.Open();
-                serialPort1.DataReceived += serialPort1_DataReceived;
                 ret = true;
             }
             catch
             {
                 
             }
-            
+
+            if (ret == true)
+            {
+                Thread_Listener = new Thread(new ThreadStart(ClassUartThreadListenerModem));
+                Thread_Listener.Start();
+                Thread_Listener_flag = true;
+            }
             return ret;
         }
         public bool Deconnect()
         {
+            Thread_Listener_flag = false;
             if(serialPort1.IsOpen)
             {
-                serialPort1.DiscardInBuffer();
+                serialPort1.ReadExisting();
                 serialPort1.Close();
                 serialPort1.Dispose();
                 return true;
@@ -88,34 +96,41 @@ namespace GroundStation
 
         private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
-            try
+        }
+        string frame = "";
+
+        private void ClassUartThreadListenerModem()
+        {
+            while (Thread_Listener_flag)
             {
-                int tt = serialPort1.BytesToRead;
-                while (tt != 0)
+                if (serialPort1.BytesToRead > 0)
                 {
-                    string dd = serialPort1.ReadLine();
-                    for (int loop = 0; loop < list_callback_messages.Count; loop++)
+
+                    try
                     {
-                        list_callback_messages[loop](dd);
-                        tt -= dd.Length;
+                        int bytes = serialPort1.BytesToRead;
+                        while (bytes != 0)
+                        {
+                            string frame = serialPort1.ReadLine();
+                            for (int loop = 0; loop < list_callback_messages.Count; loop++)
+                            {
+                                list_callback_messages[loop](frame);
+                                bytes -= frame.Length;
+                            }
+                        }
+
+                        bytes = 0;
+                    }
+                    catch
+                    {
                     }
                 }
-                /*string dd = "";
-                for (int loop = 0; loop < tt; loop++)
+                else
                 {
-                    if(  )
-                }*/
-
-                
-                tt = 0;
-                
-                //serialPort1.DiscardInBuffer();
-            }
-            catch
-            {
+                    Thread.Sleep(5);
+                }
             }
         }
-
 
        
     }

@@ -73,7 +73,7 @@ namespace GroundStation
         {
             if (ConnexiontoolStripMenuItem.Text == "Connexion")
             {
-                if ((serial.Connect("COM40") == true) || (serial.Connect("COM14") == true) || (serial.Connect("COM3") == true) || (serial.Connect("COM5") == true) || (serial.Connect("COM7") == true) || (serial.Connect("COM22") == true) || (serial.Connect("COM1") == true))
+                if ((serial.Connect("COM40") == true) || (serial.Connect("COM14") == true)|| (serial.Connect("COM5") == true) || (serial.Connect("COM7") == true) || (serial.Connect("COM22") == true) || (serial.Connect("COM1") == true))
                 {
                     ConnexiontoolStripMenuItem.Text = "Deconnexion";
                     StatetoolStripStatusLabel.Text = "Etat : Connecte";
@@ -95,6 +95,15 @@ namespace GroundStation
                 ConnexiontoolStripMenuItem.Text = "Connexion";
                 StatetoolStripStatusLabel.Text = "Etat : Deconnecte";
             }
+
+
+            FormGraph childForm = new FormGraph();
+            childForm.MdiParent = this;
+            childForm.Show();
+            FormCommand childForm2 = new FormCommand();
+            childForm2.MdiParent = this;
+            childForm2.Show();
+            LayoutMdi(MdiLayout.TileVertical);
         }
         public void IncommingMessage(string message)
         {

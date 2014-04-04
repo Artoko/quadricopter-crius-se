@@ -105,6 +105,7 @@ void SrvImuDispatcher (Event_t in_event)
 		
 		// *********************Mise à jour des Moteurs ***************************
 		SrvMotorUpdate( imu_reel.pid_error );
+		
 	}	
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
@@ -182,11 +183,13 @@ void SrvImuSensorsSetAltitudeMaintient( Int8U altitude )
 /************************************************************************/
 /*Recuperation des données des capteurs et mise en forme  des données   */
 /************************************************************************/
+static Int32U tab[2];
+Int8U index= 0;
+//variables de timming
+static Int32U interval = 0U;
+
 static void SrvImuReadAndComputeSensors( void )
 {
-	//variables de timming
-	static Int32U previous_time;
-	static Int32U interval;
 	
 	float gyroRate = 0;	
 	
@@ -210,8 +213,18 @@ static void SrvImuReadAndComputeSensors( void )
 	
 	
 	// ********************* Calcul du temps de cycle *************************
-	interval = DrvTimerGetTime() - previous_time;
-	
+	tab[ index ] = DrvTimerGetTime() ;
+	if(index == 1U)
+	{
+		index = 0U;
+		interval = tab[ 1U ] - tab[ 0U ];
+	}
+	else
+	{
+		index = 1U;
+		interval = tab[ 0U ] - tab[ 1U ];
+	}
+	interval  = interval / 10;
 	// ********************* Lecture des capteurs *****************************
 	#if ( DAISY_7 == 1 )
 	
@@ -304,8 +317,8 @@ static void SrvImuReadAndComputeSensors( void )
 	}
 	
 	// ********************* Fusion des capteurs ******************************
-	imu_reel.angles.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval ) * 10;
-	imu_reel.angles.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval ) * 10;
+	imu_reel.angles.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval ) /* 10*/;
+	imu_reel.angles.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval ) /* 10*/;
 	imu_reel.angles.lacet	  = gyroZAngle;
 	if(imu_reel.angles.lacet < 0.0)
 	{
@@ -316,7 +329,5 @@ static void SrvImuReadAndComputeSensors( void )
 		imu_reel.angles.lacet -= 360.0;
 	}
 	
-	// ********************* Calcul du temps de cycle *************************
-	previous_time = DrvTimerGetTime();
 }
 
