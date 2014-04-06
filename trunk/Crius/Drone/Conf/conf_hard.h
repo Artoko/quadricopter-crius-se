@@ -91,12 +91,12 @@
 #define		USE_UART_0		
 
 ////////////////////////////////////////////PUBLIC COMM////////////////////////////////////////////
-#define		COMM_MOTOR			0U
-#define		COMM_ANGLE			1U
-#define		COMM_ALTITUDE		2U
-#define		COMM_PID			3U
-#define		COMM_EEPROM			4U
-#define		COMM_REPPORT		5U
+#define		COMM_MOTOR			1U
+#define		COMM_ANGLE			2U
+#define		COMM_ALTITUDE		3U
+#define		COMM_PID			4U
+#define		COMM_EEPROM			5U
+#define		COMM_REPPORT		6U
 
 
 

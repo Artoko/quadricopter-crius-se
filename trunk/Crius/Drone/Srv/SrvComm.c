@@ -86,10 +86,7 @@ static void SrvCommExecute ( void )
 		//controle validité data
 		if(
 		   ( ma_trame_comm.param[PARAM_1] >= 0U ) &&
-		   ( ma_trame_comm.param[PARAM_1] <= 1000U ) &&
-		   ( ma_trame_comm.param[PARAM_2] <= 0U ) &&
-		   ( ma_trame_comm.param[PARAM_3] <= 0U ) &&
-		   ( ma_trame_comm.param[PARAM_4] <= 0U )
+		   ( ma_trame_comm.param[PARAM_1] <= 1000U ) 
 		  )
 		{
 			//applique la vitesse au moteurs
@@ -139,9 +136,9 @@ static void SrvCommExecute ( void )
 			float I = 0;
 			float D = 0;
 			index = ma_trame_comm.param[PARAM_2];
-			P = (float)(Int16S)( ma_trame_comm.param[PARAM_3]);
+			P = (float)(Int16S)( ma_trame_comm.param[PARAM_3] / 10);
 			I = (float)(Int16S)( ma_trame_comm.param[PARAM_4] / 10);
-			D = (float)(Int16S)( ma_trame_comm.param[PARAM_5]);
+			D = (float)(Int16S)( ma_trame_comm.param[PARAM_5] / 10);
 			DrvEepromWritePID(index,P,I,D);
 			SrvPIDInit();
 			DrvUart0SendMessage( "OK\n" , strlen("OK\n") );
@@ -161,9 +158,9 @@ static void SrvCommExecute ( void )
 			lenght = sprintf(pid_message
 			,"PID:%i,%i,%i,%i\n"
 			,index
-			,(Int16S)P
+			,(Int16S)(P*10)
 			,(Int16S)(I*10)
-			,(Int16S)D
+			,(Int16S)(D*10)
 			);
 			DrvUart0SendMessage( pid_message , lenght );
 		}

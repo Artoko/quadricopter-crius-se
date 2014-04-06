@@ -110,7 +110,7 @@ namespace GroundStation
 
         private void Speedbutton_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*0+0##");
+            GroundStationMainForm.serial.SendMessage("*1+0##");
             PowerTrackBar.Value = 0;
             trackBarRoulis.Value = 0;
             trackBarLacet.Value = 0;
@@ -129,7 +129,7 @@ namespace GroundStation
                 PowerTrackBar.Maximum = 500;
                 if (PowerTrackBar.Value > 500) PowerTrackBar.Value = 500;
             }
-            GroundStationMainForm.serial.SendMessage("*0+" + PowerTrackBar.Value + "##");
+            GroundStationMainForm.serial.SendMessage("*1+" + PowerTrackBar.Value + "##");
             labelspeed.Text = "speed : " + PowerTrackBar.Value.ToString();
         }
 
@@ -163,7 +163,7 @@ namespace GroundStation
 
         private void buttonReset_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*4+0##");
+            GroundStationMainForm.serial.SendMessage("*5+0##");
             PowerTrackBar.Value = 0;
             trackBarRoulis.Value = 0;
             trackBarLacet.Value = 0;
@@ -172,7 +172,7 @@ namespace GroundStation
 
         private void buttonReseteeprom_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*4+1##");
+            GroundStationMainForm.serial.SendMessage("*5+1##");
             PowerTrackBar.Value = 0;
             trackBarRoulis.Value = 0;
             trackBarLacet.Value = 0;
@@ -199,7 +199,7 @@ namespace GroundStation
 
         private void ButtonWrite_Click(object sender, EventArgs e)
         {
-            string frame = "*3+1+0";
+            string frame = "*4+1+0";
             if (numericUpDownP.Value >= 0)
             {
                 frame += "+" + numericUpDownP.Value;
@@ -229,18 +229,18 @@ namespace GroundStation
 
         private void ButtonRead_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*3+0+0##");
+            GroundStationMainForm.serial.SendMessage("*4+0+0##");
         }
 
         private void buttonRepportData_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*5+0##");
+            GroundStationMainForm.serial.SendMessage("*6+0##");
 
         }
         
         private string FormatString()
         {
-            string frame = "*1";
+            string frame = "*2";
             if (trackBarRoulis.Value >= 0)
             {
                 frame += "+" + trackBarRoulis.Value;
@@ -270,17 +270,17 @@ namespace GroundStation
 
         private void button2_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*2+2##");
+            GroundStationMainForm.serial.SendMessage("*3+2##");
         }
 
         private void buttonAltitude_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*2+1##");
+            GroundStationMainForm.serial.SendMessage("*3+1##");
         }
 
         private void button9_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*2+3+" + numericUpDown10.Value + "##");
+            GroundStationMainForm.serial.SendMessage("*3+3+" + numericUpDown10.Value + "##");
         }
 
         private void FormCommand_Load(object sender, EventArgs e)
@@ -290,7 +290,7 @@ namespace GroundStation
 
         private void button4_Click(object sender, EventArgs e)
         {
-            string frame = "*3+1+1";
+            string frame = "*4+1+1";
             if (numericUpDownP.Value >= 0)
             {
                 frame += "+" + numericUpDownP.Value;
@@ -320,12 +320,12 @@ namespace GroundStation
 
         private void button3_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*3+0+1##");
+            GroundStationMainForm.serial.SendMessage("*4+0+1##");
         }
 
         private void button6_Click(object sender, EventArgs e)
         {
-            string frame = "*3+1+2";
+            string frame = "*4+1+2";
             if (numericUpDownP.Value >= 0)
             {
                 frame += "+" + numericUpDownP.Value;
@@ -355,7 +355,7 @@ namespace GroundStation
 
         private void button8_Click(object sender, EventArgs e)
         {
-            string frame = "*3+1+3";
+            string frame = "*4+1+3";
             if (numericUpDownP.Value >= 0)
             {
                 frame += "+" + numericUpDownP.Value;
@@ -385,12 +385,12 @@ namespace GroundStation
 
         private void button5_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*3+0+2##");
+            GroundStationMainForm.serial.SendMessage("*4+0+2##");
         }
 
         private void button7_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*3+0+3##");
+            GroundStationMainForm.serial.SendMessage("*4+0+3##");
         }
 
         

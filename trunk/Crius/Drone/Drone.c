@@ -72,15 +72,16 @@ int main(void)
 	DrvEventInit();
 	DrvTickInit();
 	DrvTwiInit( TWI_SPEED_400K );
-	DrvUartInit( UART_0, UART_SPEED_115200 );
+	DrvUartInit( UART_0, UART_SPEED_57600/*UART_SPEED_115200*/ );
 	DrvEepromInit();
 	
 	// ********************* Interrupt Enable *****************************************
 	DrvInterruptSetAllInterrupts();
 	
-	// ********************* Composants init ******************************************
+	// ********************* Services init ******************************************
 	SrvCommInit();
 	SrvTimerInit();
+	SrvPIDInit();
 	SrvImuInit();
 	SrvMotorInit(); 
 	

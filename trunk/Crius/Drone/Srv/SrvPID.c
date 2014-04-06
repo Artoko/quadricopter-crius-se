@@ -58,7 +58,7 @@ void SrvPIDInit(void )
 	
 }
 
-Int16S SrvPIDCompute(Int8U index, float targetPosition, float currentPosition )
+Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition )
 {
 	float error = targetPosition - currentPosition;
 	

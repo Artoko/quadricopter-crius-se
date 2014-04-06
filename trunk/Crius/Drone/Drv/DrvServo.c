@@ -27,7 +27,7 @@ Boolean DrvServo( void )
 	for(Int8U index_servo = 0; index_servo < MAX_SERVOS ; index_servo++)
 	{	
 		MesServos[ index_servo ].pin = index_servo;
-		MesServos[ index_servo ].ticks = MIN_PULSE_WIDTH * TIMER1_TICK_PER_US;
+		MesServos[ index_servo ].ticks = TICKS_MIN_PULSE_WIDTH;
 		PORT_DIR_SERVO |= (1 << index_servo);
 	}
 	ServoPosTics = 0U;
@@ -46,7 +46,7 @@ Boolean DrvServo( void )
 Boolean DrvServoUpdate( Int8U index, Int16U power)
 {
 	//consigne
-	MesServos[ index ].ticks = ConvertPowerToTick(power)* TIMER1_TICK_PER_US;
+	MesServos[ index ].ticks = ConvertPowerToTick(power);
 	return TRUE;
 }
 
@@ -83,12 +83,12 @@ SIGNAL (TIMER1_COMPA_vect)
 	else
 	{
 		//on charge le temp avant la prochaine IT pour le rafraichissement
-		next_ticks = PERIOD_SERVO_MAX - ServoPosTics ;
+		next_ticks = TICKS_PERIOD_SERVO_MAX - ServoPosTics ;
 	}	
 	
 	OCR1A += next_ticks;
 	ServoPosTics += next_ticks;
-	if(ServoPosTics >= PERIOD_SERVO_MAX)
+	if(ServoPosTics >= TICKS_PERIOD_SERVO_MAX)
 	{
 		ServoPosTics = 0;
 	}

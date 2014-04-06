@@ -33,19 +33,23 @@ Int32S b5;
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 static void CmpBMP085ReadCalibration( void ) ;
-static Int16U CmpBMP085ReadUT ( void );
-static void CmpBMP085TimeoutReadUT ( void );
-static Int32U CmpBMP085ReadUP ( void );
-static void CmpBMP085TimeoutReadUP ( void );
+static void CmpBMP085ReadUTReadUP( void ) ;
+static Int16U CmpBMP085ReadUT ( void ) ;
+static Int32U CmpBMP085ReadUP ( void ) ;
 /////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
-Int16U ut = 0; 
-Int32U up = 0;
+Int16S temperature = 0;
+Int32U pression = 0;
+Int8U step_bmp085 = 0;
+Int16U m_ut = 0;
+Int32U m_up = 0;
+
 
 //Initialisation du barometre
 Boolean CmpBMP085Init( void )
 {
 	Boolean o_success = FALSE;
 	CmpBMP085ReadCalibration();
+	CmpBMP085LaunchReading();
 	o_success = TRUE;
 	return o_success;
 }
@@ -88,55 +92,22 @@ Int8U CmpBMP085GetWeather( float pressure , Int16U altitude )
 	}
 }
 
+//lance la lecture des variables du BMP085
+ void CmpBMP085LaunchReading( void )
+ {
+	 CmpBMP085ReadUTReadUP();
+ }
+
 //Get Temperature
 float CmpBMP085GetTemperature( void )
 {
-	Int32S x1, x2;
-	Int16U ut = CmpBMP085ReadUT();
-	
-	x1 = (((Int32S)ut - (Int32S)ac6)*(Int32S)ac5) >> 15;
-	x2 = ((Int32S)mc << 11)/(x1 + md);
-	b5 = x1 + x2;
-	
-	float temp = ((b5 + 8)>>4);
-	temp = temp / 10 - 1.5;
-	
-	return temp;
+	return temperature;
 }
 
 //Get Pressure
 Int32S CmpBMP085GetPressure( void )
-{
-	Int32S x1, x2, x3, b3, b6, p;
-	Int32U b4, b7;
-	
-	Int32U up = CmpBMP085ReadUP();
-	b6 = b5 - 4000;
-	// Calculate B3
-	x1 = (b2 * (b6 * b6)>>12)>>11;
-	x2 = (ac2 * b6)>>11;
-	x3 = x1 + x2;
-	b3 = (((((Int32S)ac1)*4 + x3)<<OSS) + 2)>>2;
-	
-	// Calculate B4
-	x1 = (ac3 * b6)>>13;
-	x2 = (b1 * ((b6 * b6)>>12))>>16;
-	x3 = ((x1 + x2) + 2)>>2;
-	b4 = (ac4 * (Int32U)(x3 + 32768))>>15;
-	
-	b7 = ((Int32U)(up - b3) * (50000>>OSS));
-	if (b7 < 0x80000000)
-	p = (b7<<1)/b4;
-	else
-	p = (b7/b4)<<1;
-	
-	x1 = (p>>8) * (p>>8);
-	x1 = (x1 * 3038)>>16;
-	x2 = (-7357 * p)>>16;
-	p += (x1 + x2 + 3791)>>4;
-	
-	Int32S temp = p;
-	return temp;
+{	
+	return pression;
 }
 
 
@@ -206,6 +177,84 @@ static void CmpBMP085ReadCalibration( void )
   md|= datum;
 }
 
+//read the two parameters UT and UP
+static void CmpBMP085ReadUTReadUP( void ) 
+{
+	Int32S x1, x2, x3, b3, b6, p ;
+	Int32U b4, b7;
+	Int8U msb, lsb, xlsb;
+	
+	switch ( step_bmp085 )
+	{
+		case 0:
+			CmpBMP085ReadUT();
+			step_bmp085++;
+		break;
+		
+		case 1:		
+		
+			// Read two uint8_ts from registers 0xF6 and 0xF7
+			DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT, &msb );
+			DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT + 1, &lsb );
+			m_ut = (Int16U)(((Int16U) msb << 8) | ((Int16U)lsb) );
+		
+			x1 = (((Int32S)m_ut - (Int32S)ac6)*(Int32S)ac5) >> 15;
+			x2 = ((Int32S)mc << 11)/(x1 + md);
+			b5 = x1 + x2;
+			
+			float temp = ((b5 + 8)>>4);
+			temp = temp / 10 - 1.5;
+			
+			temperature = (Int16S) temp ;
+			CmpBMP085ReadUP();
+			step_bmp085++;
+		break;
+		
+		case 2:
+		
+			// Read register 0xF6 (MSB), 0xF7 (LSB), and 0xF8 (XLSB)
+			DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT, &msb );
+			DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT + 1, &lsb );
+			DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT + 2, &xlsb );
+		
+			m_up = (((Int32U) msb << 16) | ((Int32U) lsb << 8) | (Int32U) xlsb) >> (8-OSS);
+		
+			b6 = b5 - 4000;
+			// Calculate B3
+			x1 = (b2 * (b6 * b6)>>12)>>11;
+			x2 = (ac2 * b6)>>11;
+			x3 = x1 + x2;
+			b3 = (((((Int32S)ac1)*4 + x3)<<OSS) + 2)>>2;
+		
+			// Calculate B4
+			x1 = (ac3 * b6)>>13;
+			x2 = (b1 * ((b6 * b6)>>12))>>16;
+			x3 = ((x1 + x2) + 2)>>2;
+			b4 = (ac4 * (Int32U)(x3 + 32768))>>15;
+		
+			b7 = ((Int32U)(m_up - b3) * (50000>>OSS));
+			if (b7 < 0x80000000)
+			p = (b7<<1)/b4;
+			else
+			p = (b7/b4)<<1;
+		
+			x1 = (p>>8) * (p>>8);
+			x1 = (x1 * 3038)>>16;
+			x2 = (-7357 * p)>>16;
+			p += (x1 + x2 + 3791)>>4;
+			
+			pression = p;
+			
+			//on reboucle
+			step_bmp085 = 0;
+		break;
+		
+	}
+	
+	
+	
+}
+
 // Read the uncompensated temperature value
 static Int16U CmpBMP085ReadUT ( void )
 {
@@ -213,19 +262,7 @@ static Int16U CmpBMP085ReadUT ( void )
 	DrvTwiWriteReg( BMP085_ADDRESS, CONTROL, READ_TEMPERATURE );
 	
 	// Wait at least 4.5ms
-	SrvTimerAddTimer(CONF_TIMER_BMP085, 5U, E_TIMER_MODE_ONE_SHOT, CmpBMP085TimeoutReadUT);
-	
-	return ut;
-}
-
-// Read the uncompensated temperature value
-static void CmpBMP085TimeoutReadUT ( void )
-{
-	// Read two uint8_ts from registers 0xF6 and 0xF7
-	Int8U msb, lsb;
-	DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT, &msb );
-	DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT + 1, &lsb );
-	ut = (Int16U)(((Int16U) msb << 8) | ((Int16U)lsb) );
+	return m_ut;
 }
 
 // Read the uncompensated pressure value
@@ -236,18 +273,5 @@ static Int32U CmpBMP085ReadUP ( void )
 	DrvTwiWriteReg( BMP085_ADDRESS, CONTROL, READ_PRESSURE + (OSS<<6) );
 		
 	// Wait for conversion, delay time dependent on OSS
-	SrvTimerAddTimer(CONF_TIMER_BMP085, 2 + (3<<OSS), E_TIMER_MODE_ONE_SHOT, CmpBMP085TimeoutReadUP);
-	return up;
-}
-
-// Read the uncompensated pressure value
-static void CmpBMP085TimeoutReadUP ( void )
-{
-	Int8U msb, lsb, xlsb;
-	// Read register 0xF6 (MSB), 0xF7 (LSB), and 0xF8 (XLSB)
-	DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT, &msb );
-	DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT + 1, &lsb );
-	DrvTwiReadReg( BMP085_ADDRESS, CONTROL_OUTPUT + 2, &xlsb );
-	
-	up = (((Int32U) msb << 16) | ((Int32U) lsb << 8) | (Int32U) xlsb) >> (8-OSS);
+	return m_up;
 }
