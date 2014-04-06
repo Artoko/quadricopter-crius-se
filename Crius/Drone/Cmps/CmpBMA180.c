@@ -15,7 +15,7 @@
 #define NB_SAMPLE_TO_CALIB_BMA180	100
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 Int8U loop_calibration_bma180 = 0U;
-static Int16S accel_calib[ 3U ] = { 0, 0, 0 };
+Int16S accel_calib_bma180[ 3U ] = { 0, 0, 0 };
 	
  ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
@@ -25,7 +25,7 @@ static Int16S accel_calib[ 3U ] = { 0, 0, 0 };
 //fonction init du capteur
 Boolean CmpBMA180Init(void)
 {
-	Boolean conf;
+	Boolean conf = FALSE;
 	Boolean o_success = FALSE;
 	Int8U datum = 0U;
 
@@ -36,20 +36,23 @@ Boolean CmpBMA180Init(void)
 		//Write on EEPROM enable
 		DrvTwiWriteReg(BMA180_ADDRESS,BMA180_REG_CTRL_REG0, 1U<<4U );
 		DrvTimerDelayUs(200);
-		//Bandwidth filters: 20Hz
+		//Bandwidth filters: 10Hz
 		DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_BW_TCS, &datum );
+		DrvTimerDelayUs(200);
 		datum = datum & 0x0F;        
-		datum = datum | (0x01 << 4); 
+		datum = datum | (0x00 << 4); 
 		DrvTwiWriteReg(BMA180_ADDRESS, BMA180_REG_BW_TCS, datum);
 		DrvTimerDelayUs(200);
 		//Mode: Low-Noise
 		DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_TC0_Z, &datum );
+		DrvTimerDelayUs(200);
 		datum = datum & 0xFC;
 		datum = datum | 0x00; 
 		DrvTwiWriteReg(BMA180_ADDRESS, BMA180_REG_TC0_Z, datum);
 		DrvTimerDelayUs(200);
 		//Range: +-8G
 		DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_OFFSET_LSB1, &datum );
+		DrvTimerDelayUs(200);
 		datum = datum & 0xF1;
 		datum = datum | (0x05 << 1); 
 		DrvTwiWriteReg(BMA180_ADDRESS, BMA180_REG_OFFSET_LSB1, datum);
@@ -61,14 +64,14 @@ Boolean CmpBMA180Init(void)
 		if(conf == FALSE)	
 		{
 			loop_calibration_bma180 = NB_SAMPLE_TO_CALIB_BMA180;
-			accel_calib[0U] = 0;
-			accel_calib[1U] = 0;
-			accel_calib[2U] = 0;
+			accel_calib_bma180[0U] = 0;
+			accel_calib_bma180[1U] = 0;
+			accel_calib_bma180[2U] = 0;
 		}	
 		else
 		{
-			loop_calibration_bma180 = 0;
-			DrvEepromReadAcc(accel_calib);
+			loop_calibration_bma180 = 0U;
+			DrvEepromReadAcc(accel_calib_bma180);
 		}	
 		o_success = TRUE;
 	}
@@ -79,7 +82,7 @@ Boolean CmpBMA180IsCalibrate(void)
 {
 	if(loop_calibration_bma180 == 0)
 	{
-		DrvEepromWriteAcc(accel_calib);
+		DrvEepromWriteAcc(accel_calib_bma180);
 		return TRUE;
 	}
 	return FALSE;
@@ -105,24 +108,24 @@ Boolean CmpBMA180GetAcceleration(S_Acc_Angle *acc)
 		{
 			if( loop_calibration_bma180 == 1U )
 			{
-				accel_calib[0U] = accel_calib[0U] / (NB_SAMPLE_TO_CALIB_BMA180 - 1);
-				accel_calib[1U] = accel_calib[1U] / (NB_SAMPLE_TO_CALIB_BMA180 - 1);
-				accel_calib[2U] = accel_calib[2U] / (NB_SAMPLE_TO_CALIB_BMA180 - 1);
-				accel_calib[2U] -= BMA180_ACC_1G;
+				accel_calib_bma180[0U] = accel_calib_bma180[0U] / (NB_SAMPLE_TO_CALIB_BMA180 - 1);
+				accel_calib_bma180[1U] = accel_calib_bma180[1U] / (NB_SAMPLE_TO_CALIB_BMA180 - 1);
+				accel_calib_bma180[2U] = accel_calib_bma180[2U] / (NB_SAMPLE_TO_CALIB_BMA180 - 1);
+				accel_calib_bma180[2U] -= BMA180_ACC_1G;
 			}
 			else
 			{
-				accel_calib[0U] += acc->x;
-				accel_calib[1U] += acc->y;
-				accel_calib[2U] += acc->z;
+				accel_calib_bma180[0U] += acc->x;
+				accel_calib_bma180[1U] += acc->y;
+				accel_calib_bma180[2U] += acc->z;
 			}
 			loop_calibration_bma180--;
 		}
 		else
 		{
-			acc->x  -= accel_calib[0U];
-			acc->y  -= accel_calib[1U];
-			acc->z  -= accel_calib[2U];
+			acc->x  -= accel_calib_bma180[0U];
+			acc->y  -= accel_calib_bma180[1U];
+			acc->z  -= accel_calib_bma180[2U];
 		}
 		return TRUE;
 	}

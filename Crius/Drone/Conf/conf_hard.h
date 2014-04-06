@@ -22,16 +22,16 @@
 
 
 ////////////////////////////////////////PUBLIC SENSORS BOARD////////////////////////////////////////
-#define DAISY_7		0
-#define CRIUS		1
+//#define DAISY_7		
+#define CRIUS		
 
 
-#if ( DAISY_7 == 1 )
+#if defined( DAISY_7 )
 	#define ACC_LIS331DLH	1
 	#define GYR_L3G4200D	1
 	#define MAG_HMC5883		1
 	#define BAR_BMP085		1
-#elif ( CRIUS == 1 )
+#elif defined( CRIUS )
 	#define ACC_BMA180		1
 	#define GYR_ITG3205		1
 	#define MAG_HMC5883		1
@@ -59,19 +59,21 @@
 #define		CONF_TIMER_NB					2U
 
 ////////////////////////////////////////////PUBLIC EVENT///////////////////////////////////////////
-#define		CONF_EVENT_TIMER_20MS		( 1U << 0U )
-#define		CONF_EVENT_TIMER_100MS		( 1U << 1U )
-#define		CONF_EVENT_TIMER_500MS		( 1U << 2U )
-#define		CONF_EVENT_TIMER_1S			( 1U << 3U )
-#define		CONF_EVENT_TIMER_5S			( 1U << 4U )
-#define		CONF_EVENT_TIMER_10S		( 1U << 5U )
-#define		CONF_EVENT_MSG_RCV			( 1U << 6U )
+#define		CONF_EVENT_TIMER_5MS		( 1U << 0U )
+#define		CONF_EVENT_TIMER_10MS		( 1U << 1U )
+#define		CONF_EVENT_TIMER_20MS		( 1U << 2U )
+#define		CONF_EVENT_TIMER_100MS		( 1U << 3U )
+#define		CONF_EVENT_TIMER_500MS		( 1U << 4U )
+#define		CONF_EVENT_TIMER_1S			( 1U << 5U )
+#define		CONF_EVENT_TIMER_5S			( 1U << 6U )
+#define		CONF_EVENT_TIMER_10S		( 1U << 7U )
+#define		CONF_EVENT_MSG_RCV			( 1U << 8U )
 
 ////////////////////////////////////PUBLIC SERVOS PORTS///////////////////////////////////////////
-#if ( DAISY_7 == 1 )
+#if defined( DAISY_7 )
 	#define PORT_DIR_SERVO			DDRB
 	#define PORT_SERVO				PORTB
-#elif ( CRIUS == 1 )
+#elif defined( CRIUS )
 	#define PORT_DIR_SERVO			DDRC
 	#define PORT_SERVO				PORTC
 #endif
@@ -98,8 +100,9 @@
 #define		COMM_EEPROM			5U
 #define		COMM_REPPORT		6U
 
-
-
+////////////////////////////////////////////ANGLES MIN MAX////////////////////////////////////////////
+#define		ANGLE_MAX			40.0
+#define		ANGLE_MIN			-40.0
 
 //-----------------------------------------------------------------------------------------------//
 typedef struct SS_moteur

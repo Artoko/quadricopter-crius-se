@@ -98,7 +98,9 @@ static void SrvCommExecute ( void )
 	{ 
 		//applique les angle souhaité
 		imu_desire.angles.roulis	= (Int16S)ma_trame_comm.param[PARAM_1];
+		constrain((float)imu_desire.angles.roulis, ANGLE_MIN, ANGLE_MAX);
 		imu_desire.angles.tangage	= (Int16S)ma_trame_comm.param[PARAM_2];
+		constrain((float)imu_desire.angles.tangage, ANGLE_MIN, ANGLE_MAX);
 		imu_desire.angles.lacet		= (Int16S)ma_trame_comm.param[PARAM_3];
 		DrvUart0SendMessage( "OK\n" , 3U );
 	}
@@ -136,9 +138,9 @@ static void SrvCommExecute ( void )
 			float I = 0;
 			float D = 0;
 			index = ma_trame_comm.param[PARAM_2];
-			P = (float)(Int16S)( ma_trame_comm.param[PARAM_3] / 10);
-			I = (float)(Int16S)( ma_trame_comm.param[PARAM_4] / 10);
-			D = (float)(Int16S)( ma_trame_comm.param[PARAM_5] / 10);
+			P = (float)( ma_trame_comm.param[PARAM_3] / 10.0);
+			I = (float)( ma_trame_comm.param[PARAM_4] / 10.0);
+			D = (float)( ma_trame_comm.param[PARAM_5] / 10.0);
 			DrvEepromWritePID(index,P,I,D);
 			SrvPIDInit();
 			DrvUart0SendMessage( "OK\n" , strlen("OK\n") );
