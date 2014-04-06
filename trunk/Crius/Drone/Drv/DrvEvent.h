@@ -11,10 +11,6 @@
 
 
 #include "Tools/tools_typedefs.h"
-
-
-#define NB_MAX_EVENT 5
-
 ////////////////////////////////////////////PUBLIC ENUMS///////////////////////////////////////////
 
 
@@ -29,7 +25,7 @@ Boolean DrvEventInit( void ) ;
 // On recupere l'evenement en cours   
 Event_t DrvEventGetEvent( void ) ;
 //On test l'evenement en cours 
-Boolean DrvEventTestEvent( Event_t in_event, Int8U conf_event ) ;
+Boolean DrvEventTestEvent( Event_t in_event, Event_t conf_event ) ;
 //On ajoute un evenement aux evenements en cours  
 Boolean DrvEventAddEvent( Event_t event ) ;
 

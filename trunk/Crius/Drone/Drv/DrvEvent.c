@@ -41,7 +41,7 @@ inline Event_t DrvEventGetEvent( void )
 /************************************************************************/
 /*On test l'evenement en cours                                          */
 /************************************************************************/
-inline Boolean DrvEventTestEvent( Event_t in_event, Int8U conf_event ) 
+inline Boolean DrvEventTestEvent( Event_t in_event, Event_t conf_event ) 
 {
 	Boolean return_value = FALSE;
 	ATOMIC

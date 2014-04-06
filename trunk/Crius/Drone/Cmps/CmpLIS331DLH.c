@@ -16,7 +16,7 @@
 #define NB_SAMPLE_TO_CALIB_LIS331DLH	100
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 Int8U loop_calibration_liS331dlh = 0U;
-static Int16S accel_calib[ 3U ] = { 0, 0, 0 };
+Int16S accel_calib_liS331dlh[ 3U ] = { 0, 0, 0 };
 	
  ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
@@ -51,14 +51,14 @@ Boolean CmpLIS331DLHInit(void)
 		if(conf == FALSE)	
 		{
 			loop_calibration_liS331dlh = NB_SAMPLE_TO_CALIB_LIS331DLH;
-			accel_calib[0U] = 0;
-			accel_calib[1U] = 0;
-			accel_calib[2U] = 0;
+			accel_calib_liS331dlh[0U] = 0;
+			accel_calib_liS331dlh[1U] = 0;
+			accel_calib_liS331dlh[2U] = 0;
 		}	
 		else
 		{
 			loop_calibration_liS331dlh = 0;
-			DrvEepromReadAcc(accel_calib);
+			DrvEepromReadAcc(accel_calib_liS331dlh);
 		}	
 		o_success = TRUE;
 	}
@@ -69,7 +69,7 @@ Boolean CmpLIS331DLHIsCalibrate(void)
 {
 	if(loop_calibration_liS331dlh == 0)
 	{
-		DrvEepromWriteAcc(accel_calib);
+		DrvEepromWriteAcc(accel_calib_liS331dlh);
 		return TRUE;
 	}
 	return FALSE;
@@ -94,24 +94,24 @@ Boolean CmpLIS331DLHGetAcceleration(S_Acc_Angle *acc)
 		{
 			if( loop_calibration_liS331dlh == 1U )
 			{
-				accel_calib[0U] = accel_calib[0U] / (NB_SAMPLE_TO_CALIB_LIS331DLH - 1);
-				accel_calib[1U] = accel_calib[1U] / (NB_SAMPLE_TO_CALIB_LIS331DLH - 1);
-				accel_calib[2U] = accel_calib[2U] / (NB_SAMPLE_TO_CALIB_LIS331DLH - 1);
-				accel_calib[2U] -= LIS331DLH_ACC_1G_2G;
+				accel_calib_liS331dlh[0U] = accel_calib_liS331dlh[0U] / (NB_SAMPLE_TO_CALIB_LIS331DLH - 1);
+				accel_calib_liS331dlh[1U] = accel_calib_liS331dlh[1U] / (NB_SAMPLE_TO_CALIB_LIS331DLH - 1);
+				accel_calib_liS331dlh[2U] = accel_calib_liS331dlh[2U] / (NB_SAMPLE_TO_CALIB_LIS331DLH - 1);
+				accel_calib_liS331dlh[2U] -= LIS331DLH_ACC_1G_2G;
 			}
 			else
 			{
-				accel_calib[0U] += acc->x;
-				accel_calib[1U] += acc->y;
-				accel_calib[2U] += acc->z;
+				accel_calib_liS331dlh[0U] += acc->x;
+				accel_calib_liS331dlh[1U] += acc->y;
+				accel_calib_liS331dlh[2U] += acc->z;
 			}
 			loop_calibration_liS331dlh--;
 		}
 		else
 		{
-			acc->x  -= accel_calib[0U];
-			acc->y  -= accel_calib[1U];
-			acc->z  -= accel_calib[2U];
+			acc->x  -= accel_calib_liS331dlh[0U];
+			acc->y  -= accel_calib_liS331dlh[1U];
+			acc->z  -= accel_calib_liS331dlh[2U];
 		}
 		return TRUE;
 	}

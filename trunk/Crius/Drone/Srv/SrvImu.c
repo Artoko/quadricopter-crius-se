@@ -16,17 +16,16 @@
 #include "Drv/DrvTick.h"
 #include "Drv/DrvEeprom.h"
 
-
-#if ( DAISY_7 == 1 )
-#include "Cmps/CmpLIS331DLH.h"
-#include "Cmps/CmpL3G4200D.h"
-#include "Cmps/CmpHMC5883.h"
-#include "Cmps/CmpBMP085.h"
-#elif ( CRIUS == 1 )
-#include "Cmps/CmpBMA180.h"
-#include "Cmps/CmpITG3205.h"
-#include "Cmps/CmpHMC5883.h"
-#include "Cmps/CmpBMP085.h"
+#if defined( DAISY_7 )
+	#include "Cmps/CmpLIS331DLH.h"
+	#include "Cmps/CmpL3G4200D.h"
+	#include "Cmps/CmpHMC5883.h"
+	#include "Cmps/CmpBMP085.h"
+#elif defined( CRIUS )
+	#include "Cmps/CmpBMA180.h"
+	#include "Cmps/CmpITG3205.h"
+	#include "Cmps/CmpHMC5883.h"
+	#include "Cmps/CmpBMP085.h"
 #endif
 
 
@@ -48,6 +47,7 @@ static float accZangle;
 static float gyroXAngle;
 static float gyroYAngle;
 static float gyroZAngle;
+static float heading_deg;
 
 
 /************************************************************************/
@@ -62,16 +62,16 @@ Boolean SrvImuInit( void )
 	gyroXAngle = 0;
 	gyroYAngle = 0;
 	gyroZAngle = 0;	
-	
+	heading_deg = 0;
 	//init des composants
-	#if ( DAISY_7 == 1 )
+	#if defined( DAISY_7 )
 	
 		CmpLIS331DLHInit();
 		CmpL3G4200DInit();
 		CmpHMC5883Init();
 		CmpBMP085Init();
 		
-	#elif ( CRIUS == 1 )
+	#elif defined( CRIUS )
 	
 		CmpBMA180Init();
 		CmpITG3205Init();
@@ -125,11 +125,13 @@ void SrvImuDispatcher (Event_t in_event)
 void SrvImuSensorsCalibration( void )
 {
 	S_Acc_Angle acceleration;
+	S_Gyr_Angle rotation;
 
-	Boolean calibrate = FALSE;
+	Boolean calibrate_acc = FALSE;
+	Boolean calibrate_gyr = FALSE;
 	do
 	{
-		#if ( DAISY_7 == 1 )
+		#if defined( DAISY_7 )
 			//calib accelerometer
 			if( CmpLIS331DLHIsCalibrate() == FALSE)
 			{
@@ -137,10 +139,9 @@ void SrvImuSensorsCalibration( void )
 			}
 			else
 			{
-				DrvEepromConfigure();
-				calibrate = TRUE;
+				calibrate_acc = TRUE;
 			}		
-		#elif ( CRIUS == 1 )
+		#elif defined( CRIUS )
 			//calib accelerometer
 			if( CmpBMA180IsCalibrate() == FALSE)
 			{
@@ -148,11 +149,21 @@ void SrvImuSensorsCalibration( void )
 			}
 			else
 			{
-				DrvEepromConfigure();
-				calibrate = TRUE;
+				calibrate_acc = TRUE;
+			}
+			//calib gyroscope
+			if( CmpITG3205IsCalibrate() == FALSE)
+			{
+				CmpITG3205GetRotation(&rotation);
+			}
+			else
+			{
+				calibrate_acc = TRUE;
 			}			
 		#endif
-	} while (!calibrate);
+	} while ((!calibrate_acc) && (!calibrate_gyr));
+	
+	DrvEepromConfigure();
 }
 
 /************************************************************************/
@@ -215,13 +226,13 @@ static void SrvImuReadAndComputeSensors( void )
 	interval = DrvTimerGetTime() - interval;
 	
 	// ********************* Lecture des capteurs *****************************
-	#if ( DAISY_7 == 1 )
+	#if defined( DAISY_7 )
 	
 		acc_read_ok = CmpLIS331DLHGetAcceleration(&acceleration);
 		gyr_read_ok = CmpL3G4200DGetRotation(&rotation);
 		mag_read_ok = CmpHMC5883GetHeading(&magnet);
 	
-	#elif ( CRIUS == 1 )
+	#elif defined( CRIUS )
 	
 		acc_read_ok = CmpBMA180GetAcceleration(&acceleration);
 		acceleration.x *= -1;
@@ -301,14 +312,15 @@ static void SrvImuReadAndComputeSensors( void )
 			{
 				heading -= 2 * M_PI;
 			}
-			imu_reel.angles.nord  = ToDeg(heading);
+			heading_deg = ToDeg(heading);
+			imu_reel.angles.nord = heading_deg;
 		}
 	}
 	
 	// ********************* Fusion des capteurs ******************************
 	imu_reel.angles.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval ) * 10;
 	imu_reel.angles.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval ) * 10;
-	imu_reel.angles.lacet	 = SrvKalmanFilterZ( imu_reel.angles.nord, gyroZAngle, interval );
+	imu_reel.angles.lacet	 = SrvKalmanFilterZ( heading_deg, gyroZAngle, interval );
 	if(imu_reel.angles.lacet < 0.0)
 	{
 		imu_reel.angles.lacet += 360.0;

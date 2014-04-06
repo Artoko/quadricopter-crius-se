@@ -67,8 +67,8 @@ namespace GroundStation
                 courbe6.Add(timeout, System.Convert.ToInt16(param[5]));
                 courbe7.Add(timeout, System.Convert.ToInt16(param[6]));
                 courbe8.Add(timeout, System.Convert.ToInt16(param[7]));
-                courbe9.Add(timeout, System.Convert.ToInt16(param[8]));
-                courbe10.Add(timeout, System.Convert.ToInt16(param[9]));
+                courbe9.Add(timeout, System.Convert.ToInt16(param[13]));
+                courbe10.Add(timeout, System.Convert.ToInt16(param[14]));
                 if (checkBoxRoulis.Checked == true)
                 {
                     myPane1.CurveList[0].IsVisible = true;
