@@ -26,7 +26,7 @@ double KX_0, KX_1;
 ////////////////////////////////////////PUBLIC FONCTIONS////////////////////////////////////////
 double SrvKalmanFilterX(double newAngle, double newRate, double dtime)
 {
-	dtX = dtime / 100000.0; // Convert from microseconds to seconds
+	dtX = dtime / 1000000.0; // Convert from microseconds to seconds
 
 	// Discrete Kalman filter time update equations - Time Update ("Predict")
 	// Update xhat - Project the state ahead
@@ -71,7 +71,7 @@ double KY_0, KY_1;
 
 double SrvKalmanFilterY(double newAngle, double newRate, double dtime)
 {
-	dtY = dtime / 100000.0; // Convert from microseconds to seconds
+	dtY = dtime / 1000000.0; // Convert from microseconds to seconds
 
 	// Discrete Kalman filter time update equations - Time Update ("Predict")
 	// Update xhat - Project the state ahead

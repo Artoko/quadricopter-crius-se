@@ -95,9 +95,9 @@ void SrvImuDispatcher (Event_t in_event)
 		SrvImuReadAndComputeSensors();
 		
 		// ********************* PID **********************************************
-		imu_reel.pid_error.roulis	= SrvPIDCompute( 0U , (float)imu_desire.angles.roulis	, (float)imu_reel.angles.roulis);
-		imu_reel.pid_error.tangage	= SrvPIDCompute( 1U , (float)imu_desire.angles.tangage	, (float)imu_reel.angles.tangage);
-		imu_reel.pid_error.lacet	= SrvPIDCompute( 2U , (float)(imu_reel.angles.lacet + imu_desire.angles.lacet)	, (float)imu_reel.angles.lacet);
+		imu_reel.pid_error.roulis	= SrvPIDCompute( 0U , imu_desire.angles.roulis	, imu_reel.angles.roulis);
+		imu_reel.pid_error.tangage	= SrvPIDCompute( 1U , imu_desire.angles.tangage	, imu_reel.angles.tangage);
+		imu_reel.pid_error.lacet	= SrvPIDCompute( 2U , (imu_reel.angles.lacet + imu_desire.angles.lacet)	, imu_reel.angles.lacet);
 		if(imu_desire.maintient_altitude == TRUE)
 		{
 			imu_reel.pid_error.altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.altitude);
@@ -109,12 +109,13 @@ void SrvImuDispatcher (Event_t in_event)
 	}	
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
+		CmpBMP085LaunchReading();
 		imu_reel.temperature = (Int16S)CmpBMP085GetTemperature();
+		imu_reel.weather = CmpBMP085GetWeather(imu_reel.pressure, imu_reel.altitude);
 		imu_reel.pressure = CmpBMP085GetPressure();
 		//atm = pressure / 101325.0;
 		imu_reel.altitude = (Int16S)CmpBMP085GetAltitude(imu_reel.pressure);
-		imu_reel.weather = CmpBMP085GetWeather(imu_reel.pressure, imu_reel.altitude);
-	}
+	}	
 }
 
 
@@ -183,10 +184,8 @@ void SrvImuSensorsSetAltitudeMaintient( Int8U altitude )
 /************************************************************************/
 /*Recuperation des données des capteurs et mise en forme  des données   */
 /************************************************************************/
-static Int32U tab[2];
-Int8U index= 0;
 //variables de timming
-static Int32U interval = 0U;
+Int32U interval = 0U;
 
 static void SrvImuReadAndComputeSensors( void )
 {
@@ -213,18 +212,8 @@ static void SrvImuReadAndComputeSensors( void )
 	
 	
 	// ********************* Calcul du temps de cycle *************************
-	tab[ index ] = DrvTimerGetTime() ;
-	if(index == 1U)
-	{
-		index = 0U;
-		interval = tab[ 1U ] - tab[ 0U ];
-	}
-	else
-	{
-		index = 1U;
-		interval = tab[ 0U ] - tab[ 1U ];
-	}
-	interval  = interval / 10;
+	interval = DrvTimerGetTime() - interval;
+	
 	// ********************* Lecture des capteurs *****************************
 	#if ( DAISY_7 == 1 )
 	
@@ -317,9 +306,9 @@ static void SrvImuReadAndComputeSensors( void )
 	}
 	
 	// ********************* Fusion des capteurs ******************************
-	imu_reel.angles.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval ) /* 10*/;
-	imu_reel.angles.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval ) /* 10*/;
-	imu_reel.angles.lacet	  = gyroZAngle;
+	imu_reel.angles.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval ) * 10;
+	imu_reel.angles.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval ) * 10;
+	imu_reel.angles.lacet	 = SrvKalmanFilterZ( imu_reel.angles.nord, gyroZAngle, interval );
 	if(imu_reel.angles.lacet < 0.0)
 	{
 		imu_reel.angles.lacet += 360.0;

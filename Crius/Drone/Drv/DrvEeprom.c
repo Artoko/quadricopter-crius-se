@@ -86,7 +86,7 @@ void DrvEepromConfigure ( void )
 //retourne l'etat de config de l'eeprom
 Boolean DrvEepromIsConfigured ( void )
 {
-	return FALSE;//eeprom_is_configured;
+	return eeprom_is_configured;
 }
 
 //retourne les config de l'accelerometre

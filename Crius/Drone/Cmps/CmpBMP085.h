@@ -58,7 +58,7 @@ float  CmpBMP085GetTemperature( void );
 Int32S CmpBMP085GetPressure( void );
 Int16U CmpBMP085GetAltitude( float pressure );
 Int8U CmpBMP085GetWeather( float pressure , Int16U altitude );
-
+void CmpBMP085LaunchReading( void );
 #endif /*BMA180_H_*/
 
 
