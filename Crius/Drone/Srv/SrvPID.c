@@ -58,24 +58,46 @@ void SrvPIDInit(void )
 	
 }
 
+
+static Int32S error = 0;
+static Int32S p_term = 0;
+static Int32S i_term = 0;
+static Int32S d_term = 0;
+
 Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition )
 {
-	float error = targetPosition - currentPosition;
+	//determine l'erreur
+	error = targetPosition - currentPosition;
 	
+	//Calcul du terme P
+	p_term = pid[index].P * error;
+	
+	//calcul de l'erreur intégré
 	pid[index].integratedError += error;
 
-	// Limit the integrated error by the windupGuard
-	if (pid[index].integratedError < -1000) 
+
+	//limit de l'erreur
+	float windupgaurd = 1000;//4.0 / pid[index].I;
+	if (pid[index].integratedError > windupgaurd)
 	{
-		pid[index].integratedError = -1000;
-	} 
-	else if (pid[index].integratedError > 1000) 
+		pid[index].integratedError = windupgaurd;
+	}
+	else if (pid[index].integratedError < -windupgaurd)
 	{
-		pid[index].integratedError = 1000;
+		pid[index].integratedError = -windupgaurd;
 	}
 	
-	int dTerm = (pid[index].D * (currentPosition - pid[index].lastPosition)) / 10;
+	
+	//Calcul du terme I
+	i_term = pid[index].I * pid[index].integratedError;
+
+	//Calcul du terme D
+	d_term = pid[index].D *( currentPosition - pid[index].lastPosition );
+	
+	//on conserve la position actuel
 	pid[index].lastPosition = currentPosition;
-	return (Int16S)(((pid[index].P * error) / 10) + ((pid[index].I * pid[index].integratedError) / 10) + dTerm);
+	
+	//retourne le calcul PID
+	return (Int16S)(p_term + i_term - d_term);
 }
 
