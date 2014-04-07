@@ -138,9 +138,9 @@ static void SrvCommExecute ( void )
 			float I = 0;
 			float D = 0;
 			index = ma_trame_comm.param[PARAM_2];
-			P = (float)( ma_trame_comm.param[PARAM_3] / 10.0);
-			I = (float)( ma_trame_comm.param[PARAM_4] / 10.0);
-			D = (float)( ma_trame_comm.param[PARAM_5] / 10.0);
+			P = (float)( ma_trame_comm.param[PARAM_3] / 100.0);
+			I = (float)( ma_trame_comm.param[PARAM_4] / 100.0);
+			D = (float)( ma_trame_comm.param[PARAM_5] / 100.0);
 			DrvEepromWritePID(index,P,I,D);
 			SrvPIDInit();
 			DrvUart0SendMessage( "OK\n" , strlen("OK\n") );
@@ -160,9 +160,9 @@ static void SrvCommExecute ( void )
 			lenght = sprintf(pid_message
 			,"PID:%i,%i,%i,%i\n"
 			,index
-			,(Int16S)(P*10)
-			,(Int16S)(I*10)
-			,(Int16S)(D*10)
+			,(Int16S)(P * 100.0)
+			,(Int16S)(I * 100.0)
+			,(Int16S)(D * 100.0)
 			);
 			DrvUart0SendMessage( pid_message , lenght );
 		}
