@@ -78,6 +78,12 @@
 	#define PORT_SERVO				PORTC
 #endif
 
+/////////////////////////////////////PUBLIC PID MANAGMENT///////////////////////////////////////////
+#define PID_ROULIS			0U
+#define PID_TANGAGE			1U
+#define PID_LACET			2U
+#define PID_ALTITUDE		3U
+#define NB_PID				4U
 
 //PINOUT CRIUS
 // A0	PC0

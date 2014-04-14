@@ -33,7 +33,7 @@
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
 #define NB_SAMPLE_MAX  5U
 
-////////////////////////////////////////PRIVATE STRUCTIURES///////////////////////////////////////
+////////////////////////////////////////PRIVATE STRUCTURES///////////////////////////////////////
 
 ////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
 static void SrvImuReadAndComputeSensors( void );
@@ -97,7 +97,7 @@ void SrvImuDispatcher (Event_t in_event)
 		// ********************* PID **********************************************
 		imu_reel.pid_error.roulis	= SrvPIDCompute( 0U , imu_desire.angles.roulis	, imu_reel.angles.roulis);
 		imu_reel.pid_error.tangage	= SrvPIDCompute( 1U , imu_desire.angles.tangage	, imu_reel.angles.tangage);
-		imu_reel.pid_error.lacet	= SrvPIDCompute( 2U , (imu_reel.angles.lacet + imu_desire.angles.lacet)	, imu_reel.angles.lacet);
+		imu_reel.pid_error.lacet	= 0;//SrvPIDCompute( 2U , (imu_reel.angles.lacet + imu_desire.angles.lacet)	, imu_reel.angles.lacet);
 		if(imu_desire.maintient_altitude == TRUE)
 		{
 			imu_reel.pid_error.altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.altitude);
@@ -318,8 +318,8 @@ static void SrvImuReadAndComputeSensors( void )
 	}
 	
 	// ********************* Fusion des capteurs ******************************
-	imu_reel.angles.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval ) * 10;
-	imu_reel.angles.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval ) * 10;
+	imu_reel.angles.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval ) ;
+	imu_reel.angles.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval ) ;
 	imu_reel.angles.lacet	 = SrvKalmanFilterZ( heading_deg, gyroZAngle, interval );
 	if(imu_reel.angles.lacet < 0.0)
 	{

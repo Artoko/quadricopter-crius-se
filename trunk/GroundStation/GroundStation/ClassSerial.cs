@@ -123,11 +123,12 @@ namespace GroundStation
                     }
                     catch
                     {
+                        frame = "";
                     }
                 }
                 else
                 {
-                    Thread.Sleep(5);
+                    Thread.Sleep(5); frame = "";
                 }
             }
         }

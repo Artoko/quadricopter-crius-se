@@ -24,7 +24,10 @@ typedef struct
 }S_IMU_PID;
 
 //init des valeurs du PID
-void SrvPIDInit(void );
+void SrvPIDInit( void );
+
+//set des valeurs du PID
+void SrvPIDSetValues( Int8U index, float p, float i, float d );
 
 //calcul des valeurs PID
 Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition );

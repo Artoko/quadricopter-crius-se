@@ -557,6 +557,7 @@
             this.MainMenuStrip = this.menuStrip;
             this.Name = "GroundStationMainForm";
             this.Text = "GroundStationMainForm";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GroundStationMainForm_FormClosing);
             this.Load += new System.EventHandler(this.GroundStationMainForm_Load);
             this.menuStrip.ResumeLayout(false);

@@ -53,22 +53,35 @@ namespace GroundStation
             GroundStationMainForm.serial.DeleteCallback(IncommingMessage);
         }
         
-        
         public void IncommingMessage(string message)
         {
             try
             {
+                if (courbe1.Count == 500)
+                {
+                    courbe1.RemoveAt(0);
+                    courbe2.RemoveAt(0);
+                    courbe3.RemoveAt(0);
+                    courbe4.RemoveAt(0);
+                    courbe5.RemoveAt(0);
+                    courbe6.RemoveAt(0);
+                    courbe7.RemoveAt(0);
+                    courbe8.RemoveAt(0);
+                    courbe9.RemoveAt(0);
+                    courbe10.RemoveAt(0);
+                }
                 string[] param = message.Replace("\0", "").Replace(" ", "").Split(',');
                 courbe1.Add(timeout, System.Convert.ToInt16(param[0]));
                 courbe2.Add(timeout, System.Convert.ToInt16(param[1]));
                 courbe3.Add(timeout, System.Convert.ToInt16(param[2]));
                 courbe4.Add(timeout, System.Convert.ToInt16(param[3]));
                 courbe5.Add(timeout, System.Convert.ToInt16(param[4]));
-                courbe6.Add(timeout, System.Convert.ToInt16(param[5]));
-                courbe7.Add(timeout, System.Convert.ToInt16(param[6]));
-                courbe8.Add(timeout, System.Convert.ToInt16(param[7]));
+                courbe6.Add(timeout, -1 * System.Convert.ToInt16(param[5]));
+                courbe7.Add(timeout, -1 * System.Convert.ToInt16(param[6]));
+                courbe8.Add(timeout, -1 * System.Convert.ToInt16(param[7]));
                 courbe9.Add(timeout, System.Convert.ToInt16(param[13]));
                 courbe10.Add(timeout, System.Convert.ToInt16(param[14]));
+
                 if (checkBoxRoulis.Checked == true)
                 {
                     myPane1.CurveList[0].IsVisible = true;

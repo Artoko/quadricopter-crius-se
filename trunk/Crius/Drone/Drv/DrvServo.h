@@ -26,7 +26,7 @@
 #define PRESCALER_TX_FALL		(_BV(CS12) | _BV(CS11))
 #define PRESCALER_TX_RISE		(_BV(CS12) | _BV(CS11) | _BV(CS10))
 
-#define TIMER1_TICKS_PER_US		2 //2 tick pour 1 µs
+#define TIMER1_TICKS_PER_US		2 //2 ticks pour 1 µs
 
 #define MIN_PULSE_WIDTH			1000U  //us  
 #define MAX_PULSE_WIDTH			2000U  //us  
@@ -39,7 +39,7 @@
 #define MAX_SERVOS				4U
 
 //calcule la vitesse en fonction de la puissance desiré
-#define ConvertPowerToTick(power_const) (Int16U)(map( power_const , 0U		,1000U	,TICKS_MIN_PULSE_WIDTH	,TICKS_MAX_PULSE_WIDTH ) )
+#define ConvertPowerToTick(power_const) (Int16U)(SetRange( power_const , 0U		,1000U	,TICKS_MIN_PULSE_WIDTH	,TICKS_MAX_PULSE_WIDTH ) )
 
 /////////////////////////////////////////PUBLIC STRUCTURES/////////////////////////////////////////
 typedef struct {

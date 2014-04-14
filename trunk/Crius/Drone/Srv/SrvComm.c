@@ -98,9 +98,9 @@ static void SrvCommExecute ( void )
 	{ 
 		//applique les angle souhaité
 		imu_desire.angles.roulis	= (Int16S)ma_trame_comm.param[PARAM_1];
-		constrain((float)imu_desire.angles.roulis, ANGLE_MIN, ANGLE_MAX);
+		SetLimits((float)imu_desire.angles.roulis, ANGLE_MIN, ANGLE_MAX);
 		imu_desire.angles.tangage	= (Int16S)ma_trame_comm.param[PARAM_2];
-		constrain((float)imu_desire.angles.tangage, ANGLE_MIN, ANGLE_MAX);
+		SetLimits((float)imu_desire.angles.tangage, ANGLE_MIN, ANGLE_MAX);
 		imu_desire.angles.lacet		= (Int16S)ma_trame_comm.param[PARAM_3];
 		DrvUart0SendMessage( "OK\n" , 3U );
 	}
@@ -138,11 +138,11 @@ static void SrvCommExecute ( void )
 			float I = 0;
 			float D = 0;
 			index = ma_trame_comm.param[PARAM_2];
-			P = (float)( ma_trame_comm.param[PARAM_3] / 100.0);
-			I = (float)( ma_trame_comm.param[PARAM_4] / 100.0);
-			D = (float)( ma_trame_comm.param[PARAM_5] / 100.0);
-			DrvEepromWritePID(index,P,I,D);
-			SrvPIDInit();
+			P = (float)( ma_trame_comm.param[PARAM_3] / 1000.0);
+			I = (float)( ma_trame_comm.param[PARAM_4] / 1000.0);
+			D = (float)( ma_trame_comm.param[PARAM_5] / 1000.0);
+			DrvEepromWritePID( index, P, I, D );
+			SrvPIDSetValues( index, P, I, D );
 			DrvUart0SendMessage( "OK\n" , strlen("OK\n") );
 		}
 		//Read PID
@@ -160,9 +160,9 @@ static void SrvCommExecute ( void )
 			lenght = sprintf(pid_message
 			,"PID:%i,%i,%i,%i\n"
 			,index
-			,(Int16S)(P * 100.0)
-			,(Int16S)(I * 100.0)
-			,(Int16S)(D * 100.0)
+			,(Int16S)(P * 1000.0)
+			,(Int16S)(I * 1000.0)
+			,(Int16S)(D * 1000.0)
 			);
 			DrvUart0SendMessage( pid_message , lenght );
 		}
