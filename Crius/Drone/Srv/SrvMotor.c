@@ -56,10 +56,10 @@ void SrvMotorUpdate(S_pid pid_error)
 		//motor[3] = PIDMIX(+1,-1,-1); //FRONT_L
 		
 		// calcul de la vitesse pour chaque moteur
-		imu_reel.moteurs.frontMotor_L = constrain(imu_reel.moteurs.throttle - pid_error.roulis + pid_error.tangage - pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
-		imu_reel.moteurs.rearMotor_L  = constrain(imu_reel.moteurs.throttle - pid_error.roulis - pid_error.tangage + pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
-		imu_reel.moteurs.frontMotor_R = constrain(imu_reel.moteurs.throttle + pid_error.roulis + pid_error.tangage + pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
-		imu_reel.moteurs.rearMotor_R  = constrain(imu_reel.moteurs.throttle + pid_error.roulis - pid_error.tangage - pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.frontMotor_L = SetLimits(imu_reel.moteurs.throttle - pid_error.roulis + pid_error.tangage - pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.rearMotor_L  = SetLimits(imu_reel.moteurs.throttle - pid_error.roulis - pid_error.tangage + pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.frontMotor_R = SetLimits(imu_reel.moteurs.throttle + pid_error.roulis + pid_error.tangage + pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.rearMotor_R  = SetLimits(imu_reel.moteurs.throttle + pid_error.roulis - pid_error.tangage - pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
 		
 		DrvServoUpdate( 0U , (imu_reel.moteurs.rearMotor_R  - OFFCOMMAND) );
 		DrvServoUpdate( 1U , (imu_reel.moteurs.frontMotor_R - OFFCOMMAND) );

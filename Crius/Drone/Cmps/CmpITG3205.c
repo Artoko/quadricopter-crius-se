@@ -44,7 +44,7 @@ Boolean CmpITG3205Init(void)
 		DrvTimerDelayUs(200);
 		DrvTwiWriteReg(ITG3205_TWI_ADDRESS, ITG3205_RA_SMPLRT_DIV, NO_SMPLRT_DIV);
 		DrvTimerDelayUs(200);
-		DrvTwiWriteReg(ITG3205_TWI_ADDRESS, ITG3205_RA_DLPF_FS, FS_RANGE_2000 | LPFBW_256HZ );
+		DrvTwiWriteReg(ITG3205_TWI_ADDRESS, ITG3205_RA_DLPF_FS, FS_RANGE_2000 | LPFBW_10HZ );
 		DrvTimerDelayUs(200);
 		DrvTwiWriteReg(ITG3205_TWI_ADDRESS, ITG3205_RA_PWR_MGM, PLL_ZGYRO_REF );
 		DrvTimerDelayUs(200);
@@ -94,9 +94,9 @@ Boolean CmpITG3205GetRotation(S_Gyr_Angle *rot)
 		rot->y = (Int16S)((Int16U) buffer[2U] << 8U) | ((Int16U) buffer[3U]);
 		rot->z = (Int16S)((Int16U) buffer[4U] << 8U) | ((Int16U) buffer[5U]);
 		//anti gyro glitch
-		rot->x = constrain( rot->x, previous_reading[ 0 ] - GYRO_GLITCH_LIMIT ,previous_reading[ 0 ] + GYRO_GLITCH_LIMIT );
-		rot->y = constrain( rot->y, previous_reading[ 1 ] - GYRO_GLITCH_LIMIT ,previous_reading[ 1 ] + GYRO_GLITCH_LIMIT );
-		rot->z = constrain( rot->z, previous_reading[ 2 ] - GYRO_GLITCH_LIMIT ,previous_reading[ 2 ] + GYRO_GLITCH_LIMIT );
+		rot->x = SetLimits( rot->x, previous_reading[ 0 ] - GYRO_GLITCH_LIMIT ,previous_reading[ 0 ] + GYRO_GLITCH_LIMIT );
+		rot->y = SetLimits( rot->y, previous_reading[ 1 ] - GYRO_GLITCH_LIMIT ,previous_reading[ 1 ] + GYRO_GLITCH_LIMIT );
+		rot->z = SetLimits( rot->z, previous_reading[ 2 ] - GYRO_GLITCH_LIMIT ,previous_reading[ 2 ] + GYRO_GLITCH_LIMIT );
 		
 		if(loop_calibration_itg3205 > 0U)
 		{

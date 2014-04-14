@@ -63,7 +63,7 @@ namespace GroundStation
         {
             if (value == "0")
             {
-                label4.Text = "ensoleil";
+                label4.Text = "ensoleillé";
             }
             else if (value == "1")
             {
@@ -291,29 +291,29 @@ namespace GroundStation
         private void button4_Click(object sender, EventArgs e)
         {
             string frame = "*4+1+1";
-            if (numericUpDownP.Value >= 0)
+            if (numericUpDown4.Value >= 0)
             {
-                frame += "+" + numericUpDownP.Value;
+                frame += "+" + numericUpDown4.Value;
             }
             else
             {
-                frame += numericUpDownP.Value;
+                frame += numericUpDown4.Value;
             }
-            if (numericUpDownI.Value >= 0)
+            if (numericUpDown3.Value >= 0)
             {
-                frame += "+" + numericUpDownI.Value;
-            }
-            else
-            {
-                frame += numericUpDownI.Value;
-            }
-            if (numericUpDownD.Value >= 0)
-            {
-                frame += "+" + numericUpDownD.Value + "##";
+                frame += "+" + numericUpDown3.Value;
             }
             else
             {
-                frame += numericUpDownD.Value + "##";
+                frame += numericUpDown3.Value;
+            }
+            if (numericUpDown2.Value >= 0)
+            {
+                frame += "+" + numericUpDown2.Value + "##";
+            }
+            else
+            {
+                frame += numericUpDown2.Value + "##";
             }
             GroundStationMainForm.serial.SendMessage(frame);
         }
@@ -326,29 +326,29 @@ namespace GroundStation
         private void button6_Click(object sender, EventArgs e)
         {
             string frame = "*4+1+2";
-            if (numericUpDownP.Value >= 0)
+            if (numericUpDown6.Value >= 0)
             {
-                frame += "+" + numericUpDownP.Value;
+                frame += "+" + numericUpDown6.Value;
             }
             else
             {
-                frame += numericUpDownP.Value;
+                frame += numericUpDown6.Value;
             }
-            if (numericUpDownI.Value >= 0)
+            if (numericUpDown5.Value >= 0)
             {
-                frame += "+" + numericUpDownI.Value;
-            }
-            else
-            {
-                frame += numericUpDownI.Value;
-            }
-            if (numericUpDownD.Value >= 0)
-            {
-                frame += "+" + numericUpDownD.Value + "##";
+                frame += "+" + numericUpDown5.Value;
             }
             else
             {
-                frame += numericUpDownD.Value + "##";
+                frame += numericUpDown5.Value;
+            }
+            if (numericUpDown1.Value >= 0)
+            {
+                frame += "+" + numericUpDown1.Value + "##";
+            }
+            else
+            {
+                frame += numericUpDown1.Value + "##";
             }
             GroundStationMainForm.serial.SendMessage(frame);
         }
@@ -356,29 +356,29 @@ namespace GroundStation
         private void button8_Click(object sender, EventArgs e)
         {
             string frame = "*4+1+3";
-            if (numericUpDownP.Value >= 0)
+            if (numericUpDown9.Value >= 0)
             {
-                frame += "+" + numericUpDownP.Value;
+                frame += "+" + numericUpDown9.Value;
             }
             else
             {
-                frame += numericUpDownP.Value;
+                frame += numericUpDown9.Value;
             }
-            if (numericUpDownI.Value >= 0)
+            if (numericUpDown8.Value >= 0)
             {
-                frame += "+" + numericUpDownI.Value;
-            }
-            else
-            {
-                frame += numericUpDownI.Value;
-            }
-            if (numericUpDownD.Value >= 0)
-            {
-                frame += "+" + numericUpDownD.Value + "##";
+                frame += "+" + numericUpDown8.Value;
             }
             else
             {
-                frame += numericUpDownD.Value + "##";
+                frame += numericUpDown8.Value;
+            }
+            if (numericUpDown7.Value >= 0)
+            {
+                frame += "+" + numericUpDown7.Value + "##";
+            }
+            else
+            {
+                frame += numericUpDown7.Value + "##";
             }
             GroundStationMainForm.serial.SendMessage(frame);
         }

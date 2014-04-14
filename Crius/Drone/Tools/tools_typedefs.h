@@ -9,34 +9,24 @@
 #ifndef TOOLS_TYPEDEFS_H_
 #define TOOLS_TYPEDEFS_H_
 
-#ifndef IAR
-  #include <avr/interrupt.h> 
+ #include <avr/interrupt.h> 
   
-  #ifndef ATOMIC
-    #define ATOMIC(code)                    \
-      {                                     \
-        cli();								\
-        do{ code }while(0);                 \
-        sei();								\
-      }
-  #endif
-#else  
-  #ifndef ATOMIC
-    #define ATOMIC(code)                    \
-      {                                     \
-        __disable_interrupt();				\
-        do{ code }while(0);                 \
-        __enable_interrupt();				\
-      }
-  #endif
+#ifndef ATOMIC
+#define ATOMIC(code)                    \
+    {                                   \
+    cli();								\
+    do{ code }while(0);                 \
+    sei();								\
+    }
 #endif
 
-static inline float map(float x, float in_min, float in_max, float out_min, float out_max)
+
+static inline float SetRange(float x, float in_min, float in_max, float out_min, float out_max)
 {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-static inline float constrain(float val, float min, float max) 
+static inline float SetLimits(float val, float min, float max) 
 { 
 	if(val > max)
 	{
