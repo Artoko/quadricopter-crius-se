@@ -60,7 +60,7 @@ Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition 
 
 
 	//limit de l'erreur
-	float windupgaurd = 4.0 / pid[index].I;
+	float windupgaurd = 5.0 / pid[index].I;
 	if(pid[index].integratedError > windupgaurd)
 	{
 		pid[index].integratedError = windupgaurd;
@@ -74,12 +74,12 @@ Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition 
 	i_term = pid[index].I * pid[index].integratedError;
 
 	//Calcul du terme D
-	d_term = pid[index].D *( currentPosition - pid[index].lastPosition );
+	d_term = pid[index].D * ( currentPosition - pid[index].lastPosition );
 	
 	//on conserve la position actuel
 	pid[index].lastPosition = currentPosition;
 	
 	//retourne le calcul PID
-	return (Int16S)(p_term + i_term - d_term);
+	return (Int16S)(p_term + i_term + d_term);
 }
 
