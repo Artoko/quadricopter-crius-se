@@ -11,11 +11,21 @@
 #include "SrvKalman.h"
 
 
+////////////////////////////////////////PRIVATE DEFINES//////////////////////////////////////////
+/*#define	Q_angle 0.001;
+#define	Q_gyro  0.003;
+#define	R_angle	0.03;
+*/
+
+#define	Q_angle 1
+#define	Q_gyro  3
+#define	R_angle	0.005
+
 ////////////////////////////////////////PRIVATE VARIABLES////////////////////////////////////////
 /* Kalman filter variables and constants */
-const double Q_angleX = 0.001; // Process noise covariance for the accelerometer - Sw
-const double Q_gyroX = 0.003; // Process noise covariance for the gyro - Sw
-const double R_angleX = 0.03; // Measurement noise covariance - Sv
+const double Q_angleX = Q_angle; // Process noise covariance for the accelerometer - Sw
+const double Q_gyroX = Q_gyro; // Process noise covariance for the gyro - Sw
+const double R_angleX = R_angle; // Measurement noise covariance - Sv
 
 double angleX = 0; // The angle output from the Kalman filter
 double biasX = 0; // The gyro bias calculated by the Kalman filter
@@ -59,9 +69,9 @@ double SrvKalmanFilterX(double newAngle, double newRate, double dtime)
 }
 
 /* Kalman filter variables and constants */
-const double Q_angleY = 0.001; // Process noise covariance for the accelerometer - Sw
-const double Q_gyroY = 0.003; // Process noise covariance for the gyro - Sw
-const double R_angleY = 0.03; // Measurement noise covariance - Sv
+const double Q_angleY = Q_angle; // Process noise covariance for the accelerometer - Sw
+const double Q_gyroY = Q_gyro; // Process noise covariance for the gyro - Sw
+const double R_angleY = R_angle; // Measurement noise covariance - Sv
 
 double angleY = 0; // The angle output from the Kalman filter
 double biasY = 0; // The gyro bias calculated by the Kalman filter
@@ -106,9 +116,9 @@ double SrvKalmanFilterY(double newAngle, double newRate, double dtime)
 
 
 /* Kalman filter variables and constants */
-const double Q_angleZ = 0.001; // Process noise covariance for the magnetometer - Sw
-const double Q_gyroZ = 0.003; // Process noise covariance for the gyro - Sw
-const double R_angleZ = 0.03; // Measurement noise covariance - Sv
+const double Q_angleZ = Q_angle; // Process noise covariance for the magnetometer - Sw
+const double Q_gyroZ = Q_gyro; // Process noise covariance for the gyro - Sw
+const double R_angleZ = R_angle; // Measurement noise covariance - Sv
 
 double angleZ = 0; // The angle output from the Kalman filter
 double biasZ = 0; // The gZro bias calculated bZ the Kalman filter
@@ -152,9 +162,9 @@ double SrvKalmanFilterZ(double newAngle, double newRate, double dtime)
 
 
 /* Kalman filter variables and constants */
-const double Q_baroALT = 0.001; // Process noise covariance for the barometer - Sw
-const double Q_accelALT = 0.003; // Process noise covariance for the accelerometer - Sw
-const double R_angleALT = 0.03; // Measurement noise covariance - Sv
+const double Q_baroALT = Q_angle; // Process noise covariance for the barometer - Sw
+const double Q_accelALT = Q_gyro; // Process noise covariance for the accelerometer - Sw
+const double R_angleALT = R_angle; // Measurement noise covariance - Sv
 
 double angleALT = 0; // The angle output from the Kalman filter
 double biasALT = 0; // The gZro bias calculated bZ the Kalman filter

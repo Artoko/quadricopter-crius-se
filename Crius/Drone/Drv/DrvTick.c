@@ -24,7 +24,8 @@ volatile Int32U drv_timer_start_delay = 0;
 void DrvTickInit(void)
 {	
 	drv_timer_tick_counter = 0U;
-	TCCR0A	= 0;             
+	TCCR0A	= 0;      
+	//100us       
     TCCR0B	|= _BV(CS01);     
     TCNT0	= 0;            
     TIFR0	|= _BV(OCF0A);     
@@ -32,7 +33,7 @@ void DrvTickInit(void)
 }
 
 //get the tick counter
-Int32U DrvTimerGetTime(void)
+Int32U DrvTimerGetTimeUs(void)
 {
 	Int8U tcnt = 0;
 	ATOMIC
@@ -45,11 +46,11 @@ Int32U DrvTimerGetTime(void)
 void DrvTimerDelayMs( Int16U delay_ms )
 {
 	Int32U time_test = 0UL;
-	drv_timer_start_delay = DrvTimerGetTime() ;
+	drv_timer_start_delay = DrvTimerGetTimeUs() ;
 	time_test = (Int32U)((Int32U)drv_timer_start_delay + (Int32U)((Int32U)delay_ms * 1000UL));
 	do 
 	{
-		if(DrvTimerGetTime() > time_test)
+		if(DrvTimerGetTimeUs() > time_test)
 		{
 			break;
 		}
@@ -59,11 +60,11 @@ void DrvTimerDelayMs( Int16U delay_ms )
 void DrvTimerDelayUs( Int16U delay_us )
 {
 	Int32U time_test = 0UL;
-	drv_timer_start_delay = DrvTimerGetTime() ;
+	drv_timer_start_delay = DrvTimerGetTimeUs() ;
 	time_test = (Int32U)(drv_timer_start_delay + (Int32U)delay_us);
 	do 
 	{
-		if(DrvTimerGetTime() > time_test)
+		if(DrvTimerGetTimeUs() > time_test)
 		{
 			break;
 		}
@@ -75,7 +76,7 @@ void DrvTimerDelayUs( Int16U delay_us )
 //ISR timer system 128us
 ISR(TIMER0_OVF_vect)
 {
-	drv_timer_tick_counter += 1 ;
+	drv_timer_tick_counter += 1U ;
 }	
 
 	

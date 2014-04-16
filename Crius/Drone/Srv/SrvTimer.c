@@ -61,14 +61,16 @@ void SrvTimerInit( void )
 		MesTimer[ loop_index ].enable = FALSE;
 		MesTimer[ loop_index ].ptrfct = NULL;
 	}		
-	//on init le timer system a 1 ms
+	//on init le timer
 	TCCR2A	= 0;
 	TCCR2B	|= _BV(CS22) ;
 	TCNT2	= 0;
 	OCR2A   = TIMER2_OFFSET_COMPA;
 	OCR2B   = TIMER2_OFFSET_COMPB;
+	//100us
 	TIFR2	|= _BV(OCF2A);
 	TIMSK2	|= _BV(OCIE2A) ;
+	//1ms
 	TIFR2	|= _BV(OCF2B);
 	TIMSK2	|= _BV(OCIE2B) ;
 }
@@ -182,11 +184,11 @@ ISR(TIMER2_COMPB_vect)
 		}			
 	}
 }	
-//ISR timer event 1ms
+//ISR timer event 100us
 ISR(TIMER2_COMPA_vect)
 {
 	OCR2A = TCNT2 + TIMER2_OFFSET_COMPA ;
-	if(tick_counter_5ms++ == 4U)
+	if(tick_counter_5ms++ == 49U)
 	{
 		tick_counter_5ms = 0U;
 		DrvEventAddEvent(CONF_EVENT_TIMER_5MS);

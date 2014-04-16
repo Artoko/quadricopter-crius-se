@@ -21,7 +21,7 @@ void DrvTickInit(void);
 void DrvTickReset(void);
 
 //get the tick counter
-Int32U DrvTimerGetTime(void);
+Int32U DrvTimerGetTimeUs(void);
 
 //wait for delay
 void DrvTimerDelayUs( Int16U delay_us );

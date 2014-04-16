@@ -57,8 +57,8 @@ static inline void swap_endianness(void *buf, uint8_t size)
 /*
  * Basic Macros
  */
-#define ToDeg(x) (x*(float)(180/M_PI))  
-#define ToRad(x) (x*(float)(M_PI/180))  
+#define ToDeg(x) (x * 57.2957795) //	180/M_PI  
+#define ToRad(x) (x * 0.0174532925)  //	M_PI/180
 
 #define BIT_HIGH( reg , bit )		reg |=  ( 1U << bit );
 #define BIT_LOW( reg , bit )		reg &= ~( 1U << bit );

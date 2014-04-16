@@ -110,6 +110,7 @@ static void SrvCommExecute ( void )
 		{
 			//on enregistre l'altitude de depart
 			SrvImuSensorsSetAltitudeDepart();
+			DrvUart0SendMessage( "OK\n" , strlen("OK\n") );
 		}
 		else if(  ma_trame_comm.param[PARAM_1] == 2 )
 		{
@@ -124,9 +125,9 @@ static void SrvCommExecute ( void )
 		{
 			//on enregistre l'altitude relative a la position de depart
 			SrvImuSensorsSetAltitudeMaintient(ma_trame_comm.param[PARAM_2]);
+			DrvUart0SendMessage( "OK\n" , strlen("OK\n") );
 		}		
 		
-		DrvUart0SendMessage( "OK\n" , strlen("OK\n") );
 	}
 	else if(ma_trame_comm.param[PARAM_0] == COMM_PID )
 	{

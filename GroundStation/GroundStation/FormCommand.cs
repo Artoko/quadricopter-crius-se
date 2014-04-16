@@ -12,7 +12,7 @@ namespace GroundStation
     public partial class FormCommand : Form
     {
         delegate void FillPIDBox(int index,short value);
-        delegate void FillWeatherBox(string value);
+        delegate void FillLabel(string value);
 
 
         public FormCommand()
@@ -46,6 +46,7 @@ namespace GroundStation
                         Invoke((FillPIDBox)WritenumericUpDownI, index, I);
                         Invoke((FillPIDBox)WritenumericUpDownD, index, D);
                     }
+                    label_OK.Invoke((FillLabel)FillResponse, "PID");
                 }
                 if (message.Contains("WEATHER:"))
                 {
@@ -53,12 +54,34 @@ namespace GroundStation
                     string[] tab = message.Remove(0, 8).Split(',');
                     if (tab.Count() == 1)
                     {
-                        label4.Invoke((FillWeatherBox)WriteWeather, tab[0]);
+                        label4.Invoke((FillLabel)WriteWeather, tab[0]);
                     }
+                    label_OK.Invoke((FillLabel)FillResponse, "WEATHER");
+                }
+                if (message.Contains("OK"))
+                {
+                    label_OK.Invoke((FillLabel)FillResponse, "OK");
                 }
             }
             catch { }
         }
+
+        void timerRecept_Tick(object sender, EventArgs e)
+        {
+            ((Timer)sender).Enabled = false;
+            ((Timer)sender).Stop();
+            label_OK.Text = " receive_frame => ";
+        }
+        void FillResponse(string value)
+        {
+            timerRecept = new Timer();
+            timerRecept.Interval = 250;
+            timerRecept.Tick += new EventHandler(timerRecept_Tick);
+            timerRecept.Enabled = true;
+            timerRecept.Start();
+            label_OK.Text = " receive_frame => " + value;
+        }
+
         void WriteWeather(string value)
         {
             if (value == "0")

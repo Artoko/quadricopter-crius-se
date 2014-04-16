@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.Stopbutton = new System.Windows.Forms.Button();
             this.PowerTrackBar = new System.Windows.Forms.TrackBar();
             this.labelspeed = new System.Windows.Forms.Label();
@@ -74,6 +75,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.button9 = new System.Windows.Forms.Button();
             this.numericUpDown10 = new System.Windows.Forms.NumericUpDown();
+            this.label_OK = new System.Windows.Forms.Label();
+            this.timerRecept = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.PowerTrackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarRoulis)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarTangage)).BeginInit();
@@ -189,7 +192,7 @@
             // 
             // buttonReset
             // 
-            this.buttonReset.Location = new System.Drawing.Point(58, 430);
+            this.buttonReset.Location = new System.Drawing.Point(12, 437);
             this.buttonReset.Name = "buttonReset";
             this.buttonReset.Size = new System.Drawing.Size(120, 23);
             this.buttonReset.TabIndex = 3;
@@ -199,7 +202,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(184, 430);
+            this.button1.Location = new System.Drawing.Point(138, 437);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(120, 23);
             this.button1.TabIndex = 3;
@@ -282,29 +285,29 @@
             // labelP
             // 
             this.labelP.AutoSize = true;
-            this.labelP.Location = new System.Drawing.Point(77, 286);
+            this.labelP.Location = new System.Drawing.Point(71, 286);
             this.labelP.Name = "labelP";
-            this.labelP.Size = new System.Drawing.Size(43, 13);
+            this.labelP.Size = new System.Drawing.Size(55, 13);
             this.labelP.TabIndex = 7;
-            this.labelP.Text = "P  (/10)";
+            this.labelP.Text = "P  (/1000)";
             // 
             // labelI
             // 
             this.labelI.AutoSize = true;
             this.labelI.Location = new System.Drawing.Point(171, 286);
             this.labelI.Name = "labelI";
-            this.labelI.Size = new System.Drawing.Size(39, 13);
+            this.labelI.Size = new System.Drawing.Size(51, 13);
             this.labelI.TabIndex = 7;
-            this.labelI.Text = "I  (/10)";
+            this.labelI.Text = "I  (/1000)";
             // 
             // labelD
             // 
             this.labelD.AutoSize = true;
             this.labelD.Location = new System.Drawing.Point(258, 286);
             this.labelD.Name = "labelD";
-            this.labelD.Size = new System.Drawing.Size(44, 13);
+            this.labelD.Size = new System.Drawing.Size(56, 13);
             this.labelD.TabIndex = 7;
-            this.labelD.Text = "D  (/10)";
+            this.labelD.Text = "D  (/1000)";
             // 
             // labelindex
             // 
@@ -327,7 +330,7 @@
             // 
             // buttonRepportData
             // 
-            this.buttonRepportData.Location = new System.Drawing.Point(310, 430);
+            this.buttonRepportData.Location = new System.Drawing.Point(264, 437);
             this.buttonRepportData.Name = "buttonRepportData";
             this.buttonRepportData.Size = new System.Drawing.Size(120, 23);
             this.buttonRepportData.TabIndex = 10;
@@ -608,10 +611,11 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(97, 289);
+            this.label4.Location = new System.Drawing.Point(469, 207);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(0, 13);
+            this.label4.Size = new System.Drawing.Size(51, 13);
             this.label4.TabIndex = 37;
+            this.label4.Text = "_weather";
             // 
             // button9
             // 
@@ -640,11 +644,25 @@
             this.numericUpDown10.Size = new System.Drawing.Size(52, 20);
             this.numericUpDown10.TabIndex = 38;
             // 
+            // label_OK
+            // 
+            this.label_OK.AutoSize = true;
+            this.label_OK.Location = new System.Drawing.Point(9, 481);
+            this.label_OK.Name = "label_OK";
+            this.label_OK.Size = new System.Drawing.Size(92, 13);
+            this.label_OK.TabIndex = 39;
+            this.label_OK.Text = "receive_frame => ";
+            // 
+            // timerRecept
+            // 
+            this.timerRecept.Interval = 1000;
+            // 
             // FormCommand
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(573, 538);
+            this.Controls.Add(this.label_OK);
             this.Controls.Add(this.numericUpDown10);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.button7);
@@ -769,5 +787,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button button9;
         private System.Windows.Forms.NumericUpDown numericUpDown10;
+        private System.Windows.Forms.Label label_OK;
+        private System.Windows.Forms.Timer timerRecept;
     }
 }
