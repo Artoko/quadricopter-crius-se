@@ -21,7 +21,7 @@ namespace GroundStation
 
         delegate void FillToolStrip(string value);
 
-        #region load and exit main form
+         #region load and exit main form
         public GroundStationMainForm()
         {
             InitializeComponent();
@@ -163,7 +163,7 @@ namespace GroundStation
         {
             if (ConnexiontoolStripMenuItem.Text == "Connexion")
             {
-                if ((serial.Connect("COM14") == true) || (serial.Connect("COM3") == true))
+                if ((serial.Connect("COM5") == true) || (serial.Connect("COM3") == true))
                 {
                     ConnexiontoolStripMenuItem.Text = "Deconnexion";
                     StatetoolStripStatusLabel.Text = "Etat : Connecte";

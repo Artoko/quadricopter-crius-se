@@ -49,7 +49,6 @@ static float gyroYAngle;
 static float gyroZAngle;
 static float heading_deg;
 
-
 /************************************************************************/
 /*Initialisation des composants                                         */
 /************************************************************************/
@@ -90,25 +89,21 @@ void SrvImuDispatcher (Event_t in_event)
 {
 	//on calcul toutes les 20 millisecondes
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_10MS ) == TRUE)
-	{		
+	{
 		// ********************* Mesure des capteurs ******************************
 		SrvImuReadAndComputeSensors();
-		
 		// ********************* PID **********************************************
 		imu_reel.pid_error.roulis	= SrvPIDCompute( 0U , imu_desire.angles.roulis	, imu_reel.angles.roulis);
 		imu_reel.pid_error.tangage	= SrvPIDCompute( 1U , imu_desire.angles.tangage	, imu_reel.angles.tangage);
 		imu_reel.pid_error.lacet	= SrvPIDCompute( 2U , (imu_reel.angles.lacet + imu_desire.angles.lacet)	, imu_reel.angles.lacet);
-		if(imu_desire.maintient_altitude == TRUE)
-		{
-			imu_reel.pid_error.altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.altitude);
-		}	
+		imu_reel.pid_error.altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.altitude);
 		
 		// *********************Mise à jour des Moteurs ***************************
 		SrvMotorUpdate( imu_reel.pid_error );
-		
-	}	
+	}
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
+		// *********************Mise à jour du  barometre *************************
 		CmpBMP085LaunchReading();
 		imu_reel.temperature = (Int16S)CmpBMP085GetTemperature();
 		imu_reel.weather = CmpBMP085GetWeather(imu_reel.pressure, imu_reel.altitude);
@@ -196,11 +191,12 @@ void SrvImuSensorsSetAltitudeMaintient( Int8U altitude )
 /*Recuperation des données des capteurs et mise en forme  des données   */
 /************************************************************************/
 //variables de timming
-Int32U interval = 0U;
+static Int32U interval = 0U;
+static Int32U now = 0U;
+static Int32U lastread = 0;
 
 static void SrvImuReadAndComputeSensors( void )
 {
-	
 	float gyroRate = 0;	
 	
 	Boolean acc_read_ok = FALSE;
@@ -221,9 +217,10 @@ static void SrvImuReadAndComputeSensors( void )
 	magnet.y = 0; 
 	magnet.z = 0; 
 	
-	
 	// ********************* Calcul du temps de cycle *************************
-	interval = DrvTimerGetTime() - interval;
+	now = DrvTimerGetTimeUs();
+	interval = ((Int32U)(now - lastread)); 
+	lastread = now;
 	
 	// ********************* Lecture des capteurs *****************************
 	#if defined( DAISY_7 )
@@ -270,21 +267,21 @@ static void SrvImuReadAndComputeSensors( void )
 		#if ( GYR_L3G4200D == 1 )
 		gyroRate	=	rotation.x * 0.00875 ;
 		#elif ( GYR_ITG3205 == 1 )	
-		gyroRate	=	rotation.x / 14.375 ;
+		gyroRate	=	rotation.x * 0.06956 ;
 		#endif
 		gyroYAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
 		
 		#if ( GYR_L3G4200D == 1 )
 		gyroRate	=	rotation.y * 0.00875 ;
 		#elif ( GYR_ITG3205 == 1 )
-		gyroRate	=	rotation.y / 14.375 ;
+		gyroRate	=	rotation.y * 0.06956 ;
 		#endif
 		gyroXAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
 		
 		#if ( GYR_L3G4200D == 1 )
 		gyroRate	=	rotation.z * 0.00875 ;
 		#elif ( GYR_ITG3205 == 1 )
-		gyroRate	=	rotation.z / 14.375 ;
+		gyroRate	=	rotation.z * 0.06956 ;
 		#endif
 		gyroZAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
 	}		

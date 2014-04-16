@@ -39,48 +39,42 @@ Boolean DrvTwiInit( Int16U speed )
 /*Read register                                                         */
 /************************************************************************/
 Boolean DrvTwiReadReg( Int8U slave_address , Int8U slave_register, Int8U *data )
-{
+{	
 	Boolean read_no_error = FALSE;
+	
 	//Send start
-	TWCR = (1U<<TWINT)|(1U<<TWSTA)|(1U<<TWEN);           
+	TWCR = (1U<<TWINT)|(1U<<TWSTA)|(1U<<TWEN);
 	DrvTwiWaitTransmission();
-
 	if (((TWSR==TW_START) || (TWSR==TW_REP_START)) )
 	{
 		//send slave address write
 		TWDR =  (slave_address << 1) | TW_WRITE;
 		TWCR = (1U<<TWINT) | (1U<<TWEN);
 		DrvTwiWaitTransmission();
-
 		if( (TWSR == TW_MT_SLA_ACK) )
 		{
 			//send register address
 			TWDR = slave_register;
 			TWCR = (1U<<TWINT) | (1U<<TWEN);
 			DrvTwiWaitTransmission();
-
 			if ( (TWSR == TW_MT_DATA_ACK) )
 			{
 				//repeat start
 				TWCR = (1U<<TWINT)|(1U<<TWSTA)|(1U<<TWEN);
 				DrvTwiWaitTransmission();
-				
-				//send slave address read
 				if ( (TWSR == TW_REP_START) )
 				{
-					TWDR =  (slave_address << 1 ) | TW_READ;                   
+					//send slave address read
+					TWDR =  (slave_address << 1 ) | TW_READ;
 					TWCR = (1U<<TWINT) | (1U<<TWEN);
-					DrvTwiWaitTransmission();
-					
-					//send clock 
+					DrvTwiWaitTransmission();					
 					if ( (TWSR==TW_MR_SLA_ACK) )
 					{
-						TWCR = (1U<<TWINT) | (1U<<TWEN);                    
+						//send clock
+						TWCR = (1U<<TWINT) | (1U<<TWEN);
 						DrvTwiWaitTransmission();
-						
-						//read data
 						if ( ( TWSR==TW_MR_DATA_NACK) )
-						{						
+						{
 							//record data
 							data[ 0U ] = TWDR;
 							
@@ -117,26 +111,22 @@ Boolean DrvTwiWriteReg( Int8U slave_address , Int8U slave_register, Int8U data )
 		TWDR =  (slave_address << 1 ) | TW_WRITE;
 		TWCR = (1U << TWINT) | (1U << TWEN);
 		DrvTwiWaitTransmission();
-
 		if ( (TWSR==TW_MT_SLA_ACK) )
 		{
 			//send register address
 			TWDR = slave_register;
 			TWCR = (1U<<TWINT) | (1U<<TWEN);
 			DrvTwiWaitTransmission();
-
 			if ( (TWSR==TW_MT_DATA_ACK) )
 			{
 				//write data to register
 				TWDR = data;
 				TWCR = (1U<<TWINT) | (1U<<TWEN);
 				DrvTwiWaitTransmission();
-
 				if ( (TWSR==TW_MT_DATA_ACK) )
 				{
 					//send stop
 					TWCR = (1U<<TWINT)|(1U<<TWEN)| (1U<<TWSTO);
-
 					if (TWSR==TW_NO_INFO)
 					{
 						write_no_error = TRUE;
@@ -155,24 +145,67 @@ Boolean DrvTwiWriteReg( Int8U slave_address , Int8U slave_register, Int8U data )
 /************************************************************************/
 Boolean DrvTwiReadRegBuf(Int8U slave_address, Int8U slave_register, Int8U *buffer, Int8U buffer_size) 
 {
-	Boolean o_success = TRUE;
+	Boolean read_no_error = FALSE;
 	
-	for( Int8U i = 0 ; i < buffer_size ; i++ )
+	//Send start
+	TWCR = (1U<<TWINT)|(1U<<TWSTA)|(1U<<TWEN);
+	DrvTwiWaitTransmission();
+	if (((TWSR==TW_START) || (TWSR==TW_REP_START)) )
 	{
-		Int8U datum = 0U;
-		if( TRUE == DrvTwiReadReg( slave_address , slave_register + i , &datum ))
+		//send slave address write
+		TWDR =  (slave_address << 1) | TW_WRITE;
+		TWCR = (1U<<TWINT) | (1U<<TWEN);
+		DrvTwiWaitTransmission();
+		if( (TWSR == TW_MT_SLA_ACK) )
 		{
-			buffer[ i ] = datum;
-		}
-		else
-		{
-			o_success = FALSE;
-			i = buffer_size;
+			//send register address
+			TWDR = slave_register;
+			TWCR = (1U<<TWINT) | (1U<<TWEN);
+			DrvTwiWaitTransmission();
+			if ( (TWSR == TW_MT_DATA_ACK) )
+			{
+				//repeat start
+				TWCR = (1U<<TWINT) | (1U<<TWSTA) | (1U<<TWEN);
+				DrvTwiWaitTransmission();
+				if ( (TWSR == TW_REP_START) )
+				{
+					//send slave address read
+					TWDR =  (slave_address << 1 ) | TW_READ;
+					TWCR = (1U<<TWINT) | (1U<<TWEN);
+					DrvTwiWaitTransmission();
+					if ( (TWSR == TW_MR_SLA_ACK) )
+					{
+						//for each data to read
+						for ( Int8U loop_read_twi = 0 ; loop_read_twi < buffer_size; loop_read_twi++ )
+						{
+							//send ack for each data to read
+							if(  loop_read_twi != ( buffer_size - 1U ) )
+							{
+								TWCR = (1U<<TWINT) | (1U<<TWEA) | (1U<<TWEN); 
+							}
+							//last data send nack
+							else
+							{
+								TWCR = (1U<<TWINT) | (1U<<TWEN);
+							}
+							DrvTwiWaitTransmission();
+							*buffer++ = TWDR;
+						}
+													
+						//send stop
+						TWCR = (1U<<TWINT) | (1U<<TWEN) | (1U<<TWSTO);
+						if (TWSR == TW_NO_INFO)
+						{
+							//no error
+							read_no_error = TRUE;
+						}
+					}
+				}
+			}
 		}
 	}
-	
-	return o_success;
-}
+	return read_no_error; 
+}	
 
 /************************************************************************/
 /*Write many registers                                                  */
