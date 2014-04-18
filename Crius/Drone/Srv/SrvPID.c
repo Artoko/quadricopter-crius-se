@@ -19,22 +19,29 @@
 ////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
-S_IMU_PID pid[ NB_PID ] ;
+static S_IMU_PID pid[ NB_PID ] ;
 
-Int32S error = 0;
-Int32S p_term = 0;
-Int32S i_term = 0;
-Int32S d_term = 0;
-
+Int16S error = 0, p_term = 0, i_term = 0, d_term = 0;
 
 //Init des valeurs du pid
 void SrvPIDInit( void )
 {
-	float p,i,d;
+	float p,i,d = 0.0;
+	Boolean eep_config = DrvEepromIsConfigured();
 	
 	for(Int8U loop_pid = 0 ; loop_pid < NB_PID ; loop_pid++ )
 	{
-		DrvEepromReadPID( loop_pid, &p, &i, &d );
+		if( eep_config == TRUE )
+		{
+			//on lit les valeurs enregistrés
+			DrvEepromReadPID( loop_pid, &p, &i, &d );
+		}
+		else
+		{
+			//on ecrit les valeurs nulles
+			DrvEepromWritePID( loop_pid, p, i, d );
+		}
+		//set actual values
 		SrvPIDSetValues( loop_pid, p, i, d );
 	}
 }
@@ -42,9 +49,9 @@ void SrvPIDInit( void )
 //Set des valeurs du pid
 void SrvPIDSetValues( Int8U index, float p, float i, float d )
 {
-	pid[index].P = p;
-	pid[index].I = i;
-	pid[index].D = d;
+	pid[index].P = p ;
+	pid[index].I = i ;
+	pid[index].D = d ;
 }
 
 Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition )
@@ -53,14 +60,13 @@ Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition 
 	error = targetPosition - currentPosition;
 	
 	//Calcul du terme P
-	p_term = pid[index].P * error;
+	p_term = (Int16S)( pid[index].P * error );
 	
 	//calcul de l'erreur intégré
 	pid[index].integratedError += error;
 
-
 	//limit de l'erreur
-	float windupgaurd = 5.0 / pid[index].I;
+	float windupgaurd = 1000.0;//pid[index].I * 1000.0;
 	if(pid[index].integratedError > windupgaurd)
 	{
 		pid[index].integratedError = windupgaurd;
@@ -71,10 +77,10 @@ Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition 
 	}
 	
 	//Calcul du terme I
-	i_term = pid[index].I * pid[index].integratedError;
+	i_term = (Int16S)( pid[index].I * pid[index].integratedError );
 
 	//Calcul du terme D
-	d_term = pid[index].D * ( currentPosition - pid[index].lastPosition );
+	d_term = (Int16S)( pid[index].D * ( currentPosition - pid[index].lastPosition ) );
 	
 	//on conserve la position actuel
 	pid[index].lastPosition = currentPosition;

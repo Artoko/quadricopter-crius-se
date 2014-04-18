@@ -17,16 +17,19 @@ namespace GroundStation
     public partial class GroundStationMainForm : Form
     {
         public static ClassSerial serial = new ClassSerial();
-        Server tcpserv;
+        //Server tcpserv;
 
         delegate void FillToolStrip(string value);
+
+        FormGraph childForm = new FormGraph();
+        FormCommand childForm2 = new FormCommand();
+
 
          #region load and exit main form
         public GroundStationMainForm()
         {
             InitializeComponent();
-            tcpserv = new Server();
-            GroundStationMainForm.serial.AddCallback(IncommingMessage);
+            //tcpserv = new Server();
 
             /*ProcessStartInfo notepadStartInfo = new ProcessStartInfo("Using3DModels.exe");
             Process notepad = new Process();
@@ -43,7 +46,7 @@ namespace GroundStation
         private void GroundStationMainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             serial.Deconnect();
-            tcpserv.CloseServer();
+            //tcpserv.CloseServer();
 
             try
             {
@@ -73,7 +76,12 @@ namespace GroundStation
         {
             if (ConnexiontoolStripMenuItem.Text == "Connexion")
             {
-                if ((serial.Connect("COM40") == true) || (serial.Connect("COM14") == true)|| (serial.Connect("COM5") == true) || (serial.Connect("COM7") == true) || (serial.Connect("COM22") == true) || (serial.Connect("COM1") == true))
+                if ((serial.Connect("COM40", IncommingMessage) == true) ||
+                    (serial.Connect("COM14", IncommingMessage) == true) ||
+                    (serial.Connect("COM5", IncommingMessage) == true) ||
+                    (serial.Connect("COM7", IncommingMessage) == true) ||
+                    (serial.Connect("COM22", IncommingMessage) == true) ||
+                    (serial.Connect("COM1", IncommingMessage) == true))
                 {
                     ConnexiontoolStripMenuItem.Text = "Deconnexion";
                     StatetoolStripStatusLabel.Text = "Etat : Connecte";
@@ -97,19 +105,21 @@ namespace GroundStation
             }
 
 
-            FormGraph childForm = new FormGraph();
             childForm.MdiParent = this;
             childForm.Show();
-            FormCommand childForm2 = new FormCommand();
             childForm2.MdiParent = this;
             childForm2.Show();
+
+
             LayoutMdi(MdiLayout.TileVertical);
         }
         public void IncommingMessage(string message)
         {
             try
             {
-                Invoke((FillToolStrip)AddItemToolStrip, message);
+                //Invoke((FillToolStrip)AddItemToolStrip, message);
+                childForm.IncommingMessage(message);
+                childForm2.IncommingMessage(message);
             }
             catch { }
         }
@@ -161,30 +171,7 @@ namespace GroundStation
 
         private void ConnexiontoolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (ConnexiontoolStripMenuItem.Text == "Connexion")
-            {
-                if ((serial.Connect("COM5") == true) || (serial.Connect("COM3") == true))
-                {
-                    ConnexiontoolStripMenuItem.Text = "Deconnexion";
-                    StatetoolStripStatusLabel.Text = "Etat : Connecte";
-                }
-                else
-                {
-                    StatetoolStripStatusLabel.Text = "Etat : Connection impossible";
-                }
-            }
-            else
-            {
-                try
-                {
-                    serial.Deconnect();
-                }
-                catch
-                {
-                }
-                ConnexiontoolStripMenuItem.Text = "Connexion";
-                StatetoolStripStatusLabel.Text = "Etat : Deconnecte";
-            }
+            
         }
         private void OpenFile(object sender, EventArgs e)
         {

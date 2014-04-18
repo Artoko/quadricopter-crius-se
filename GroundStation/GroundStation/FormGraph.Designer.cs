@@ -43,13 +43,17 @@
             this.checkBoxpression = new System.Windows.Forms.CheckBox();
             this.checkBoxtemperature = new System.Windows.Forms.CheckBox();
             this.checkBoxnord = new System.Windows.Forms.CheckBox();
+            this.checkBoxMoteur1 = new System.Windows.Forms.CheckBox();
+            this.checkBoxMoteur2 = new System.Windows.Forms.CheckBox();
+            this.checkBoxMoteur3 = new System.Windows.Forms.CheckBox();
+            this.checkBoxMoteur4 = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // zedGraphControl1
             // 
-            this.zedGraphControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.zedGraphControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.zedGraphControl1.Location = new System.Drawing.Point(98, 12);
             this.zedGraphControl1.Name = "zedGraphControl1";
             this.zedGraphControl1.ScrollGrace = 0D;
@@ -59,7 +63,7 @@
             this.zedGraphControl1.ScrollMinX = 0D;
             this.zedGraphControl1.ScrollMinY = 0D;
             this.zedGraphControl1.ScrollMinY2 = 0D;
-            this.zedGraphControl1.Size = new System.Drawing.Size(748, 254);
+            this.zedGraphControl1.Size = new System.Drawing.Size(748, 347);
             this.zedGraphControl1.TabIndex = 2;
             // 
             // timer_tick
@@ -177,11 +181,55 @@
             this.checkBoxnord.Text = "nord";
             this.checkBoxnord.UseVisualStyleBackColor = true;
             // 
+            // checkBoxMoteur1
+            // 
+            this.checkBoxMoteur1.AutoSize = true;
+            this.checkBoxMoteur1.Location = new System.Drawing.Point(10, 272);
+            this.checkBoxMoteur1.Name = "checkBoxMoteur1";
+            this.checkBoxMoteur1.Size = new System.Drawing.Size(67, 17);
+            this.checkBoxMoteur1.TabIndex = 13;
+            this.checkBoxMoteur1.Text = "moteur 1";
+            this.checkBoxMoteur1.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxMoteur2
+            // 
+            this.checkBoxMoteur2.AutoSize = true;
+            this.checkBoxMoteur2.Location = new System.Drawing.Point(10, 295);
+            this.checkBoxMoteur2.Name = "checkBoxMoteur2";
+            this.checkBoxMoteur2.Size = new System.Drawing.Size(67, 17);
+            this.checkBoxMoteur2.TabIndex = 14;
+            this.checkBoxMoteur2.Text = "moteur 2";
+            this.checkBoxMoteur2.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxMoteur3
+            // 
+            this.checkBoxMoteur3.AutoSize = true;
+            this.checkBoxMoteur3.Location = new System.Drawing.Point(10, 318);
+            this.checkBoxMoteur3.Name = "checkBoxMoteur3";
+            this.checkBoxMoteur3.Size = new System.Drawing.Size(67, 17);
+            this.checkBoxMoteur3.TabIndex = 15;
+            this.checkBoxMoteur3.Text = "moteur 3";
+            this.checkBoxMoteur3.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxMoteur4
+            // 
+            this.checkBoxMoteur4.AutoSize = true;
+            this.checkBoxMoteur4.Location = new System.Drawing.Point(10, 341);
+            this.checkBoxMoteur4.Name = "checkBoxMoteur4";
+            this.checkBoxMoteur4.Size = new System.Drawing.Size(67, 17);
+            this.checkBoxMoteur4.TabIndex = 16;
+            this.checkBoxMoteur4.Text = "moteur 4";
+            this.checkBoxMoteur4.UseVisualStyleBackColor = true;
+            // 
             // FormGraph
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(858, 272);
+            this.ClientSize = new System.Drawing.Size(858, 365);
+            this.Controls.Add(this.checkBoxMoteur4);
+            this.Controls.Add(this.checkBoxMoteur3);
+            this.Controls.Add(this.checkBoxMoteur2);
+            this.Controls.Add(this.checkBoxMoteur1);
             this.Controls.Add(this.checkBoxnord);
             this.Controls.Add(this.checkBoxpression);
             this.Controls.Add(this.checkBoxtemperature);
@@ -220,6 +268,10 @@
         private System.Windows.Forms.CheckBox checkBoxpression;
         private System.Windows.Forms.CheckBox checkBoxtemperature;
         private System.Windows.Forms.CheckBox checkBoxnord;
+        private System.Windows.Forms.CheckBox checkBoxMoteur1;
+        private System.Windows.Forms.CheckBox checkBoxMoteur2;
+        private System.Windows.Forms.CheckBox checkBoxMoteur3;
+        private System.Windows.Forms.CheckBox checkBoxMoteur4;
 
     }
 }

@@ -87,17 +87,20 @@ Boolean SrvImuInit( void )
 /************************************************************************/
 void SrvImuDispatcher (Event_t in_event)
 {
-	//on calcul toutes les 20 millisecondes
+	//on calcul toutes les 10 millisecondes
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_10MS ) == TRUE)
 	{
 		// ********************* Mesure des capteurs ******************************
 		SrvImuReadAndComputeSensors();
+		
 		// ********************* PID **********************************************
 		imu_reel.pid_error.roulis	= SrvPIDCompute( 0U , imu_desire.angles.roulis	, imu_reel.angles.roulis);
 		imu_reel.pid_error.tangage	= SrvPIDCompute( 1U , imu_desire.angles.tangage	, imu_reel.angles.tangage);
 		imu_reel.pid_error.lacet	= SrvPIDCompute( 2U , (imu_reel.angles.lacet + imu_desire.angles.lacet)	, imu_reel.angles.lacet);
 		imu_reel.pid_error.altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.altitude);
-		
+	}
+	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_20MS ) == TRUE)
+	{
 		// *********************Mise à jour des Moteurs ***************************
 		SrvMotorUpdate( imu_reel.pid_error );
 	}

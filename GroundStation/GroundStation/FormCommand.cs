@@ -19,11 +19,9 @@ namespace GroundStation
         {
             InitializeComponent();
 
-            GroundStationMainForm.serial.AddCallback(IncommingMessage);
         }
         private void FormCommand_FormClosing(object sender, FormClosingEventArgs e)
         {
-            GroundStationMainForm.serial.DeleteCallback(IncommingMessage);
         }
 
 

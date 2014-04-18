@@ -36,16 +36,7 @@ typedef struct SSTimer
 //configuration initial des leds
 STimer MesTimer[ CONF_TIMER_NB ];
 
-volatile Int8U tick_counter_5ms = 0U;
-volatile Int8U tick_counter_10ms = 0U;
-volatile Int8U tick_counter_20ms = 0U;
-volatile Int8U tick_counter_50ms = 0U;
-volatile Int8U tick_counter_100ms = 0U;
-volatile Int8U tick_counter_500ms = 0U;
-volatile Int8U tick_counter_1s = 0U;
-volatile Int8U tick_counter_5s = 0U;
-volatile Int8U tick_counter_10s = 0U;
-
+volatile Int16U tick_counter_100us = 0U;
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 // fait tourner le timer 0 compA a 1 ms
@@ -123,15 +114,6 @@ void SrvTimerTickReset(void)
 	{
 		MesTimer[ loop_index ].cpt_delay = 0U;	
 	}
-	tick_counter_5ms = 0U;
-	tick_counter_10ms = 0U;
-	tick_counter_20ms = 0U;
-	tick_counter_50ms = 0U;
-	tick_counter_100ms = 0U;
-	tick_counter_500ms = 0U;
-	tick_counter_1s = 0U;
-	tick_counter_5s = 0U;
-	tick_counter_10s = 0U;
 	TCNT2	= 0U;
 	OCR2A   = TIMER2_OFFSET_COMPA;
 }
@@ -187,45 +169,37 @@ ISR(TIMER2_COMPB_vect)
 //ISR timer event 100us
 ISR(TIMER2_COMPA_vect)
 {
+	//reenclanche le timer dans 100us
 	OCR2A = TCNT2 + TIMER2_OFFSET_COMPA ;
-	if(tick_counter_5ms++ == 49U)
+	
+	tick_counter_100us++;
+	if(tick_counter_100us % 50U == 0 )
 	{
-		tick_counter_5ms = 0U;
 		DrvEventAddEvent(CONF_EVENT_TIMER_5MS);
-		if(tick_counter_10ms++ == 1U)
-		{
-			tick_counter_10ms = 0U;
-			DrvEventAddEvent(CONF_EVENT_TIMER_10MS);
-			if(tick_counter_20ms++ == 1U)
-			{
-				tick_counter_20ms = 0U;
-				DrvEventAddEvent(CONF_EVENT_TIMER_20MS);
-				if(tick_counter_100ms++ == 4U)
-				{
-					tick_counter_100ms = 0U;
-					DrvEventAddEvent(CONF_EVENT_TIMER_100MS);
-					if(tick_counter_500ms++ == 4U)
-					{
-						tick_counter_500ms = 0U;
-						DrvEventAddEvent(CONF_EVENT_TIMER_500MS);
-						if(tick_counter_1s++ == 1U)
-						{
-							tick_counter_1s = 0U;
-							DrvEventAddEvent(CONF_EVENT_TIMER_1S);
-							if(tick_counter_5s++ == 4U)
-							{
-								tick_counter_5s = 0U;
-								DrvEventAddEvent(CONF_EVENT_TIMER_5S);
-								if(tick_counter_10s++ == 1U)
-								{
-									tick_counter_10s = 0U;
-									DrvEventAddEvent(CONF_EVENT_TIMER_10S);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+	}
+	if(tick_counter_100us % 100U == 0 )
+	{
+		DrvEventAddEvent(CONF_EVENT_TIMER_10MS);
+	}
+	if(tick_counter_100us % 200U == 0)
+	{
+		DrvEventAddEvent(CONF_EVENT_TIMER_20MS );
+	}
+	if(tick_counter_100us % 500U == 0)
+	{
+		DrvEventAddEvent(CONF_EVENT_TIMER_50MS );
+	}
+	if(tick_counter_100us % 1000U == 0U )
+	{
+		DrvEventAddEvent(CONF_EVENT_TIMER_100MS );
+	}
+	if(tick_counter_100us % 5000U == 0U )
+	{
+		DrvEventAddEvent(CONF_EVENT_TIMER_500MS );
+	}
+	if(tick_counter_100us % 10000U == 0U )
+	{
+		DrvEventAddEvent(CONF_EVENT_TIMER_1S );
+		tick_counter_100us=0;
 	}
 }
