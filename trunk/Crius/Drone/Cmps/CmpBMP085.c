@@ -61,34 +61,30 @@ Int16U CmpBMP085GetAltitude(float pressure)
 	float B = 1.0/5.25588;
 	float C = pow(A,B);
 	C = 1 - C;
-	C = C /0.0000225577;
-	
+	C = C / 0.0000225577;
 	return (Int16U)C;
 }
 
 //Get weather 
 Int8U CmpBMP085GetWeather( float pressure , Int16U altitude )
 {	
+	static float ePressure = 0;
 	// calcul de la presion attendu a notre altitude
-	float ePressure = SEA_PRESSURE * pow((1-altitude/44330.0), 5.255);
+	ePressure = SEA_PRESSURE * pow((1-altitude/44330.0), 5.255);
 	// on compare par rapport a la pression mesurée
-	Int16S weatherDiff = (Int16S)( (Int16S)(pressure / 10.0) - (Int16S)(ePressure / 10.0));
+	Int16S weatherDiff = (Int16S)( (pressure / 10.0) - (ePressure / 10.0) );
 	//on retourne le type de temps
-	if(weatherDiff > 250)
+	if(weatherDiff > 25)
 	{
 		return (Int8U)WEATHER_SUNNY;
 	}
-	else if ((weatherDiff <= 250) && (weatherDiff >= -250))
+	else if ((weatherDiff <= 25) && (weatherDiff >= -25))
 	{
 		return (Int8U)WEATHER_CLOUDY;
 	}
-	else if (weatherDiff < -250)
-	{
-		return (Int8U)WEATHER_RAIN;
-	}
 	else
 	{
-		return (Int8U)WEATHER_ERROR;
+		return (Int8U)WEATHER_RAIN;
 	}
 }
 

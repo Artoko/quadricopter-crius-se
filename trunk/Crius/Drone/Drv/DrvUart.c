@@ -110,6 +110,11 @@ void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
 			in_message_sent_0++;
 		}
 	}
+	else
+	{
+		in_message_len_0 = 0;
+		in_message_sent_0 = 0;
+	}
 }
 
 //on recupere le message
@@ -257,7 +262,7 @@ ISR(USART0_TX_vect)
 	else
 	{
 		in_message_len_0 = 0;
-		in_message_sent_0= 0;
+		in_message_sent_0 = 0;
 	}
 }	
 

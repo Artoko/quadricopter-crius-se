@@ -13,16 +13,17 @@ namespace GroundStation
         SerialPort serialPort1 = new SerialPort();
         
         public delegate void callback_message_receive(string message);
-        List<callback_message_receive> list_callback_messages = new List<callback_message_receive>();
+        callback_message_receive list_callback_messages;
         public static bool Thread_Listener_flag = false;
 
         static Thread Thread_Listener;
 
-        public bool Connect (string port_name)
+        public bool Connect(string port_name, callback_message_receive callback)
         {
             bool ret = false;
             serialPort1.PortName = port_name;
             serialPort1.BaudRate = 57600;
+            list_callback_messages = callback;
             try
             {
                 serialPort1.Open();
@@ -65,34 +66,11 @@ namespace GroundStation
         }
 
 
-        public bool DeleteCallback(callback_message_receive callback)
-        {
-            try
-            {
-                list_callback_messages.Remove(callback);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
         public void SendMessage(string message)
         {
             serialPort1.Write(message);
         }
-        public bool AddCallback( callback_message_receive callback )
-        {
-            try
-            {
-                list_callback_messages.Add(callback);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
+
 
         private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
@@ -112,9 +90,9 @@ namespace GroundStation
                         while (bytes != 0)
                         {
                             string frame = serialPort1.ReadLine();
-                            for (int loop = 0; loop < list_callback_messages.Count; loop++)
+                            //for (int loop = 0; loop < list_callback_messages.Count; loop++)
                             {
-                                list_callback_messages[loop](frame);
+                                list_callback_messages(frame);
                                 bytes -= frame.Length;
                             }
                         }

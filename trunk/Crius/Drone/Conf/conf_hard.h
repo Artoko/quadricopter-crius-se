@@ -25,6 +25,8 @@
 //#define DAISY_7		
 #define CRIUS		
 
+#define QUADX
+//#define BI
 
 #if defined( DAISY_7 )
 	#define ACC_LIS331DLH	1
@@ -62,12 +64,11 @@
 #define		CONF_EVENT_TIMER_5MS		( 1U << 0U )
 #define		CONF_EVENT_TIMER_10MS		( 1U << 1U )
 #define		CONF_EVENT_TIMER_20MS		( 1U << 2U )
-#define		CONF_EVENT_TIMER_100MS		( 1U << 3U )
-#define		CONF_EVENT_TIMER_500MS		( 1U << 4U )
-#define		CONF_EVENT_TIMER_1S			( 1U << 5U )
-#define		CONF_EVENT_TIMER_5S			( 1U << 6U )
-#define		CONF_EVENT_TIMER_10S		( 1U << 7U )
-#define		CONF_EVENT_MSG_RCV			( 1U << 8U )
+#define		CONF_EVENT_TIMER_50MS		( 1U << 3U )
+#define		CONF_EVENT_TIMER_100MS		( 1U << 4U )
+#define		CONF_EVENT_TIMER_500MS		( 1U << 5U )
+#define		CONF_EVENT_TIMER_1S			( 1U << 6U )
+#define		CONF_EVENT_MSG_RCV			( 1U << 7U )
 
 ////////////////////////////////////PUBLIC SERVOS PORTS///////////////////////////////////////////
 #if defined( DAISY_7 )
