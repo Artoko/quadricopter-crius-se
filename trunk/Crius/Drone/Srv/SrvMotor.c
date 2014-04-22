@@ -48,17 +48,14 @@ void SrvMotorUpdate(S_pid pid_error)
 {
 	if( imu_reel.moteurs.throttle > OFFCOMMAND)
 	{
-	//#define PIDMIX(X,Y,Z) rcCommand[THROTTLE] + axisPID[ROLL]*X + axisPID[PITCH]*Y + YAW_DIRECTION * axisPID[YAW]*Z
-		
-		
 		// calcul de la vitesse pour chaque moteur
 		#ifdef BI
 		
 		//motor[0] = PIDMIX(+1, 0, 0); //LEFT
 		//motor[1] = PIDMIX(-1, 0, 0); //RIGHT
 		
-		imu_reel.moteurs.rearMotor_R  = SetLimits(imu_reel.moteurs.throttle + pid_error.lacet + pid_error.tangage, OFFCOMMAND, MAXCOMMAND);
-		imu_reel.moteurs.frontMotor_L = SetLimits(imu_reel.moteurs.throttle - pid_error.lacet + pid_error.tangage, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.rearMotor_R  = SetLimits(imu_reel.moteurs.throttle + pid_error.roulis, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.frontMotor_L = SetLimits(imu_reel.moteurs.throttle - pid_error.roulis, OFFCOMMAND, MAXCOMMAND);
 		
 		DrvServoUpdate( 0U , (imu_reel.moteurs.rearMotor_R  - OFFCOMMAND) );
 		DrvServoUpdate( 3U , (imu_reel.moteurs.frontMotor_L - OFFCOMMAND) );
