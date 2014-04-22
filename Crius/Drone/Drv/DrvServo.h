@@ -33,7 +33,7 @@
 #define TICKS_MIN_PULSE_WIDTH	MIN_PULSE_WIDTH * TIMER1_TICKS_PER_US  
 #define TICKS_MAX_PULSE_WIDTH	MAX_PULSE_WIDTH * TIMER1_TICKS_PER_US  
 
-#define PERIOD_SERVO_MAX		20000U 
+#define PERIOD_SERVO_MAX		10000U 
 #define TICKS_PERIOD_SERVO_MAX	PERIOD_SERVO_MAX * TIMER1_TICKS_PER_US   
  	
 #define MAX_SERVOS				4U
@@ -53,6 +53,5 @@ Boolean DrvServo( void ) ;
 
 // bouge le servo a la position voulu en angle
 Boolean DrvServoUpdate( Int8U index, Int16U angle ) ;
-
 
 #endif /* DRV_SERVO_H_ */

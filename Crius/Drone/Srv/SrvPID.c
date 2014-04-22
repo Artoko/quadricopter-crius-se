@@ -43,6 +43,7 @@ void SrvPIDInit( void )
 		}
 		//set actual values
 		SrvPIDSetValues( loop_pid, p, i, d );
+		SrvPIDResetValues( loop_pid ) ;
 	}
 }
 
@@ -52,6 +53,13 @@ void SrvPIDSetValues( Int8U index, float p, float i, float d )
 	pid[index].P = p ;
 	pid[index].I = i ;
 	pid[index].D = d ;
+}
+
+//Reset des valeurs du pid
+void SrvPIDResetValues( Int8U index )
+{
+	pid[index].integratedError = 0 ;
+	pid[index].lastPosition = 0 ;
 }
 
 Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition )

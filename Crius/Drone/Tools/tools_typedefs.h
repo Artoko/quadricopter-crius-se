@@ -73,6 +73,36 @@ static inline void swap_endianness(void *buf, uint8_t size)
 										BIT_LOW( reg , bit)	\
 									};
 
+
+						
+#define MultiS16X16to32(longRes, intIn1, intIn2) \
+asm volatile ( \
+"clr r26 \n\t" \
+"mul %A1, %A2 \n\t" \
+"movw %A0, r0 \n\t" \
+"muls %B1, %B2 \n\t" \
+"movw %C0, r0 \n\t" \
+"mulsu %B2, %A1 \n\t" \
+"sbc %D0, r26 \n\t" \
+"add %B0, r0 \n\t" \
+"adc %C0, r1 \n\t" \
+"adc %D0, r26 \n\t" \
+"mulsu %B1, %A2 \n\t" \
+"sbc %D0, r26 \n\t" \
+"add %B0, r0 \n\t" \
+"adc %C0, r1 \n\t" \
+"adc %D0, r26 \n\t" \
+"clr r1 \n\t" \
+: \
+"=&r" (longRes) \
+: \
+"a" (intIn1), \
+"a" (intIn2) \
+: \
+"r26" \
+)		
+						
+
 /*
  * Basic types for the microcontroler
  */
@@ -114,6 +144,9 @@ typedef Int8U Boolean;
 typedef void (*ptrfct_Isr_Callback)(void);
 //defini un pointeur vers une fct null, reset du micro
 #define RESET_SOFT() ptrfct_Isr_Callback ptrfct_null = NULL; ptrfct_null();
+
+
+
 
 
 #endif /* TOOLS_TYPEDEFS_H_ */

@@ -98,9 +98,7 @@ void SrvImuDispatcher (Event_t in_event)
 		imu_reel.pid_error.tangage	= SrvPIDCompute( 1U , imu_desire.angles.tangage	, imu_reel.angles.tangage);
 		imu_reel.pid_error.lacet	= SrvPIDCompute( 2U , (imu_reel.angles.lacet + imu_desire.angles.lacet)	, imu_reel.angles.lacet);
 		imu_reel.pid_error.altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.altitude);
-	}
-	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_20MS ) == TRUE)
-	{
+		
 		// *********************Mise à jour des Moteurs ***************************
 		SrvMotorUpdate( imu_reel.pid_error );
 	}
@@ -190,6 +188,7 @@ void SrvImuSensorsSetAltitudeMaintient( Int8U altitude )
 	}
 }
 ////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
+
 /************************************************************************/
 /*Recuperation des données des capteurs et mise en forme  des données   */
 /************************************************************************/
@@ -318,8 +317,8 @@ static void SrvImuReadAndComputeSensors( void )
 	}
 	
 	// ********************* Fusion des capteurs ******************************
-	imu_reel.angles.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval ) ;
-	imu_reel.angles.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval ) ;
+	imu_reel.angles.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval ) * 10;
+	imu_reel.angles.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval ) * 10;
 	imu_reel.angles.lacet	 = SrvKalmanFilterZ( heading_deg, gyroZAngle, interval );
 	if(imu_reel.angles.lacet < 0.0)
 	{
@@ -332,3 +331,11 @@ static void SrvImuReadAndComputeSensors( void )
 	
 }
 
+
+Int32S  __attribute__ ((noinline)) mul(Int16S a, Int16S b)
+{
+	Int32S r;
+	MultiS16X16to32(r, a, b);
+	//r = (int32_t)a*b; without asm requirement
+	return r;
+}
