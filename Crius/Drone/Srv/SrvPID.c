@@ -43,8 +43,8 @@ void SrvPIDInit( void )
 		}
 		//set actual values
 		SrvPIDSetValues( loop_pid, p, i, d );
-		SrvPIDResetValues( loop_pid ) ;
 	}
+	SrvPIDResetValues( ) ;
 }
 
 //Set des valeurs du pid
@@ -56,10 +56,13 @@ void SrvPIDSetValues( Int8U index, float p, float i, float d )
 }
 
 //Reset des valeurs du pid
-void SrvPIDResetValues( Int8U index )
+void SrvPIDResetValues( void )
 {
-	pid[index].integratedError = 0 ;
-	pid[index].lastPosition = 0 ;
+	for(Int8U loop_pid = 0 ; loop_pid < NB_PID ; loop_pid++ )
+	{
+		pid[ loop_pid ].integratedError = 0 ;
+		pid[ loop_pid ].lastPosition = 0 ;
+	}
 }
 
 Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition )
@@ -74,7 +77,7 @@ Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition 
 	pid[index].integratedError += error;
 
 	//limit de l'erreur
-	float windupgaurd = 1000.0;//pid[index].I * 1000.0;
+	float windupgaurd = 2000.0;//pid[index].I * 1000.0;
 	if(pid[index].integratedError > windupgaurd)
 	{
 		pid[index].integratedError = windupgaurd;
@@ -88,10 +91,10 @@ Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition 
 	i_term = (Int16S)( pid[index].I * pid[index].integratedError );
 
 	//Calcul du terme D
-	d_term = (Int16S)( pid[index].D * ( currentPosition - pid[index].lastPosition ) );
+	d_term = (Int16S)( pid[index].D * ( error - pid[index].lastPosition ) );
 	
 	//on conserve la position actuel
-	pid[index].lastPosition = currentPosition;
+	pid[index].lastPosition = error;
 	
 	//retourne le calcul PID
 	return (Int16S)(p_term + i_term + d_term);

@@ -30,7 +30,7 @@ void SrvPIDInit( void ) ;
 void SrvPIDSetValues( Int8U index, float p, float i, float d ) ;
 
 //Reset des valeurs du pid
-void SrvPIDResetValues( Int8U index ) ;
+void SrvPIDResetValues( void ) ;
 
 //calcul des valeurs PID
 Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition ) ;
