@@ -9,6 +9,7 @@
 #include "Conf/conf_hard.h"
 
 #include "SrvMotor.h"
+#include "SrvPID.h"
 
 #include "Drv/DrvUart.h"
 #include "Drv/DrvServo.h"
@@ -54,8 +55,8 @@ void SrvMotorUpdate(S_pid pid_error)
 		//motor[0] = PIDMIX(+1, 0, 0); //LEFT
 		//motor[1] = PIDMIX(-1, 0, 0); //RIGHT
 		
-		imu_reel.moteurs.rearMotor_R  = SetLimits(imu_reel.moteurs.throttle + pid_error.roulis, OFFCOMMAND, MAXCOMMAND);
-		imu_reel.moteurs.frontMotor_L = SetLimits(imu_reel.moteurs.throttle - pid_error.roulis, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.rearMotor_R  = SetLimits(imu_reel.moteurs.throttle - pid_error.roulis + pid_error.tangage, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.frontMotor_L = SetLimits(imu_reel.moteurs.throttle + pid_error.roulis - pid_error.tangage, OFFCOMMAND, MAXCOMMAND);
 		
 		DrvServoUpdate( 0U , (imu_reel.moteurs.rearMotor_R  - OFFCOMMAND) );
 		DrvServoUpdate( 3U , (imu_reel.moteurs.frontMotor_L - OFFCOMMAND) );
@@ -84,6 +85,7 @@ void SrvMotorUpdate(S_pid pid_error)
 	else
 	{
 		//on met la vitesse de tout les moteurs à zeros 
+		SrvPIDResetValues();
 		imu_reel.moteurs.rearMotor_R	= OFFCOMMAND;
 		imu_reel.moteurs.frontMotor_R	= OFFCOMMAND;
 		imu_reel.moteurs.rearMotor_L	= OFFCOMMAND;

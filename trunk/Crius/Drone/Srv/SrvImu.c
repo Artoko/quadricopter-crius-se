@@ -317,8 +317,8 @@ static void SrvImuReadAndComputeSensors( void )
 	}
 	
 	// ********************* Fusion des capteurs ******************************
-	imu_reel.angles.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval ) * 10;
-	imu_reel.angles.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval ) * 10;
+	imu_reel.angles.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval );
+	imu_reel.angles.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval );
 	imu_reel.angles.lacet	 = SrvKalmanFilterZ( heading_deg, gyroZAngle, interval );
 	if(imu_reel.angles.lacet < 0.0)
 	{
