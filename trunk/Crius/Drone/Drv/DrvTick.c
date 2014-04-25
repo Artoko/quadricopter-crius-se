@@ -71,6 +71,14 @@ void DrvTimerDelayUs( Int16U delay_us )
 	} while (TRUE);
 }
 
+Int32U DrvTimerGetInterval( Int32U *last_interval )
+{
+	Int32U now = DrvTimerGetTimeUs();
+	Int32U interval = now - last_interval[ 0U ];
+	last_interval[ 0U ] = now;
+	return interval;
+}
+
 
 ///////////////////////////////////////////ISR FUNCTIONS//////////////////////////////////////////
 //ISR timer system 128us

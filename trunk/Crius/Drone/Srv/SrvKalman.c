@@ -24,9 +24,9 @@ double dtX, yX, SX;
 double KX_0, KX_1;
 
 ////////////////////////////////////////PUBLIC FONCTIONS////////////////////////////////////////
-double SrvKalmanFilterX(double newAngle, double newRate, double dtime)
+double SrvKalmanFilterX(double newAngle, double newRate, float dtime)
 {						
-        dtX = dtime / 1000000.0; // Convert from microseconds to seconds
+        dtX = dtime; // Convert from microseconds to seconds
 
         // Discrete Kalman filter time update equations - Time Update ("Predict")
         // Update xhat - Project the state ahead
@@ -69,9 +69,9 @@ double PY_00 = 0, PY_01 = 0, PY_10 = 0, PY_11 = 0;
 double dtY, yY, SY;
 double KY_0, KY_1;
 
-double SrvKalmanFilterY(double newAngle, double newRate, double dtime)
+double SrvKalmanFilterY(double newAngle, double newRate, float dtime)
 {
-        dtY = dtime / 1000000.0; // Convert from microseconds to seconds
+        dtY = dtime; // Convert from microseconds to seconds
 
         // Discrete Kalman filter time update equations - Time Update ("Predict")
         // Update xhat - Project the state ahead
@@ -116,9 +116,9 @@ double PZ_00 = 0, PZ_01 = 0, PZ_10 = 0, PZ_11 = 0;
 double dtZ, ZZ, SZ;
 double KZ_0, KZ_1;
 
-double SrvKalmanFilterZ(double newAngle, double newRate, double dtime)
+double SrvKalmanFilterZ(double newAngle, double newRate, float dtime)
 {
-        dtZ = dtime / 1000000.0; // Convert from microseconds to seconds
+        dtZ = dtime; // Convert from microseconds to seconds
 
         // Discrete Kalman filter time update equations - Time Update ("Predict")
         // Update xhat - Project the state ahead
@@ -162,9 +162,9 @@ double PALT_00 = 0, PALT_01 = 0, PALT_10 = 0, PALT_11 = 0;
 double dtALT, ZALT, SALT;
 double KALT_0, KALT_1;
 
-double SrvKalmanFilterAlt(double newAngle, double newRate, double dtime)
+double SrvKalmanFilterAlt(double newAngle, double newRate, float dtime)
 {
-        dtALT = dtime / 1000000.0; // Convert from microseconds to seconds
+        dtALT = dtime; // Convert from microseconds to seconds
 
         // Discrete Kalman filter time update equations - Time Update ("Predict")
         // Update xhat - Project the state ahead
