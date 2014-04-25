@@ -33,7 +33,7 @@
 #define UART_SPEED_76800		76800U
 #define UART_SPEED_115200		115200U
 
-#define BUFFER_MAX				150U
+#define BUFFER_MAX				64U
 
 
 #define ComputeBaudRate( baud )				( CONF_FOSC_HZ / ( baud * 16 ) - 1 )
