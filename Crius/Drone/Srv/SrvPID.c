@@ -65,16 +65,23 @@ void SrvPIDResetValues( void )
 	}
 }
 
+//variables de timming
+static Int32U interval_dt = 0U;
+static Int32U lastread = 0;
 Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition )
 {
+	// ********************* Calcul du temps de cycle *************************
+	interval_dt = DrvTimerGetInterval( &lastread ) ;
+	interval_dt = interval_dt / 1000000.0;
+	
 	//determine l'erreur
-	error = targetPosition - currentPosition;
+	error = (targetPosition - currentPosition );
 	
 	//Calcul du terme P
 	p_term = (Int16S)( pid[index].P * error );
 	
 	//calcul de l'erreur intégré
-	pid[index].integratedError += error;
+	pid[index].integratedError += error * interval_dt ;
 
 	//limit de l'erreur
 	float windupgaurd = 2000.0;//pid[index].I * 1000.0;
@@ -91,10 +98,10 @@ Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition 
 	i_term = (Int16S)( pid[index].I * pid[index].integratedError );
 
 	//Calcul du terme D
-	d_term = (Int16S)( pid[index].D * ( error - pid[index].lastPosition ) );
+	d_term = (Int16S)( pid[index].D * ( targetPosition - pid[index].lastPosition ) / interval_dt );
 	
 	//on conserve la position actuel
-	pid[index].lastPosition = error;
+	pid[index].lastPosition = targetPosition;
 	
 	//retourne le calcul PID
 	return (Int16S)(p_term + i_term + d_term);

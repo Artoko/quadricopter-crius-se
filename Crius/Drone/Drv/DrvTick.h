@@ -12,8 +12,6 @@
 #include "Conf/conf_hard.h"
 #include "Tools/tools_typedefs.h"
 
-
-
 //on init le driver
 void DrvTickInit(void);
 
@@ -27,5 +25,7 @@ Int32U DrvTimerGetTimeUs(void);
 void DrvTimerDelayUs( Int16U delay_us );
 void DrvTimerDelayMs( Int16U delay_ms );
 
+//get time interval
+Int32U DrvTimerGetInterval( Int32U *last_interval );
 
 #endif /* DRVTICK_H_ */

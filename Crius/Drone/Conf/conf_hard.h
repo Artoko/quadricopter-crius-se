@@ -49,8 +49,8 @@
 #define CONFIGURE_LED_PIN() (DDRB	|=	(1 << PORTB5))
 
 ////////////////////////////////////////PUBLIC FREQUENCE OSC///////////////////////////////////////
-#define		CONF_FOSC_HZ				16000000UL
-#define		CONF_FOSC_MHZ				16UL
+#define		CONF_FOSC_MHZ				16U
+#define		CONF_FOSC_HZ				CONF_FOSC_MHZ * 1000000UL
 #define		STD_LOOP_TIME				20			//20ms 
 //-----------------------------------------------------------------------------------------------//
 

@@ -193,9 +193,10 @@ void SrvImuSensorsSetAltitudeMaintient( Int8U altitude )
 /*Recuperation des données des capteurs et mise en forme  des données   */
 /************************************************************************/
 //variables de timming
-static Int32U interval = 0U;
-static Int32U now = 0U;
-static Int32U lastread = 0;
+static Int32U interval_gyro = 0U;
+static Int32U lastread_gyro = 0;
+static Int32U interval_ekf = 0U;
+static Int32U lastread_ekf = 0;
 
 static void SrvImuReadAndComputeSensors( void )
 {
@@ -219,10 +220,10 @@ static void SrvImuReadAndComputeSensors( void )
 	magnet.y = 0; 
 	magnet.z = 0; 
 	
-	// ********************* Calcul du temps de cycle *************************
-	now = DrvTimerGetTimeUs();
+	
+	/*now = DrvTimerGetTimeUs();
 	interval = ((Int32U)(now - lastread)); 
-	lastread = now;
+	lastread = now;*/
 	
 	// ********************* Lecture des capteurs *****************************
 	#if defined( DAISY_7 )
@@ -265,27 +266,30 @@ static void SrvImuReadAndComputeSensors( void )
 	//sensitivity	=>	14.375
 	if(gyr_read_ok != FALSE)
 	{
+		// ********************* Calcul du temps de cycle *************************
+		interval_gyro = DrvTimerGetInterval( &lastread_gyro ) ;
+		interval_gyro = interval_gyro / 1000000.0;
 		
 		#if ( GYR_L3G4200D == 1 )
 		gyroRate	=	rotation.x * 0.00875 ;
 		#elif ( GYR_ITG3205 == 1 )	
 		gyroRate	=	rotation.x * 0.06956 ;
 		#endif
-		gyroYAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
+		gyroYAngle	+=	(float)((float)((gyroRate * interval_gyro)));
 		
 		#if ( GYR_L3G4200D == 1 )
 		gyroRate	=	rotation.y * 0.00875 ;
 		#elif ( GYR_ITG3205 == 1 )
 		gyroRate	=	rotation.y * 0.06956 ;
 		#endif
-		gyroXAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
+		gyroXAngle	+=	(float)((float)((gyroRate * interval_gyro) ));
 		
 		#if ( GYR_L3G4200D == 1 )
 		gyroRate	=	rotation.z * 0.00875 ;
 		#elif ( GYR_ITG3205 == 1 )
 		gyroRate	=	rotation.z * 0.06956 ;
 		#endif
-		gyroZAngle	+=	(float)((float)((gyroRate * interval) / 1000000.0));
+		gyroZAngle	+=	(float)((float)((gyroRate * interval_gyro)));
 	}		
 	//MAG
 	if(mag_read_ok != FALSE)
@@ -317,9 +321,14 @@ static void SrvImuReadAndComputeSensors( void )
 	}
 	
 	// ********************* Fusion des capteurs ******************************
-	imu_reel.angles.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval );
-	imu_reel.angles.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval );
-	imu_reel.angles.lacet	 = SrvKalmanFilterZ( heading_deg, gyroZAngle, interval );
+	
+	// ********************* Calcul du temps de cycle *************************
+	interval_ekf = DrvTimerGetInterval( &lastread_ekf ) ;
+	interval_ekf = interval_ekf / 1000000.0;
+	
+	imu_reel.angles.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval_ekf );
+	imu_reel.angles.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval_ekf );
+	imu_reel.angles.lacet	 = SrvKalmanFilterZ( heading_deg, gyroZAngle, interval_ekf );
 	if(imu_reel.angles.lacet < 0.0)
 	{
 		imu_reel.angles.lacet += 360.0;
