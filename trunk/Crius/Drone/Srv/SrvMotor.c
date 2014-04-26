@@ -16,8 +16,8 @@
 #include "Drv/DrvTick.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-#define OFFCOMMAND 1000U
-#define MAXCOMMAND 2000U
+#define OFFCOMMAND 0U
+#define MAXCOMMAND 1000U
 
 ////////////////////////////////////////PRIVATE STRUCTIURES///////////////////////////////////////
 
@@ -47,7 +47,7 @@ Boolean SrvMotorInit ( void )
 /************************************************************************/
 void SrvMotorUpdate(S_pid pid_error)
 {
-	if( imu_reel.moteurs.throttle > OFFCOMMAND)
+	if( ( imu_reel.moteurs.throttle > OFFCOMMAND) && ( imu_reel.moteurs.throttle <= MAXCOMMAND) )
 	{
 		// calcul de la vitesse pour chaque moteur
 		#ifdef BI
@@ -58,8 +58,8 @@ void SrvMotorUpdate(S_pid pid_error)
 		imu_reel.moteurs.rearMotor_R  = SetLimits(imu_reel.moteurs.throttle - pid_error.roulis + pid_error.tangage, OFFCOMMAND, MAXCOMMAND);
 		imu_reel.moteurs.frontMotor_L = SetLimits(imu_reel.moteurs.throttle + pid_error.roulis - pid_error.tangage, OFFCOMMAND, MAXCOMMAND);
 		
-		DrvServoUpdate( 0U , (imu_reel.moteurs.rearMotor_R  - OFFCOMMAND) );
-		DrvServoUpdate( 3U , (imu_reel.moteurs.frontMotor_L - OFFCOMMAND) );
+		DrvServoUpdate( 0U , imu_reel.moteurs.rearMotor_R );
+		DrvServoUpdate( 3U , imu_reel.moteurs.frontMotor_L );
 		
 		#endif
 		
@@ -75,10 +75,10 @@ void SrvMotorUpdate(S_pid pid_error)
 		imu_reel.moteurs.rearMotor_L	= SetLimits(imu_reel.moteurs.throttle + pid_error.roulis + pid_error.tangage + pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
 		imu_reel.moteurs.frontMotor_L	= SetLimits(imu_reel.moteurs.throttle + pid_error.roulis - pid_error.tangage - pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
 		
-		DrvServoUpdate( 0U , (imu_reel.moteurs.rearMotor_R  - OFFCOMMAND) );
-		DrvServoUpdate( 1U , (imu_reel.moteurs.frontMotor_R - OFFCOMMAND) );
-		DrvServoUpdate( 2U , (imu_reel.moteurs.rearMotor_L  - OFFCOMMAND) );
-		DrvServoUpdate( 3U , (imu_reel.moteurs.frontMotor_L - OFFCOMMAND) );
+		DrvServoUpdate( 0U , imu_reel.moteurs.rearMotor_R );
+		DrvServoUpdate( 1U , imu_reel.moteurs.frontMotor_R );
+		DrvServoUpdate( 2U , imu_reel.moteurs.rearMotor_L );
+		DrvServoUpdate( 3U , imu_reel.moteurs.frontMotor_L );
 		
 		#endif
 	}
@@ -111,22 +111,26 @@ Int16U SrvMotorGetSpeed( void )
 /************************************************************************/
 Boolean SrvMotorApplyAbsoluteSpeed(Int16U speed)
 {
-	if( speed <= OFFCOMMAND )
+	Boolean o_success = FALSE;
+	if( speed <= MAXCOMMAND )
 	{
-		imu_reel.moteurs.throttle = speed + OFFCOMMAND;
+		imu_reel.moteurs.throttle = speed;
+		o_success = TRUE;
 	}
-	return TRUE;
+	return o_success;
 }
 
 /************************************************************************/
 /*applique une vitesse relative aux moteurs                             */
 /************************************************************************/
-Boolean SrvMotorApplyRelativeSpeed(Int16U speed)
+Boolean SrvMotorApplyRelativeSpeed(Int16S speed)
 {
+	Boolean o_success = FALSE;
 	//la somme doit etre inferieur 
 	if( (imu_reel.moteurs.throttle + speed) <= MAXCOMMAND )
 	{
 		imu_reel.moteurs.throttle += speed;
+		o_success = TRUE;
 	}
-	return TRUE;
+	return o_success;
 }

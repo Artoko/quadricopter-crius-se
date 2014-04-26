@@ -21,7 +21,7 @@ void SrvMotorUpdate(S_pid pid_error) ;
 Boolean SrvMotorApplyAbsoluteSpeed(Int16U speed) ;
 
 //applique une vittesse aux moteurs
-Boolean SrvMotorApplyRelativeSpeed(Int16U speed);
+Boolean SrvMotorApplyRelativeSpeed(Int16S speed);
 
 //recupere une vittesse des moteurs
 Int16U SrvMotorGetSpeed( void ) ;
