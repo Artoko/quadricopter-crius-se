@@ -13,8 +13,8 @@
 
 ////////////////////////////////////////PRIVATE VARIABLES////////////////////////////////////////
 /* Kalman filter variables and constants */
-const double Q_angleX = 0.5; // Process noise covariance for the accelerometer - Sw
-const double Q_gyroX = 1.0; // Process noise covariance for the gyro - Sw
+const double Q_angleX = 0.1; // Process noise covariance for the accelerometer - Sw
+const double Q_gyroX = 0.2; // Process noise covariance for the gyro - Sw
 const double R_angleX = 0.05; // Measurement noise covariance - Sv
 
 double angleX = 0; // The angle output from the Kalman filter
@@ -59,8 +59,8 @@ double SrvKalmanFilterX(double newAngle, double newRate, float dtime)
 }
 
 /* Kalman filter variables and constants */
-const double Q_angleY = 0.5; // Process noise covariance for the accelerometer - Sw
-const double Q_gyroY = 1.0; // Process noise covariance for the gyro - Sw
+const double Q_angleY = 0.1; // Process noise covariance for the accelerometer - Sw
+const double Q_gyroY = 0.2; // Process noise covariance for the gyro - Sw
 const double R_angleY = 0.03; // Measurement noise covariance - Sv
 
 double angleY = 0; // The angle output from the Kalman filter

@@ -124,6 +124,7 @@ void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
 			UDR0 = in_message_0[ 0U ];
 			in_message_0[ 0U ] = 0;
 			in_message_sent_0++;
+			UCSR0B |= (1<<UDRIE0);	//enable interrupt
 		}
 	}
 	else

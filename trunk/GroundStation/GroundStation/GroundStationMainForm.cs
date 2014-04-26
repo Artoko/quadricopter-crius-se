@@ -113,12 +113,14 @@ namespace GroundStation
 
             LayoutMdi(MdiLayout.TileVertical);
         }
-        public void IncommingMessage(string message)
+        public void IncommingMessage(byte[] message)
         {
             try
             {
                 //Invoke((FillToolStrip)AddItemToolStrip, message);
+                if(message.Length == 34)
                 childForm.IncommingMessage(message);
+
                 childForm2.IncommingMessage(message);
             }
             catch { }
