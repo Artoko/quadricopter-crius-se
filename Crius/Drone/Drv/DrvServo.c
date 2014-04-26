@@ -46,7 +46,7 @@ Boolean DrvServo( void )
 Boolean DrvServoUpdate( Int8U index, Int16U power)
 {
 	//consigne
-	MesServos[ index ].ticks = ConvertPowerToTick(power);
+	MesServos[ index ].ticks = ConvertToTick(power);
 	return TRUE;
 }
 

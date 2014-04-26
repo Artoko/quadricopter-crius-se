@@ -21,8 +21,8 @@ namespace GroundStation
 
         delegate void FillToolStrip(string value);
 
-        FormGraph childForm = new FormGraph();
-        FormCommand childForm2 = new FormCommand();
+        FormGraph graph_form = new FormGraph();
+        FormCommand command_form = new FormCommand();
 
 
          #region load and exit main form
@@ -105,10 +105,10 @@ namespace GroundStation
             }
 
 
-            childForm.MdiParent = this;
-            childForm.Show();
-            childForm2.MdiParent = this;
-            childForm2.Show();
+            graph_form.MdiParent = this;
+            graph_form.Show();
+            command_form.MdiParent = this;
+            command_form.Show();
 
 
             LayoutMdi(MdiLayout.TileVertical);
@@ -118,10 +118,14 @@ namespace GroundStation
             try
             {
                 //Invoke((FillToolStrip)AddItemToolStrip, message);
-                if(message.Length == 34)
-                childForm.IncommingMessage(message);
-
-                childForm2.IncommingMessage(message);
+                if (message.Length == 30)
+                {
+                    graph_form.IncommingMessage(message);
+                }
+                else
+                {
+                    command_form.IncommingMessage(message);
+                }
             }
             catch { }
         }

@@ -39,7 +39,7 @@
 #define MAX_SERVOS				4U
 
 //calcule la vitesse en fonction de la puissance desiré
-#define ConvertPowerToTick(power_const) (Int16U)(SetRange( power_const , 0U		,1000U	,TICKS_MIN_PULSE_WIDTH	,TICKS_MAX_PULSE_WIDTH ) )
+#define ConvertToTick(power_const) (Int16U)(SetRange( power_const , 0U		,1000U	,TICKS_MIN_PULSE_WIDTH	,TICKS_MAX_PULSE_WIDTH ) )
 
 /////////////////////////////////////////PUBLIC STRUCTURES/////////////////////////////////////////
 typedef struct {
