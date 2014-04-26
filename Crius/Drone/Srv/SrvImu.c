@@ -193,10 +193,12 @@ void SrvImuSensorsSetAltitudeMaintient( Int8U altitude )
 /*Recuperation des données des capteurs et mise en forme  des données   */
 /************************************************************************/
 //variables de timming
-static Int32U interval_gyro = 0U;
-static Int32U lastread_gyro = 0;
-static Int32U interval_ekf = 0U;
-static Int32U lastread_ekf = 0;
+static float interval_gyro = 0U;
+static Int32U lastread_gyro = 0U;
+static Int32U now_gyro = 0U;
+static float interval_ekf = 0U;
+static Int32U lastread_ekf = 0U;
+static Int32U now_ekf = 0U;
 
 static void SrvImuReadAndComputeSensors( void )
 {
@@ -267,7 +269,9 @@ static void SrvImuReadAndComputeSensors( void )
 	if(gyr_read_ok != FALSE)
 	{
 		// ********************* Calcul du temps de cycle *************************
-		interval_gyro = DrvTimerGetInterval( &lastread_gyro ) ;
+		now_gyro = DrvTimerGetTimeUs();
+		interval_gyro = (float)(now_gyro - lastread_gyro);
+		lastread_gyro = now_gyro;		
 		interval_gyro = interval_gyro / 1000000.0;
 		
 		#if ( GYR_L3G4200D == 1 )
@@ -323,7 +327,9 @@ static void SrvImuReadAndComputeSensors( void )
 	// ********************* Fusion des capteurs ******************************
 	
 	// ********************* Calcul du temps de cycle *************************
-	interval_ekf = DrvTimerGetInterval( &lastread_ekf ) ;
+	now_ekf = DrvTimerGetTimeUs();
+	interval_ekf = (float)(now_ekf - lastread_ekf);
+	lastread_ekf = now_ekf;
 	interval_ekf = interval_ekf / 1000000.0;
 	
 	imu_reel.angles.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval_ekf );
@@ -337,7 +343,6 @@ static void SrvImuReadAndComputeSensors( void )
 	{
 		imu_reel.angles.lacet -= 360.0;
 	}
-	
 }
 
 

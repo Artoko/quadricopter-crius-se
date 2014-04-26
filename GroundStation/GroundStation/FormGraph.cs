@@ -59,10 +59,27 @@ namespace GroundStation
         {
         }
         
-        public void IncommingMessage(string message)
+        public void IncommingMessage(byte[] message)
         {
             try
             {
+                
+
+                courbe_roulis.Add(timeout, (short)((message[0] << 8) + message[1]));
+                courbe_tangage.Add(timeout, (short)((message[2] << 8) + message[3]));
+                courbe_lacet.Add(timeout, (short)((message[4] << 8) + message[5]));
+                courbe_nord.Add(timeout, (short)((message[6] << 8) + message[7]));
+                courbe_altitude.Add(timeout, (short)((message[8] << 8) + message[9]));
+                courbe_pid_roulis.Add(timeout, -1 * (short)((message[10] << 8) + message[11]));
+                courbe_pid_tangage.Add(timeout, -1 * (short)((message[12] << 8) + message[13]));
+                courbe_pid_lacet.Add(timeout, -1 * (short)((message[14] << 8) + message[15]));
+                courbe_moteur_1.Add(timeout, (short)((message[16] << 8) + message[17]));
+                courbe_moteur_2.Add(timeout, (short)((message[18] << 8) + message[19]));
+                courbe_moteur_3.Add(timeout, (short)((message[20] << 8) + message[21]));
+                courbe_moteur_4.Add(timeout, (short)((message[22] << 8) + message[23]));
+                courbe_pression.Add(timeout, (short)((message[24] << 8) + message[25]));
+                courbe_temperature.Add(timeout, (short)((message[26] << 8) + message[27]));
+
                 if (courbe_roulis.Count == 500)
                 {
                     courbe_roulis.RemoveAt(0);
@@ -80,22 +97,6 @@ namespace GroundStation
                     courbe_moteur_3.RemoveAt(0);
                     courbe_moteur_4.RemoveAt(0);
                 }
-                string[] param = message.Replace("\0", "").Replace(" ", "").Split(',');
-                courbe_roulis.Add(timeout, System.Convert.ToInt16(param[0]));
-                courbe_tangage.Add(timeout, System.Convert.ToInt16(param[1]));
-                courbe_lacet.Add(timeout, System.Convert.ToInt16(param[2]));
-                courbe_nord.Add(timeout, System.Convert.ToInt16(param[3]));
-                courbe_altitude.Add(timeout, System.Convert.ToInt16(param[4]));
-                courbe_pid_roulis.Add(timeout, -1 * System.Convert.ToInt16(param[5]));
-                courbe_pid_tangage.Add(timeout, -1 * System.Convert.ToInt16(param[6]));
-                courbe_pid_lacet.Add(timeout, -1 * System.Convert.ToInt16(param[7]));
-                courbe_moteur_1.Add(timeout, System.Convert.ToInt16(param[8]));
-                courbe_moteur_2.Add(timeout, System.Convert.ToInt16(param[9]));
-                courbe_moteur_3.Add(timeout, System.Convert.ToInt16(param[10]));
-                courbe_moteur_4.Add(timeout, System.Convert.ToInt16(param[11]));
-                courbe_pression.Add(timeout, System.Convert.ToInt16(param[13]));
-                courbe_temperature.Add(timeout, System.Convert.ToInt16(param[14]));
-
                 if (checkBoxRoulis.Checked == true)
                 {
                     myPane1.CurveList[0].IsVisible = true;

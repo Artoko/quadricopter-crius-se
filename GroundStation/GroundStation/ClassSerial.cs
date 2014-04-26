@@ -11,8 +11,8 @@ namespace GroundStation
     public class ClassSerial
     {
         SerialPort serialPort1 = new SerialPort();
-        
-        public delegate void callback_message_receive(string message);
+
+        public delegate void callback_message_receive(byte[] frame);
         callback_message_receive list_callback_messages;
         public static bool Thread_Listener_flag = false;
 
@@ -75,8 +75,10 @@ namespace GroundStation
         private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
         }
-        string frame = "";
 
+
+        byte[] recpt_buff = new byte[100];
+        int index = 0;
         private void ClassUartThreadListenerModem()
         {
             while (Thread_Listener_flag)
@@ -89,11 +91,23 @@ namespace GroundStation
                         int bytes = serialPort1.BytesToRead;
                         while (bytes != 0)
                         {
-                            string frame = serialPort1.ReadLine();
-                            //for (int loop = 0; loop < list_callback_messages.Count; loop++)
+                            recpt_buff[index++] = (byte)serialPort1.ReadByte();
+                            if (index > 4)
+                            if ( (recpt_buff[index - 4] == '#') && (recpt_buff[index - 3] == '#') && (recpt_buff[index - 2] == '#') && (recpt_buff[index - 1] == '#'))
                             {
-                                list_callback_messages(frame);
-                                bytes -= frame.Length;
+                                //if (index == 34)
+                                {
+                                    byte[] frame = new byte[index - 4];
+                                    for (int i = 0; i < index - 4; i++)
+                                    {
+                                        frame[i] = recpt_buff[i];
+                                        recpt_buff[i] = 0;
+                                    }
+                                    list_callback_messages(frame);
+                                }
+                                bytes -= index;
+                                if (bytes < 0) bytes = 0;
+                                index = 0;
                             }
                         }
 
@@ -101,12 +115,13 @@ namespace GroundStation
                     }
                     catch
                     {
-                        frame = "";
+                        index = 0;
                     }
                 }
                 else
                 {
-                    Thread.Sleep(5); frame = "";
+                    Thread.Sleep(5);
+                    index = 0;
                 }
             }
         }

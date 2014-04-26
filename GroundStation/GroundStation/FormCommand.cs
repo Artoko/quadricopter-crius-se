@@ -25,38 +25,30 @@ namespace GroundStation
         }
 
 
-        public void IncommingMessage(string message)
+        public void IncommingMessage(byte[] message)
         {
             try
             {
-                if (message.Contains("PID:"))
+                if ((message[0] == 'P') && (message[1] == 'I') && (message[2] == 'D') && (message[3] == ':'))
                 {
-                    message = message.Substring(message.IndexOf("PID:"), message.Length - message.IndexOf("PID:"));
-                    string [] tab = message.Remove(0, 4).Split(',');
-                    if (tab.Count() == 4)
-                    {
-                        short index = Convert.ToInt16(tab[0]);
-                        short P = Convert.ToInt16(tab[1]);
-                        short I = Convert.ToInt16(tab[2]);
-                        short D = Convert.ToInt16(tab[3]);
 
-                        Invoke((FillPIDBox)WritenumericUpDownP, index, P);
-                        Invoke((FillPIDBox)WritenumericUpDownI, index, I);
-                        Invoke((FillPIDBox)WritenumericUpDownD, index, D);
-                    }
+                    short index = message[4];
+                    short P = (short)((message[5] << 8) + message[6]);
+                    short I = (short)((message[7] << 8) + message[8]);
+                    short D = (short)((message[9] << 8) + message[10]);
+
+                    Invoke((FillPIDBox)WritenumericUpDownP, index, P);
+                    Invoke((FillPIDBox)WritenumericUpDownI, index, I);
+                    Invoke((FillPIDBox)WritenumericUpDownD, index, D);
+
                     label_OK.Invoke((FillLabel)FillResponse, "PID");
                 }
-                if (message.Contains("WEATHER:"))
+                else if ((message[0] == 'W') && (message[1] == 'E') && (message[2] == 'A') && (message[3] == 'T'))
                 {
-                    message = message.Substring(message.IndexOf("WEATHER:"), message.Length - message.IndexOf("WEATHER:"));
-                    string[] tab = message.Remove(0, 8).Split(',');
-                    if (tab.Count() == 1)
-                    {
-                        label4.Invoke((FillLabel)WriteWeather, tab[0]);
-                    }
+                    label4.Invoke((FillLabel)WriteWeather, message[8]);
                     label_OK.Invoke((FillLabel)FillResponse, "WEATHER");
                 }
-                if (message.Contains("OK"))
+                else if ((message[0] == 'O') && (message[1] == 'K'))
                 {
                     label_OK.Invoke((FillLabel)FillResponse, "OK");
                 }
