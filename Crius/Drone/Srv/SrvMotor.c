@@ -90,10 +90,10 @@ void SrvMotorUpdate(S_pid pid_error)
 		imu_reel.moteurs.frontMotor_R	= OFFCOMMAND;
 		imu_reel.moteurs.rearMotor_L	= OFFCOMMAND;
 		imu_reel.moteurs.frontMotor_L	= OFFCOMMAND;
-		DrvServoUpdate( 0U , 0U );
-		DrvServoUpdate( 1U , 0U );
-		DrvServoUpdate( 2U , 0U );
-		DrvServoUpdate( 3U , 0U );
+		DrvServoUpdate( 0U , OFFCOMMAND );
+		DrvServoUpdate( 1U , OFFCOMMAND );
+		DrvServoUpdate( 2U , OFFCOMMAND );
+		DrvServoUpdate( 3U , OFFCOMMAND );
 	}
 }	
 

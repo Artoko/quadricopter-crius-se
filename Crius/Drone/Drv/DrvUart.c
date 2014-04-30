@@ -124,7 +124,6 @@ void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
 			UDR0 = in_message_0[ 0U ];
 			in_message_0[ 0U ] = 0;
 			in_message_sent_0++;
-			UCSR0B |= (1<<UDRIE0);	//enable interrupt
 		}
 	}
 	else
@@ -133,46 +132,6 @@ void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
 		in_message_sent_0 = 0;
 	}
 }
-
-int DrvUart0DataAvailable (void)
-{
-	return RxFifo.cnt;	// Returns number of bytes in the Rx FIFO
-}
-
-void DrvUart0PutChar (Int8U caract)
-{
-	while (TxFifo.cnt >= BUFFER_MAX) ;	// Wait while Tx FIFO is full
-
-	// ********************* Interrupt Disable ****************************************
-	DrvInterruptClearAllInterrupts();
-
-	TxFifo.buff[ TxFifo.in ] = caract;			//place character in buffer
-	TxFifo.in = ( TxFifo.in + 1U ) & (BUFFER_MAX - 1U);
-	TxFifo.cnt++;
-	UCSR0B |= (1U << UDRIE0);		// Data Register Empty Interrupt Enable
-
-	// ********************* Interrupt Enable *****************************************
-	DrvInterruptSetAllInterrupts();
-}
-
-Int8U DrvUart0GetChar (void)
-{
-	Int8U caract;
-	while( RxFifo.cnt == 0U );	// Wait while Rx FIFO empty
-
-	// ********************* Interrupt Disable ****************************************
-	DrvInterruptClearAllInterrupts();
-
-	caract = RxFifo.buff[ RxFifo.out ];	// Get a byte from Rx FIFO
-	RxFifo.out = ( RxFifo.out + 1U ) & ( BUFFER_MAX - 1U );
-	RxFifo.cnt--;
-
-	// ********************* Interrupt Enable *****************************************
-	DrvInterruptSetAllInterrupts();
-
-	return caract;
-}
-
 
 //on recupere le message
 void DrvUart0SendDirectMessage( Char *i_message, Int8U i_message_len )
