@@ -11,6 +11,38 @@
 
  #include <avr/interrupt.h> 
   
+
+// Unsigned 8 bits char
+typedef char Char;
+
+// Unsigned 8 bits integer type
+typedef unsigned char Int8U;
+// Unsigned 16 bits integer type
+typedef unsigned int Int16U;
+// Unsigned 32 bits integer type
+typedef unsigned long Int32U;
+
+// Signed 8 bits integer type
+typedef signed char Int8S;
+// Signed 16 bits integer type
+typedef signed int Int16S;
+// Signed 32 bits integer type
+typedef signed long Int32S;
+
+// Boolean type
+typedef Int8U Boolean;
+#define FALSE       0U
+#define TRUE        1U
+#define	ENABLE		TRUE
+#define	DISABLE		FALSE
+
+// Null pointer
+#ifndef NULL
+#define NULL     ((void *)0U)
+#endif
+
+  
+  
 #ifndef ATOMIC
 #define ATOMIC(code)                    \
     {                                   \
@@ -38,6 +70,19 @@ static inline float SetLimits(float val, float min, float max)
 	}
 	return val;
 }	
+
+static inline Int16S SetLimitsInt16S(Int16S val, Int16S min, Int16S max)
+{
+	if(val > max)
+	{
+		val = max;
+	}
+	else if(val < min)
+	{
+		val = min;
+	}
+	return val;
+}
 
 static inline void swap_endianness(void *buf, uint8_t size) 
 {
@@ -110,35 +155,6 @@ asm volatile ( \
 #define MID(X,limitdown,limitup)	((X > limitdown ) && (X < limitup ))
 #define MIN(A,B)					(((A)<(B)) ? (A) : (B) )
 #define MAX(A,B)					(((A)>(B)) ? (A) : (B) )
-
-// Unsigned 8 bits char
-typedef char Char;
-
-// Unsigned 8 bits integer type
-typedef unsigned char Int8U;
-// Unsigned 16 bits integer type
-typedef unsigned int Int16U;
-// Unsigned 32 bits integer type
-typedef unsigned long Int32U;
-
-// Signed 8 bits integer type
-typedef signed char Int8S;
-// Signed 16 bits integer type
-typedef signed int Int16S;
-// Signed 32 bits integer type
-typedef signed long Int32S;
-
-// Boolean type
-typedef Int8U Boolean;
-	#define FALSE       0U
-	#define TRUE        1U
-	#define	ENABLE		TRUE
-	#define	DISABLE		FALSE
-
-// Null pointer
-#ifndef NULL
-  #define NULL     ((void *)0U)
-#endif
 
 //definit un type de pointeur de fonction pour abstraire les interruptions micro
 typedef void (*ptrfct_Isr_Callback)(void);

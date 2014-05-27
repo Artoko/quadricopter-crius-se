@@ -104,6 +104,11 @@ void DrvUart0ReadMessage( STrame *trame )
 //on recupere le message
 void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
 {
+	for ( Int8U loop_send = 0U ; loop_send < i_message_len ; loop_send++)
+	{
+		while ( !( UCSR0A & (1U<<UDRE0)) );
+		UDR0 = i_message[ loop_send ];
+	}/*
 	Int8U start_index = in_message_len_0;
 	if( (start_index + i_message_len) <= BUFFER_MAX )
 	{
@@ -130,7 +135,7 @@ void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
 	{
 		in_message_len_0 = 0;
 		in_message_sent_0 = 0;
-	}
+	}*/
 }
 
 //on recupere le message

@@ -13,9 +13,9 @@
 
 ////////////////////////////////////////PRIVATE VARIABLES////////////////////////////////////////
 /* Kalman filter variables and constants */
-const double Q_angleX = 0.1; // Process noise covariance for the accelerometer - Sw
-const double Q_gyroX = 0.2; // Process noise covariance for the gyro - Sw
-const double R_angleX = 0.05; // Measurement noise covariance - Sv
+const double Q_angleX = 0.01; // Process noise covariance for the accelerometer - Sw
+const double Q_gyroX = 0.03; // Process noise covariance for the gyro - Sw
+const double R_angleX = 0.001; // Measurement noise covariance - Sv
 
 double angleX = 0; // The angle output from the Kalman filter
 double biasX = 0; // The gyro bias calculated by the Kalman filter
@@ -26,42 +26,48 @@ double KX_0, KX_1;
 ////////////////////////////////////////PUBLIC FONCTIONS////////////////////////////////////////
 double SrvKalmanFilterX(double newAngle, double newRate, float dtime)
 {						
-        dtX = dtime; // Convert from microseconds to seconds
+	// Discrete Kalman filter time update equations - Time Update ("Predict")
+	// Update xhat - Project the state ahead
+	/* Step 1 */
+	dtX = (double)dtime;
+	angleX += dtX * (newRate - biasX);
 
-        // Discrete Kalman filter time update equations - Time Update ("Predict")
-        // Update xhat - Project the state ahead
-        angleX += dtX * (newRate - biasX);
+	// Update estimation error covariance - Project the error covariance ahead
+	/* Step 2 */
+	PX_00 += dtX * (dtX*PX_11 - PX_01 - PX_10 + Q_angleX);
+	PX_01 -= dtX * PX_11;
+	PX_10 -= dtX * PX_11;
+	PX_11 += Q_gyroX * dtX;
 
-        // Update estimation error covariance - Project the error covariance ahead
-        PX_00 += -dtX * (PX_10 + PX_01) + Q_angleX * dtX;
-        PX_01 += -dtX * PX_11;
-        PX_10 += -dtX * PX_11;
-        PX_11 += +Q_gyroX * dtX;
+	// Discrete Kalman filter measurement update equations - Measurement Update ("Correct")
+	// Calculate Kalman gain - Compute the Kalman gain
+	/* Step 4 */
+	SX = PX_00 + R_angleX;
+	/* Step 5 */
+	KX_0 = PX_00 / SX;
+	KX_1 = PX_10 / SX;
 
-        // Discrete Kalman filter measurement update equations - Measurement Update ("Correct")
-        // Calculate Kalman gain - Compute the Kalman gain
-        SX = PX_00 + R_angleX;
-        KX_0 = PX_00 / SX;
-        KX_1 = PX_10 / SX;
+	// Calculate angle and bias - Update estimate with measurement zk (newAngle)
+	/* Step 3 */
+	yX = newAngle - angleX;
+	/* Step 6 */
+	angleX += KX_0 * yX;
+	biasX += KX_1 * yX;
 
-        // Calculate angle and resting rate - Update estimate with measurement zk
-        yX = newAngle - angleX;
-        angleX += KX_0 * yX;
-        biasX += KX_1 * yX;
-
-        // Calculate estimation error covariance - Update the error covariance
-        PX_00 -= KX_0 * PX_00;
-        PX_01 -= KX_0 * PX_01;
-        PX_10 -= KX_1 * PX_00;
-        PX_11 -= KX_1 * PX_01;
-
-        return angleX;
+	// Calculate estimation error covariance - Update the error covariance
+	/* Step 7 */
+	PX_00 -= KX_0 * PX_00;
+	PX_01 -= KX_0 * PX_01;
+	PX_10 -= KX_1 * PX_00;
+	PX_11 -= KX_1 * PX_01;
+	
+    return angleX;
 }
 
 /* Kalman filter variables and constants */
-const double Q_angleY = 0.1; // Process noise covariance for the accelerometer - Sw
-const double Q_gyroY = 0.2; // Process noise covariance for the gyro - Sw
-const double R_angleY = 0.03; // Measurement noise covariance - Sv
+const double Q_angleY = 0.01; // Process noise covariance for the accelerometer - Sw
+const double Q_gyroY = 0.03; // Process noise covariance for the gyro - Sw
+const double R_angleY = 0.001; // Measurement noise covariance - Sv
 
 double angleY = 0; // The angle output from the Kalman filter
 double biasY = 0; // The gyro bias calculated by the Kalman filter
@@ -71,36 +77,42 @@ double KY_0, KY_1;
 
 double SrvKalmanFilterY(double newAngle, double newRate, float dtime)
 {
-        dtY = dtime; // Convert from microseconds to seconds
+    // Discrete Kalman filter time update equations - Time Update ("Predict")
+    // Update xhat - Project the state ahead
+    /* Step 1 */
+	dtY = (double)dtime;
+    angleY += dtY * (newRate - biasY);
 
-        // Discrete Kalman filter time update equations - Time Update ("Predict")
-        // Update xhat - Project the state ahead
-        angleY += dtY * (newRate - biasY);
+    // Update estimation error covariance - Project the error covariance ahead
+    /* Step 2 */
+    PY_00 += dtY * (dtY*PY_11 - PY_01 - PY_10 + Q_angleY);
+    PY_01 -= dtY * PY_11;
+    PY_10 -= dtY * PY_11;
+    PY_11 += Q_gyroY * dtY;
 
-        // Update estimation error covariance - Project the error covariance ahead
-        PY_00 += -dtY * (PY_10 + PY_01) + Q_angleY * dtY;
-        PY_01 += -dtY * PY_11;
-        PY_10 += -dtY * PY_11;
-        PY_11 += +Q_gyroY * dtY;
+    // Discrete Kalman filter measurement update equations - Measurement Update ("Correct")
+    // Calculate Kalman gain - Compute the Kalman gain
+    /* Step 4 */
+    SY = PY_00 + R_angleY;
+    /* Step 5 */
+    KY_0 = PY_00 / SY;
+    KY_1 = PY_10 / SY;
 
-        // Discrete Kalman filter measurement update equations - Measurement Update ("Correct")
-        // Calculate Kalman gain - Compute the Kalman gain
-        SY = PY_00 + R_angleY;
-        KY_0 = PY_00 / SY;
-        KY_1 = PY_10 / SY;
+    // Calculate angle and bias - Update estimate with measurement zk (newAngle)
+    /* Step 3 */
+    yY = newAngle - angleY;
+    /* Step 6 */
+    angleY += KY_0 * yY;
+    biasY += KY_1 * yY;
 
-        // Calculate angle and resting rate - Update estimate with measurement zk
-        yY = newAngle - angleY;
-        angleY += KY_0 * yY;
-        biasY += KY_1 * yY;
-
-        // Calculate estimation error covariance - Update the error covariance
-        PY_00 -= KY_0 * PY_00;
-        PY_01 -= KY_0 * PY_01;
-        PY_10 -= KY_1 * PY_00;
-        PY_11 -= KY_1 * PY_01;
-
-        return angleY;
+    // Calculate estimation error covariance - Update the error covariance
+    /* Step 7 */
+    PY_00 -= KY_0 * PY_00;
+    PY_01 -= KY_0 * PY_01;
+    PY_10 -= KY_1 * PY_00;
+    PY_11 -= KY_1 * PY_01;
+    
+    return angleY;
 }
 
 
