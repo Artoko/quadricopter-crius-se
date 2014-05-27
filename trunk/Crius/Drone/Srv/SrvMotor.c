@@ -16,8 +16,8 @@
 #include "Drv/DrvTick.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-#define OFFCOMMAND 0U
-#define MAXCOMMAND 1000U
+#define OFFCOMMAND 0
+#define MAXCOMMAND 1000
 
 ////////////////////////////////////////PRIVATE STRUCTIURES///////////////////////////////////////
 
@@ -55,8 +55,8 @@ void SrvMotorUpdate(S_pid pid_error)
 		//motor[0] = PIDMIX(+1, 0, 0); //LEFT
 		//motor[1] = PIDMIX(-1, 0, 0); //RIGHT
 		
-		imu_reel.moteurs.rearMotor_R  = SetLimits(imu_reel.moteurs.throttle - pid_error.roulis + pid_error.tangage, OFFCOMMAND, MAXCOMMAND);
-		imu_reel.moteurs.frontMotor_L = SetLimits(imu_reel.moteurs.throttle + pid_error.roulis - pid_error.tangage, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.rearMotor_R  = SetLimitsInt16S(imu_reel.moteurs.throttle - pid_error.roulis + pid_error.tangage, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.frontMotor_L = SetLimitsInt16S(imu_reel.moteurs.throttle + pid_error.roulis - pid_error.tangage, OFFCOMMAND, MAXCOMMAND);
 		
 		DrvServoUpdate( 0U , imu_reel.moteurs.rearMotor_R );
 		DrvServoUpdate( 3U , imu_reel.moteurs.frontMotor_L );
@@ -70,10 +70,10 @@ void SrvMotorUpdate(S_pid pid_error)
 		//motor[2] = PIDMIX(+1,+1,+1); //REAR_L
 		//motor[3] = PIDMIX(+1,-1,-1); //FRONT_L
 		
-		imu_reel.moteurs.rearMotor_R	= SetLimits(imu_reel.moteurs.throttle - pid_error.roulis + pid_error.tangage - pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
-		imu_reel.moteurs.frontMotor_R	= SetLimits(imu_reel.moteurs.throttle - pid_error.roulis - pid_error.tangage + pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
-		imu_reel.moteurs.rearMotor_L	= SetLimits(imu_reel.moteurs.throttle + pid_error.roulis + pid_error.tangage + pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
-		imu_reel.moteurs.frontMotor_L	= SetLimits(imu_reel.moteurs.throttle + pid_error.roulis - pid_error.tangage - pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.rearMotor_R	= SetLimitsInt16S(imu_reel.moteurs.throttle - pid_error.roulis + pid_error.tangage - pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.frontMotor_R	= SetLimitsInt16S(imu_reel.moteurs.throttle - pid_error.roulis - pid_error.tangage + pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.rearMotor_L	= SetLimitsInt16S(imu_reel.moteurs.throttle + pid_error.roulis + pid_error.tangage + pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
+		imu_reel.moteurs.frontMotor_L	= SetLimitsInt16S(imu_reel.moteurs.throttle + pid_error.roulis - pid_error.tangage - pid_error.lacet, OFFCOMMAND, MAXCOMMAND);
 		
 		DrvServoUpdate( 0U , imu_reel.moteurs.rearMotor_R );
 		DrvServoUpdate( 1U , imu_reel.moteurs.frontMotor_R );

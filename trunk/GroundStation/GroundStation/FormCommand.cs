@@ -13,6 +13,7 @@ namespace GroundStation
     {
         delegate void FillPIDBox(int index,short value);
         delegate void FillLabel(string value);
+        delegate void FillWeather(byte value);
 
 
         public FormCommand()
@@ -45,7 +46,7 @@ namespace GroundStation
                 }
                 else if ((message[0] == 'W') && (message[1] == 'E') && (message[2] == 'A') && (message[3] == 'T'))
                 {
-                    label4.Invoke((FillLabel)WriteWeather, message[8]);
+                    label4.Invoke((FillWeather)WriteWeather, message[8]);
                     label_OK.Invoke((FillLabel)FillResponse, "WEATHER");
                 }
                 else if ((message[0] == 'O') && (message[1] == 'K'))
@@ -72,13 +73,13 @@ namespace GroundStation
             label_OK.Text = " receive_frame => " + value;
         }
 
-        void WriteWeather(string value)
+        void WriteWeather(byte value)
         {
-            if (value == "0")
+            if (value == 0)
             {
                 label4.Text = "ensoleillé";
             }
-            else if (value == "1")
+            else if (value == 1)
             {
                 label4.Text = "nuageux";
             }

@@ -67,7 +67,7 @@ void SrvCommDispatcher (Event_t in_event)
 		SrvCommExecute();
 	}
 	
-	else if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_20MS))
+	else if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_10MS))
 	{
 		if( want_repport_data == TRUE )
 		{
@@ -161,14 +161,14 @@ static void SrvCommExecute ( void )
 			
 			o_message[ 4U ] = index;
 			
-			o_message[ 5U ] = (Int8U)(( (Int16S)P * 1000 ) >> 8U);
-			o_message[ 6U ] = (Int8U)( (Int16S)P * 1000 );
+			o_message[ 5U ] = (Int8U)((Int16S)( P * 1000 ) >> 8U);
+			o_message[ 6U ] = (Int8U)((Int16S)(P * 1000 ));
 			
-			o_message[ 7U ] = (Int8U)(( (Int16S)I * 1000 ) >> 8U);
-			o_message[ 8U ] = (Int8U)( (Int16S)I * 1000 );
+			o_message[ 7U ] = (Int8U)((Int16S)( I * 1000 ) >> 8U);
+			o_message[ 8U ] = (Int8U)((Int16S)(I * 1000 ));
 			
-			o_message[ 9U ] = (Int8U)(( (Int16S)D * 1000 ) >> 8U);
-			o_message[ 10U ] = (Int8U)( (Int16S)D * 1000 );
+			o_message[ 9U ] = (Int8U)((Int16S)(D * 1000 ) >> 8U);
+			o_message[ 10U ] = (Int8U)((Int16S)(D * 1000 ));
 			DrvUart0SendMessage( o_message , 15U );
 		}
 		

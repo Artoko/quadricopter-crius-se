@@ -88,7 +88,7 @@ Boolean SrvImuInit( void )
 void SrvImuDispatcher (Event_t in_event)
 {
 	//on calcul toutes les 10 millisecondes
-	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_10MS ) == TRUE)
+	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_20MS ) == TRUE)
 	{
 		// ********************* Mesure des capteurs ******************************
 		SrvImuReadAndComputeSensors();
@@ -270,9 +270,8 @@ static void SrvImuReadAndComputeSensors( void )
 	{
 		// ********************* Calcul du temps de cycle *************************
 		now_gyro = DrvTimerGetTimeUs();
-		interval_gyro = (float)(now_gyro - lastread_gyro);
+		interval_gyro = (float)(now_gyro - lastread_gyro) / 1000000.0F;
 		lastread_gyro = now_gyro;		
-		interval_gyro = interval_gyro / 1000000.0;
 		
 		#if ( GYR_L3G4200D == 1 )
 		gyroRate	=	rotation.x * 0.00875 ;
@@ -328,12 +327,12 @@ static void SrvImuReadAndComputeSensors( void )
 	
 	// ********************* Calcul du temps de cycle *************************
 	now_ekf = DrvTimerGetTimeUs();
-	interval_ekf = (float)(now_ekf - lastread_ekf);
+	interval_ekf = (float)(now_ekf - lastread_ekf) / 1000000.0F;
 	lastread_ekf = now_ekf;
-	interval_ekf = interval_ekf / 1000000.0;
 	
-	imu_reel.angles.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval_ekf );
-	imu_reel.angles.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval_ekf );
+	
+	imu_reel.angles.roulis   = SrvKalmanFilterX( accXangle, gyroXAngle, interval_ekf ) * 10;
+	imu_reel.angles.tangage  = SrvKalmanFilterY( accYangle, gyroYAngle, interval_ekf ) * 10;
 	imu_reel.angles.lacet	 = SrvKalmanFilterZ( heading_deg, gyroZAngle, interval_ekf );
 	if(imu_reel.angles.lacet < 0.0)
 	{
