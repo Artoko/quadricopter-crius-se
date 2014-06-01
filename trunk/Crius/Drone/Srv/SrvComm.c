@@ -57,9 +57,12 @@ Boolean SrvCommInit (void)
 /************************************************************************/
 /*dispatcher d'evenements                                               */
 /************************************************************************/
+Int8U buffer[ BUFFER_MAX ];
+Int8U buffer_size = 0U;
+
 void SrvCommDispatcher (Event_t in_event) 
 {
-	if( DrvEventTestEvent(in_event, CONF_EVENT_MSG_RCV))
+	/*if( DrvEventTestEvent(in_event, CONF_EVENT_MSG_RCV))
 	{
 		//reception de la trame
 		DrvUart0ReadMessage(&ma_trame_comm);
@@ -67,9 +70,63 @@ void SrvCommDispatcher (Event_t in_event)
 		SrvCommExecute();
 	}
 	
-	else if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_10MS))
+	else */
+	
+	if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_10MS))
 	{
-		if( want_repport_data == TRUE )
+		
+		//on lit le buffer
+		DrvUart0ReadBuffer(buffer ,&buffer_size);
+		
+		if(buffer_size > 3U)
+		{
+			Int8S signe = 1;
+			Char field_in_message[ 10U ];
+			Int8U cpt_message = 0U;
+			Int8U cpt_field = 0U;
+			//on parcours le buffer 
+			for (Int8U loop = 1U ; loop < buffer_size ; loop++)
+			{
+				if(( buffer[ loop - 1U ] == '#' ) && ( buffer[ loop ] == '#' ) && ( buffer[ 0U ] == '*' ))
+				{
+					//on reset pour la prochaine trame
+					DrvUart0ResetBuffer(loop + 1U);
+		
+					//dispatche trame
+					SrvCommExecute();
+				}
+				else
+				{
+					//on cherche le + ou le -
+					if( ! ( ( buffer[ loop ] == '-' ) || ( buffer[ loop ] == '+' ) || ( buffer[ loop ] == '#' ) ) )
+					{
+						field_in_message[ cpt_message ] = buffer[ loop ];
+						cpt_message ++;
+						//on efface au fur et à mesure
+						buffer[ loop ] = 0U ;
+					}
+					else
+					{
+						field_in_message[ cpt_message ] = '\0';
+						ma_trame_comm.param[ cpt_field ] = atoi(field_in_message) * signe;
+						//on met a zero le compteur
+						cpt_message = 0;
+						//on incremente pour remplir le prochain champ
+						cpt_field++;
+						//on determine le signe du prochain champ
+						if( buffer[ loop ] == '-' )
+						{
+							signe = -1;
+						}
+						else
+						{
+							signe = 1;
+						}
+					}
+				}
+			}
+		}
+		else if( want_repport_data == TRUE )
 		{
 			SrvCommRepportData();
 		}
