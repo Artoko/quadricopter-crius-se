@@ -33,7 +33,7 @@ void SrvPIDSetValues( Int8U index, float p, float i, float d ) ;
 void SrvPIDResetValues( void ) ;
 
 //calcul des valeurs PID
-Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition ) ;
+Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition, float delta_time ) ;
 
 
 #endif /* SRVPID_H_ */

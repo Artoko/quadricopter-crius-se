@@ -101,14 +101,47 @@ void DrvUart0ReadMessage( STrame *trame )
 	}
 }
 
+void DrvUart0ResetBuffer( Int8U size )
+{
+	Int8U loop = 0U;
+	for( loop = 0U; loop < size ; loop++)
+	{
+		buff_uart_0[ loop ] = 0U;
+	}
+	for( loop = size; loop < ctr_buff_uart_0 ; loop++)
+	{
+		buff_uart_0[ loop - size ] = buff_uart_0[ loop ];
+	}
+	ctr_buff_uart_0 = 0U;
+}
+void DrvUart0ReadBuffer( Int8U *trame ,Int8U *lenght )
+{
+	if(buff_uart_0[ 0U ] == '*')
+	{
+		for( Int8U loop = 0U; loop < BUFFER_MAX ; loop++)
+		{
+			trame[ loop ] = buff_uart_0[ loop ];
+			if(( buff_uart_0[ loop - 1U ] == '#' ) && ( buff_uart_0[ loop ] == '#' ))
+			{
+				lenght[ 0U ] = loop + 1U;
+				loop = BUFFER_MAX;
+			}
+		}
+	}
+	else
+	{
+		lenght[ 0U ] = 0U;
+	}
+}
+
 //on recupere le message
 void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
 {
-	for ( Int8U loop_send = 0U ; loop_send < i_message_len ; loop_send++)
+	/*for ( Int8U loop_send = 0U ; loop_send < i_message_len ; loop_send++)
 	{
 		while ( !( UCSR0A & (1U<<UDRE0)) );
 		UDR0 = i_message[ loop_send ];
-	}/*
+	}*/
 	Int8U start_index = in_message_len_0;
 	if( (start_index + i_message_len) <= BUFFER_MAX )
 	{
@@ -129,9 +162,10 @@ void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
 			UDR0 = in_message_0[ 0U ];
 			in_message_0[ 0U ] = 0;
 			in_message_sent_0++;
+			UCSR0B |= (1<<TXCIE0);	//enable TX interrupt 
 		}
 	}
-	else
+	/*else
 	{
 		in_message_len_0 = 0;
 		in_message_sent_0 = 0;
@@ -196,8 +230,21 @@ void DrvUart1SendMessage(Char *i_message,Int8U i_message_len )
 	ISR(USART0_RX_vect)
 	#endif
 	{
-		//on enregistre l'octet recu
-		rcv_byte = UDR0;
+		rcv_byte = UDR0 ;
+		if( rcv_byte == '*' )
+		{
+			buff_uart_0[ 0U ] = '*';
+			ctr_buff_uart_0 = 1U;
+		}
+		else if( ctr_buff_uart_0 > 0 )
+		{
+			//on enregistre les octet recus
+			buff_uart_0[ ctr_buff_uart_0 ] = rcv_byte;
+			ctr_buff_uart_0++;
+		}
+		
+		
+		/*
 		//start of frame
 		if( rcv_byte == '*' )
 		{
@@ -261,7 +308,7 @@ void DrvUart1SendMessage(Char *i_message,Int8U i_message_len )
 				ctr_buff_uart_0 = 0U;
 				last_rcv_byte = 0U;
 			}
-		}
+		}*/
 	} 
 	
 	//ISR uart octet envoyé

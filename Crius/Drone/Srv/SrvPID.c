@@ -68,17 +68,8 @@ void SrvPIDResetValues( void )
 	}
 }
 
-//variables de timming
-static float interval_pid = 0U;
-static Int32U lastread_pid = 0;
-static Int32U now_pid = 0;
-Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition )
-{
-	// ********************* Calcul du temps de cycle *************************
-	now_pid = DrvTimerGetTimeUs();
-	interval_pid = (float)(now_pid - lastread_pid) / 1000000.0F;
-	lastread_pid = now_pid;
-	
+Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition, float delta_time )
+{	
 	//determine l'erreur
 	error = (targetPosition - currentPosition );
 	
@@ -86,24 +77,25 @@ Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition 
 	p_term = (float)( pid[index].P * error );
 	
 	//calcul de l'erreur intégré
-	pid[index].integratedError += error * interval_pid ;
+	pid[index].integratedError += error * delta_time ;
 
-	//limit de l'erreur
-	float windupgaurd = 100.0F;//pid[index].I * 1000.0;
-	if(pid[index].integratedError > windupgaurd)
+	//limitation de l'erreur
+	float windupguard = 500.0F / pid[index].I ;
+	
+	if(pid[index].integratedError > windupguard)
 	{
-		pid[index].integratedError = windupgaurd;
+		pid[index].integratedError = windupguard;
 	}
-	else if(pid[index].integratedError < -windupgaurd)
+	else if(pid[index].integratedError < -windupguard)
 	{
-		pid[index].integratedError = -windupgaurd;
+		pid[index].integratedError = -windupguard;
 	}
 	
 	//Calcul du terme I
 	i_term = (float)( pid[index].I * pid[index].integratedError );
 
 	//Calcul du terme D
-	d_term = (float)( pid[index].D * ( currentPosition - pid[index].lastPosition ) /* interval_pid*/ );
+	d_term = (float)((float)( pid[index].D * (float)( currentPosition - pid[index].lastPosition ) ) / delta_time );
 	
 	//on conserve la position actuel
 	pid[index].lastPosition = currentPosition;

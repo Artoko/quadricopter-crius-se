@@ -80,7 +80,7 @@ namespace GroundStation
                 courbe_pression.Add(timeout, (short)((message[24] << 8) + message[25]));
                 courbe_temperature.Add(timeout, (short)((message[26] << 8) + message[27]));
 
-                if (courbe_roulis.Count == 500)
+                if (courbe_roulis.Count == 5000)
                 {
                     courbe_roulis.RemoveAt(0);
                     courbe_tangage.RemoveAt(0);
