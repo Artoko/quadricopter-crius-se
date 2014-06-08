@@ -84,7 +84,6 @@ void DrvUart1SendMessage( Char *i_message, Int8U i_message_len ) ;
 // Returns:   void
 // Qualifier: on recupere le message
 //**********************************
-void DrvUart0ReadMessage( STrame *trame );
 void DrvUart0ReadBuffer( Int8U *trame ,Int8U *lenght );
 void DrvUart0ResetBuffer( Int8U size );
 //************************************

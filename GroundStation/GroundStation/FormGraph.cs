@@ -245,9 +245,123 @@ namespace GroundStation
             zedGraphControl1.Refresh();
         }
 
-        private void checkBoxlacet_CheckedChanged(object sender, EventArgs e)
+        private void buttonRefresh_Click(object sender, EventArgs e)
         {
+            if (checkBoxRoulis.Checked == true)
+            {
+                myPane1.CurveList[0].IsVisible = true;
+            }
+            else
+            {
+                myPane1.CurveList[0].IsVisible = false;
+            }
+            if (checkBoxtangage.Checked == true)
+            {
+                myPane1.CurveList[1].IsVisible = true;
+            }
+            else
+            {
+                myPane1.CurveList[1].IsVisible = false;
+            }
+            if (checkBoxlacet.Checked == true)
+            {
+                myPane1.CurveList[2].IsVisible = true;
+            }
+            else
+            {
+                myPane1.CurveList[2].IsVisible = false;
+            }
+            if (checkBoxnord.Checked == true)
+            {
+                myPane1.CurveList[3].IsVisible = true;
+            }
+            else
+            {
+                myPane1.CurveList[3].IsVisible = false;
+            }
+            if (checkBoxaltitude.Checked == true)
+            {
+                myPane1.CurveList[4].IsVisible = true;
+            }
+            else
+            {
+                myPane1.CurveList[4].IsVisible = false;
+            }
+            if (checkBoxpidroulis.Checked == true)
+            {
+                myPane1.CurveList[5].IsVisible = true;
+            }
+            else
+            {
+                myPane1.CurveList[5].IsVisible = false;
+            }
+            if (checkBoxpidtangage.Checked == true)
+            {
+                myPane1.CurveList[6].IsVisible = true;
+            }
+            else
+            {
+                myPane1.CurveList[6].IsVisible = false;
+            }
+            if (checkBoxpidlacet.Checked == true)
+            {
+                myPane1.CurveList[7].IsVisible = true;
+            }
+            else
+            {
+                myPane1.CurveList[7].IsVisible = false;
+            }
+            if (checkBoxMoteur1.Checked == true)
+            {
+                myPane1.CurveList[8].IsVisible = true;
+            }
+            else
+            {
+                myPane1.CurveList[8].IsVisible = false;
+            }
+            if (checkBoxMoteur2.Checked == true)
+            {
+                myPane1.CurveList[9].IsVisible = true;
+            }
+            else
+            {
+                myPane1.CurveList[9].IsVisible = false;
+            }
+            if (checkBoxMoteur3.Checked == true)
+            {
+                myPane1.CurveList[10].IsVisible = true;
+            }
+            else
+            {
+                myPane1.CurveList[10].IsVisible = false;
+            }
+            if (checkBoxMoteur4.Checked == true)
+            {
+                myPane1.CurveList[11].IsVisible = true;
+            }
+            else
+            {
+                myPane1.CurveList[11].IsVisible = false;
+            }
 
+            if (checkBoxpression.Checked == true)
+            {
+                myPane1.CurveList[12].IsVisible = true;
+            }
+            else
+            {
+                myPane1.CurveList[12].IsVisible = false;
+            }
+            if (checkBoxtemperature.Checked == true)
+            {
+                myPane1.CurveList[13].IsVisible = true;
+            }
+            else
+            {
+                myPane1.CurveList[13].IsVisible = false;
+            }
+
+            zedGraphControl1.Refresh();
         }
     }
 }

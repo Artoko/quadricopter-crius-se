@@ -132,8 +132,8 @@
             // 
             this.trackBarRoulis.LargeChange = 1;
             this.trackBarRoulis.Location = new System.Drawing.Point(12, 131);
-            this.trackBarRoulis.Maximum = 900;
-            this.trackBarRoulis.Minimum = -900;
+            this.trackBarRoulis.Maximum = 9;
+            this.trackBarRoulis.Minimum = -9;
             this.trackBarRoulis.Name = "trackBarRoulis";
             this.trackBarRoulis.Size = new System.Drawing.Size(268, 45);
             this.trackBarRoulis.TabIndex = 1;
@@ -153,8 +153,8 @@
             // 
             this.trackBarTangage.LargeChange = 1;
             this.trackBarTangage.Location = new System.Drawing.Point(12, 177);
-            this.trackBarTangage.Maximum = 900;
-            this.trackBarTangage.Minimum = -900;
+            this.trackBarTangage.Maximum = 9;
+            this.trackBarTangage.Minimum = -9;
             this.trackBarTangage.Name = "trackBarTangage";
             this.trackBarTangage.Size = new System.Drawing.Size(268, 45);
             this.trackBarTangage.TabIndex = 1;
