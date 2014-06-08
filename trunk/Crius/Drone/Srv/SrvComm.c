@@ -72,7 +72,7 @@ void SrvCommDispatcher (Event_t in_event)
 	
 	else */
 	
-	if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_10MS))
+	//if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_10MS))
 	{
 		
 		//on lit le buffer
