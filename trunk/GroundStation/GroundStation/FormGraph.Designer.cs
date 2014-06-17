@@ -256,7 +256,7 @@
             this.Name = "FormGraph";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
-            this.Text = "S";
+            this.Text = "Graphs";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormGraph_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
