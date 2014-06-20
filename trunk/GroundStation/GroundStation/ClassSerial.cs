@@ -68,7 +68,10 @@ namespace GroundStation
 
         public void SendMessage(string message)
         {
-            serialPort1.Write(message);
+            if (serialPort1.IsOpen)
+            {
+                serialPort1.Write(message);
+            }
         }
 
 

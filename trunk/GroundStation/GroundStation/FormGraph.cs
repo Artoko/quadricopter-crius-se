@@ -80,6 +80,10 @@ namespace GroundStation
                 courbe_pression.Add(timeout, (short)((message[24] << 8) + message[25]));
                 courbe_temperature.Add(timeout, (short)((message[26] << 8) + message[27]));
 
+            }
+            catch
+            {
+            }
                 if (courbe_roulis.Count == 5000)
                 {
                     courbe_roulis.RemoveAt(0);
@@ -212,10 +216,6 @@ namespace GroundStation
                 }
 
                 zedGraphControl1.AxisChange();
-            }
-            catch
-            { 
-            }
         }
 
         private void timer_tick_Tick(object sender, EventArgs e)

@@ -87,7 +87,6 @@ int main(void)
 	
 	//Wait 2 sec for sensors init
 	DrvTimerDelayMs(3000);
-	LED_OFF();
 		
 	// ********************* Calibration sensors **************************************
 	SrvImuSensorsCalibration();
@@ -96,7 +95,7 @@ int main(void)
 	DrvTimerDelayMs(1000);
 	
 	//stop Initialisation
-	LED_ON();
+	LED_OFF();
 	
 	// ********************* Reset time ***********************************************
 	SrvTimerTickReset();
