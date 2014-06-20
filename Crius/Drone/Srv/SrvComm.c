@@ -71,7 +71,10 @@ void SrvCommDispatcher (Event_t in_event)
 	}
 	
 	else */
-	
+	/*if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_20MS))
+	{
+		SrvCommRepportData();
+	}*/
 	//if( DrvEventTestEvent(in_event, CONF_EVENT_TIMER_10MS))
 	{
 		
@@ -126,10 +129,10 @@ void SrvCommDispatcher (Event_t in_event)
 				}
 			}
 		}
-		else if( want_repport_data == TRUE )
+		/*else if( want_repport_data == TRUE )
 		{
 			SrvCommRepportData();
-		}
+		}*/
 	}
 }
 
@@ -240,19 +243,28 @@ static void SrvCommExecute ( void )
 		DrvUart0SendMessage( o_message , 6U );
 		RESET_SOFT();
 	}
-	else if (ma_trame_comm.param[PARAM_0]  == COMM_REPPORT)
+	else if (ma_trame_comm.param[PARAM_0] == COMM_REPPORT)
 	{
-		if (want_repport_data == TRUE)
+		if( ma_trame_comm.param[PARAM_1] == 1U)
 		{
-			want_repport_data = FALSE;
+			Int8U lenght = 0;
+			Char o_message[ 10 ] = { 0 };
+			o_message[ lenght++ ] = (Int8U)(imu_reel.angles.roulis >> 8U);
+			o_message[ lenght++ ] = (Int8U)imu_reel.angles.roulis;	
+			o_message[ lenght++ ] = (Int8U)(imu_reel.angles.tangage >> 8U);
+			o_message[ lenght++ ] = (Int8U)imu_reel.angles.tangage;
+			o_message[ lenght++ ] = (Int8U)(imu_reel.angles.lacet >> 8U);
+			o_message[ lenght++ ] = (Int8U)imu_reel.angles.lacet;
+			o_message[ lenght++ ] = '#';
+			o_message[ lenght++ ] = '#';
+			o_message[ lenght++ ] = '#';
+			o_message[ lenght++ ] = '#';
+			DrvUart0SendMessage( o_message , 10U );
 		}
-		else
-		{
-			want_repport_data = TRUE;
-		}
-		
-		Char o_message[ ] = { 'O','K','#','#','#','#' };
-		DrvUart0SendMessage( o_message , 6U );
+	}
+	else if (ma_trame_comm.param[PARAM_0] == COMM_REPPORT_ALL)
+	{
+		SrvCommRepportData();
 	}
 }	
 

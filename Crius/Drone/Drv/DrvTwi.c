@@ -22,10 +22,10 @@ static void DrvTwiWaitTransmission( void );
 /************************************************************************/
 /*Init du Drv Twi                                                       */
 /************************************************************************/
-Boolean DrvTwiInit( Int16U speed ) 
+Boolean DrvTwiInit( Int32U speed ) 
 {
 	Boolean o_success = TRUE;
-	TWBR =  ((CONF_FOSC_HZ / (speed * 1000) ) - 16) / 2;	// change the I2C clock rate
+	TWBR =  (Int8U)((Int16U)((Int32U)(CONF_FOSC_HZ / speed ) - 16U) / 2U);	// change the I2C clock rate
 	TWSR =  0U;	                                        	// Not used. Driver presumes prescaler to be 00.
 	TWCR =	(1U<<TWEN) |                                	// Enable TWI-interface and release TWI pins.
 			(0U<<TWIE) | (0U<<TWINT) |                    	// Disable Interupt.

@@ -49,9 +49,8 @@
 #define CONFIGURE_LED_PIN() (DDRB	|=	(1 << PORTB5))
 
 ////////////////////////////////////////PUBLIC FREQUENCE OSC///////////////////////////////////////
-#define		CONF_FOSC_MHZ				16U
+#define		CONF_FOSC_MHZ				16UL
 #define		CONF_FOSC_HZ				CONF_FOSC_MHZ * 1000000UL
-#define		STD_LOOP_TIME				20			//20ms 
 //-----------------------------------------------------------------------------------------------//
 
 
@@ -106,6 +105,7 @@
 #define		COMM_PID			4U
 #define		COMM_EEPROM			5U
 #define		COMM_REPPORT		6U
+#define		COMM_REPPORT_ALL	7U
 
 ////////////////////////////////////////////ANGLES MIN MAX////////////////////////////////////////////
 #define		ANGLE_MAX			40.0

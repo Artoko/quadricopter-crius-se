@@ -24,6 +24,8 @@ namespace GroundStation
         FormGraph graph_form = new FormGraph();
         FormCommand command_form = new FormCommand();
 
+        Thread Thread_ListenerModem;
+        bool thread_modem = false;
 
          #region load and exit main form
         public GroundStationMainForm()
@@ -42,9 +44,23 @@ namespace GroundStation
             boussole.StartInfo = boussoleStartInfo;
             boussole.Start();
             Thread.Sleep(200);*/
+            thread_modem = true;
+            Thread_ListenerModem = new Thread(new ThreadStart(ListenerModem));
+            Thread_ListenerModem.Start();
         }
+
+        private void ListenerModem()
+        {
+            while (thread_modem)
+            {
+                GroundStationMainForm.serial.SendMessage("*6+1##");
+                Thread.Sleep(10);
+            }
+        }
+
         private void GroundStationMainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            thread_modem = false;
             serial.Deconnect();
             //tcpserv.CloseServer();
 
@@ -115,19 +131,19 @@ namespace GroundStation
         }
         public void IncommingMessage(byte[] message)
         {
-            try
+            //try
             {
                 //Invoke((FillToolStrip)AddItemToolStrip, message);
-                if (message.Length == 30)
+                //if (message.Length == 30)
                 {
                     graph_form.IncommingMessage(message);
                 }
-                else
+                //else
                 {
                     command_form.IncommingMessage(message);
                 }
             }
-            catch { }
+            //catch { }
         }
         void AddItemToolStrip(string value)
         {

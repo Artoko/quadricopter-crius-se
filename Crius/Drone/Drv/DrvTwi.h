@@ -13,11 +13,11 @@
 
 ////////////////////////////////////////PUBLIC DEFINES/////////////////////////////////////////
 
-#define TWI_SPEED_100K		100U
-#define TWI_SPEED_400K		400U
+#define TWI_SPEED_100K		100000UL
+#define TWI_SPEED_400K		400000UL
 
 //on init le driver
-Boolean DrvTwiInit( Int16U speed );
+Boolean DrvTwiInit( Int32U speed );
 //read register
 Boolean DrvTwiReadReg( Int8U slave_address , Int8U slave_register, Int8U *data ) ;
 //write register
