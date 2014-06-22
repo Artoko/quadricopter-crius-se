@@ -48,6 +48,7 @@
             this.checkBoxMoteur3 = new System.Windows.Forms.CheckBox();
             this.checkBoxMoteur4 = new System.Windows.Forms.CheckBox();
             this.buttonRefresh = new System.Windows.Forms.Button();
+            this.checkBoxPuissance = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // zedGraphControl1
@@ -64,7 +65,7 @@
             this.zedGraphControl1.ScrollMinX = 0D;
             this.zedGraphControl1.ScrollMinY = 0D;
             this.zedGraphControl1.ScrollMinY2 = 0D;
-            this.zedGraphControl1.Size = new System.Drawing.Size(748, 376);
+            this.zedGraphControl1.Size = new System.Drawing.Size(748, 391);
             this.zedGraphControl1.TabIndex = 2;
             // 
             // timer_tick
@@ -231,11 +232,22 @@
             this.buttonRefresh.UseVisualStyleBackColor = true;
             this.buttonRefresh.Click += new System.EventHandler(this.buttonRefresh_Click);
             // 
+            // checkBoxPuissance
+            // 
+            this.checkBoxPuissance.AutoSize = true;
+            this.checkBoxPuissance.Location = new System.Drawing.Point(8, 392);
+            this.checkBoxPuissance.Name = "checkBoxPuissance";
+            this.checkBoxPuissance.Size = new System.Drawing.Size(74, 17);
+            this.checkBoxPuissance.TabIndex = 18;
+            this.checkBoxPuissance.Text = "puissance";
+            this.checkBoxPuissance.UseVisualStyleBackColor = true;
+            // 
             // FormGraph
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(858, 394);
+            this.ClientSize = new System.Drawing.Size(858, 409);
+            this.Controls.Add(this.checkBoxPuissance);
             this.Controls.Add(this.buttonRefresh);
             this.Controls.Add(this.checkBoxMoteur4);
             this.Controls.Add(this.checkBoxMoteur3);
@@ -284,6 +296,7 @@
         private System.Windows.Forms.CheckBox checkBoxMoteur3;
         private System.Windows.Forms.CheckBox checkBoxMoteur4;
         private System.Windows.Forms.Button buttonRefresh;
+        private System.Windows.Forms.CheckBox checkBoxPuissance;
 
     }
 }

@@ -54,10 +54,10 @@
 
 
 ////////////////////////////////////////PUBLIC STRUCTURES/////////////////////////////////////////
-typedef struct 
+typedef struct
 {
-	Int16S x; 
-	Int16S y; 
+	Int16S x;
+	Int16S y;
 	Int16S z;
 }S_Acc_Angle;
 

@@ -46,7 +46,8 @@ void SrvStartEngineDispatcher (Event_t in_event)
 			}
 			SrvMotorApplyAbsoluteSpeed(speed_moteur);
 		}
-		else
+		//on decompte si on est en mode allumage
+		else if (allumage == TRUE)
 		{
 			//si le timeout est active on decompte
 			if(timeout_before_allumage != DISABLE_TIMEOUT_ALLUMAGE)

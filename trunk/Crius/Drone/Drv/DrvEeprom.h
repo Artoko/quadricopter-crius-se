@@ -31,6 +31,9 @@ Boolean DrvEepromIsConfigured ( void ) ;
 //ecrit l'etat de config de l'eeprom
 void DrvEepromConfigure ( void );
 
+//retourne le numero de version
+void DrvEepromReadVersion ( Int8U *verison );
+
 //retourne les config de l'accelerometre
 void DrvEepromReadAcc ( Int16S *calib );
 

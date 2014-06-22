@@ -124,7 +124,7 @@ namespace GroundStation
 
         private void Speedbutton_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*1+0##");
+            GroundStationMainForm.SendMessage("*1+0##");
             PowerTrackBar.Value = 0;
             trackBarRoulis.Value = 0;
             trackBarLacet.Value = 0;
@@ -143,7 +143,7 @@ namespace GroundStation
                 PowerTrackBar.Maximum = 500;
                 if (PowerTrackBar.Value > 500) PowerTrackBar.Value = 500;
             }
-            GroundStationMainForm.serial.SendMessage("*1+" + PowerTrackBar.Value + "##");
+            GroundStationMainForm.SendMessage("*1+" + PowerTrackBar.Value + "##");
             labelspeed.Text = "speed : " + PowerTrackBar.Value.ToString();
         }
 
@@ -153,7 +153,7 @@ namespace GroundStation
             {
                 trackBarTangage.Value = trackBarRoulis.Value;
             }
-            GroundStationMainForm.serial.SendMessage(FormatString());
+            GroundStationMainForm.SendMessage(FormatString());
             labelroulis.Text = "roulis angle : " + trackBarRoulis.Value.ToString();
         }
 
@@ -163,7 +163,7 @@ namespace GroundStation
             {
                 trackBarRoulis.Value = trackBarTangage.Value;
             }
-            GroundStationMainForm.serial.SendMessage(FormatString());
+            GroundStationMainForm.SendMessage(FormatString());
             labeltangage.Text = "tangage angle : " + trackBarTangage.Value.ToString();
         }
 
@@ -171,13 +171,13 @@ namespace GroundStation
 
         private void LacetTrackBar_ValueChanged(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage(FormatString());
+            GroundStationMainForm.SendMessage(FormatString());
             labelLacet.Text = "lacet angle : " + trackBarLacet.Value.ToString();
         }
 
         private void buttonReset_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*5+0##");
+            GroundStationMainForm.SendMessage("*5+0##");
             PowerTrackBar.Value = 0;
             trackBarRoulis.Value = 0;
             trackBarLacet.Value = 0;
@@ -186,7 +186,7 @@ namespace GroundStation
 
         private void buttonReseteeprom_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*5+1##");
+            GroundStationMainForm.SendMessage("*5+1##");
             PowerTrackBar.Value = 0;
             trackBarRoulis.Value = 0;
             trackBarLacet.Value = 0;
@@ -238,17 +238,17 @@ namespace GroundStation
             {
                 frame += numericUpDownD.Value + "##";
             }
-            GroundStationMainForm.serial.SendMessage(frame);
+            GroundStationMainForm.SendMessage(frame);
         }
 
         private void ButtonRead_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*4+0+0##");
+            GroundStationMainForm.SendMessage("*4+0+0##");
         }
 
         private void buttonRepportData_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*6+0##");
+            GroundStationMainForm.SendMessage("*6+0##");
 
         }
         
@@ -284,17 +284,17 @@ namespace GroundStation
 
         private void button2_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*3+2##");
+            GroundStationMainForm.SendMessage("*3+2##");
         }
 
         private void buttonAltitude_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*3+1##");
+            GroundStationMainForm.SendMessage("*3+1##");
         }
 
         private void button9_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*3+3+" + numericUpDown10.Value + "##");
+            GroundStationMainForm.SendMessage("*3+3+" + numericUpDown10.Value + "##");
         }
 
         private void FormCommand_Load(object sender, EventArgs e)
@@ -329,12 +329,12 @@ namespace GroundStation
             {
                 frame += numericUpDown2.Value + "##";
             }
-            GroundStationMainForm.serial.SendMessage(frame);
+            GroundStationMainForm.SendMessage(frame);
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*4+0+1##");
+            GroundStationMainForm.SendMessage("*4+0+1##");
         }
 
         private void button6_Click(object sender, EventArgs e)
@@ -364,7 +364,7 @@ namespace GroundStation
             {
                 frame += numericUpDown1.Value + "##";
             }
-            GroundStationMainForm.serial.SendMessage(frame);
+            GroundStationMainForm.SendMessage(frame);
         }
 
         private void button8_Click(object sender, EventArgs e)
@@ -394,17 +394,17 @@ namespace GroundStation
             {
                 frame += numericUpDown7.Value + "##";
             }
-            GroundStationMainForm.serial.SendMessage(frame);
+            GroundStationMainForm.SendMessage(frame);
         }
 
         private void button5_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*4+0+2##");
+            GroundStationMainForm.SendMessage("*4+0+2##");
         }
 
         private void button7_Click(object sender, EventArgs e)
         {
-            GroundStationMainForm.serial.SendMessage("*4+0+3##");
+            GroundStationMainForm.SendMessage("*4+0+3##");
         }
 
         

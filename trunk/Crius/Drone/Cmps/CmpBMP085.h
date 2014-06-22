@@ -39,13 +39,13 @@
 #define MODE_ULTRA_HIGHRES      3 //oversampling=3, internalsamples=8, maxconvtimepressure=25.5ms, avgcurrent=12uA, RMSnoise_hPA=0.03, RMSnoise_m=0.25
 
 //define oversampling
-#define OSS MODE_HIGHRES
+#define OSS MODE_ULTRA_HIGHRES//MODE_HIGHRES
 
 //define weather
 #define WEATHER_SUNNY			0U
 #define WEATHER_CLOUDY			1U
 #define WEATHER_RAIN			2U
-#define WEATHER_ERROR			3U
+#define WEATHER_NONE			3U
 
 ////////////////////////////////////////PUBLIC STRUCTURES/////////////////////////////////////////
 
@@ -58,7 +58,7 @@ float  CmpBMP085GetTemperature( void );
 Int32S CmpBMP085GetPressure( void );
 Int16U CmpBMP085GetAltitude( float pressure );
 Int8U CmpBMP085GetWeather( float pressure , Int16U altitude );
-void CmpBMP085LaunchReading( void );
+void CmpBMP085StateMachine( void );
 #endif /*BMA180_H_*/
 
 

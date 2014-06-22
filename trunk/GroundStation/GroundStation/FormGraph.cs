@@ -28,6 +28,7 @@ namespace GroundStation
         PointPairList courbe_moteur_2 = new PointPairList();
         PointPairList courbe_moteur_3 = new PointPairList();
         PointPairList courbe_moteur_4 = new PointPairList();
+        PointPairList courbe_moteur_puissance = new PointPairList();
         
         public int timeout = 0;
         GraphPane myPane1;
@@ -44,13 +45,14 @@ namespace GroundStation
             myPane1.AddCurve("lacet"        , courbe_lacet      , Color.DarkGreen   , SymbolType.None);
             myPane1.AddCurve("nord"         , courbe_nord       , Color.Chocolate   , SymbolType.None);
             myPane1.AddCurve("altitude"     , courbe_altitude   , Color.Brown       , SymbolType.None);
-            myPane1.AddCurve("pid roulis"   , courbe_pid_roulis , Color.BlueViolet  , SymbolType.None);
-            myPane1.AddCurve("pid tangage"  , courbe_pid_tangage, Color.Green       , SymbolType.None);
-            myPane1.AddCurve("pid lacet"    , courbe_pid_lacet  , Color.Firebrick   , SymbolType.None);
+            myPane1.AddCurve("pid roulis"   , courbe_pid_roulis , Color.Tomato  , SymbolType.None);
+            myPane1.AddCurve("pid tangage"  , courbe_pid_tangage, Color.RoyalBlue       , SymbolType.None);
+            myPane1.AddCurve("pid lacet"    , courbe_pid_lacet  , Color.GreenYellow   , SymbolType.None);
             myPane1.AddCurve("moteur 1"     , courbe_moteur_1   , Color.Aqua        , SymbolType.None);
             myPane1.AddCurve("moteur 2"     , courbe_moteur_2   , Color.DarkGray    , SymbolType.None);
             myPane1.AddCurve("moteur 3"     , courbe_moteur_3   , Color.LightSeaGreen , SymbolType.None);
-            myPane1.AddCurve("moteur 4"     , courbe_moteur_4   , Color.LightBlue   , SymbolType.None);
+            myPane1.AddCurve("moteur 4"     , courbe_moteur_4   , Color.LightBlue    , SymbolType.None);
+            myPane1.AddCurve("puissance", courbe_moteur_puissance, Color.Blue, SymbolType.None);
             myPane1.AddCurve("pression"     , courbe_pression   , Color.IndianRed   , SymbolType.None);
             myPane1.AddCurve("temperature"  , courbe_temperature, Color.Khaki       , SymbolType.None);
         }
@@ -77,8 +79,9 @@ namespace GroundStation
                 courbe_moteur_2.Add(timeout, (short)((message[18] << 8) + message[19]));
                 courbe_moteur_3.Add(timeout, (short)((message[20] << 8) + message[21]));
                 courbe_moteur_4.Add(timeout, (short)((message[22] << 8) + message[23]));
-                courbe_pression.Add(timeout, (short)((message[24] << 8) + message[25]));
-                courbe_temperature.Add(timeout, (short)((message[26] << 8) + message[27]));
+                courbe_moteur_puissance.Add(timeout, (short)((message[24] << 8) + message[25]));
+                courbe_pression.Add(timeout, (int)((message[26] << 24) + (message[27] << 16) + (message[28] << 8) + message[29]));
+                courbe_temperature.Add(timeout, (short)((message[30] << 8) + message[31]));
 
             }
             catch
@@ -100,6 +103,7 @@ namespace GroundStation
                     courbe_moteur_2.RemoveAt(0);
                     courbe_moteur_3.RemoveAt(0);
                     courbe_moteur_4.RemoveAt(0);
+                    courbe_moteur_puissance.RemoveAt(0);
                 }
                 if (checkBoxRoulis.Checked == true)
                 {
@@ -198,7 +202,7 @@ namespace GroundStation
                     myPane1.CurveList[11].IsVisible = false;
                 }
 
-                if (checkBoxpression.Checked == true)
+                if (checkBoxPuissance.Checked == true)
                 {
                     myPane1.CurveList[12].IsVisible = true;
                 }
@@ -206,13 +210,24 @@ namespace GroundStation
                 {
                     myPane1.CurveList[12].IsVisible = false;
                 }
-                if (checkBoxtemperature.Checked == true)
+
+
+                if (checkBoxpression.Checked == true)
                 {
                     myPane1.CurveList[13].IsVisible = true;
                 }
                 else
                 {
                     myPane1.CurveList[13].IsVisible = false;
+                }
+
+                if (checkBoxtemperature.Checked == true)
+                {
+                    myPane1.CurveList[14].IsVisible = true;
+                }
+                else
+                {
+                    myPane1.CurveList[14].IsVisible = false;
                 }
 
                 zedGraphControl1.AxisChange();
@@ -344,7 +359,7 @@ namespace GroundStation
                 myPane1.CurveList[11].IsVisible = false;
             }
 
-            if (checkBoxpression.Checked == true)
+            if (checkBoxPuissance.Checked == true)
             {
                 myPane1.CurveList[12].IsVisible = true;
             }
@@ -352,13 +367,24 @@ namespace GroundStation
             {
                 myPane1.CurveList[12].IsVisible = false;
             }
-            if (checkBoxtemperature.Checked == true)
+
+
+            if (checkBoxpression.Checked == true)
             {
                 myPane1.CurveList[13].IsVisible = true;
             }
             else
             {
                 myPane1.CurveList[13].IsVisible = false;
+            }
+
+            if (checkBoxtemperature.Checked == true)
+            {
+                myPane1.CurveList[14].IsVisible = true;
+            }
+            else
+            {
+                myPane1.CurveList[14].IsVisible = false;
             }
 
             zedGraphControl1.Refresh();
