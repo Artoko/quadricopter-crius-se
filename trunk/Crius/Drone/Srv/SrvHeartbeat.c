@@ -45,7 +45,7 @@ void SrvHeartbeatInit( void )
 void SrvHeartbeatDispatcher (Event_t in_event)
 {
 	//toutes les 100ms
-	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
+	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_50MS ) == TRUE)
 	{
 		if( heartbeat_ramp == HEARTBEAT_RAMP_UP )
 		{

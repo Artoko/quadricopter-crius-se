@@ -121,7 +121,7 @@ namespace GroundStationDrone
             if (response.Substring(0,4) == "*2+2")
             {
                 toolStripStatusLabelSpeed.Text = "Speed : " + Convert.ToString((short)((frame[12] << 8) + frame[13]));
-                int Number = ((frame[12] << 8) + frame[13]);
+                float Number = ((frame[12] << 8) + frame[13]);
                 toolStripStatusLabelSpeed.ForeColor = System.Drawing.Color.FromArgb((byte)(float)(255 * (Number / 1000)), (byte)(float)(255 - (255 * (Number / 1000))), (byte)(50));
             }
         }

@@ -268,12 +268,78 @@ static void SrvCommRepportMotors( void )
 
 static void SrvCommRepportAngles( void )
 {
-	
+	//report angles
+	if( ma_trame_comm.param[ PARAM_1 ] == COMM_ANGLE_WRITE)
+	{
+		//applique les angle souhaité
+		imu_desire.angles.roulis	= (Int16S)ma_trame_comm.param[PARAM_2];
+		SetLimits((float)imu_desire.angles.roulis, ANGLE_MIN, ANGLE_MAX);
+		imu_desire.angles.tangage	= (Int16S)ma_trame_comm.param[PARAM_3];
+		SetLimits((float)imu_desire.angles.tangage, ANGLE_MIN, ANGLE_MAX);
+		imu_desire.angles.lacet		= (Int16S)ma_trame_comm.param[PARAM_4];
+		Char o_message[ ] = { '*', '3', '+', '1', '#','#' };
+		DrvUart0SendMessage( o_message , sizeof(o_message) );
+	}
+	else if( ma_trame_comm.param[ PARAM_1 ] == COMM_ANGLE_READ)
+	{
+		Char o_message[ ] = { '*', '3', '+', '2',
+							(Int8U)(imu_reel.angles.roulis >> 8U),
+							(Int8U)imu_reel.angles.roulis,
+							(Int8U)(imu_reel.angles.tangage >> 8U),
+							(Int8U)imu_reel.angles.tangage,
+							(Int8U)(imu_reel.angles.lacet >> 8U),
+							(Int8U)imu_reel.angles.lacet,			 
+							'#', '#' };
+		DrvUart0SendMessage( o_message , sizeof(o_message) );
+	}
+	else
+	{
+		Char o_message[ ] = { '*', COMM_ERROR,'#', '#' };
+		DrvUart0SendMessage( o_message , sizeof(o_message) );
+	}
 }
 
 static void SrvCommRepportSensors( void )
 {
-	
+	//report acc angles 
+	if( ma_trame_comm.param[PARAM_1] == COMM_SENSOR_ACC_READ)
+	{
+		Int8U lenght = 0;
+		Char o_message[ 10 ] = { 0 };
+		o_message[ lenght++ ] = (Int8U)(imu_reel.acc_angles.x >> 8U);
+		o_message[ lenght++ ] = (Int8U)imu_reel.acc_angles.x;	
+		o_message[ lenght++ ] = (Int8U)(imu_reel.acc_angles.y >> 8U);
+		o_message[ lenght++ ] = (Int8U)imu_reel.acc_angles.y;
+		o_message[ lenght++ ] = (Int8U)(imu_reel.acc_angles.z >> 8U);
+		o_message[ lenght++ ] = (Int8U)imu_reel.acc_angles.z;
+		o_message[ lenght++ ] = '#';
+		o_message[ lenght++ ] = '#';
+		o_message[ lenght++ ] = '#';
+		o_message[ lenght++ ] = '#';
+		DrvUart0SendMessage( o_message , 10U );
+	}
+	//report gyr angles 
+	else if( ma_trame_comm.param[PARAM_1] == COMM_SENSOR_GYR_READ)
+	{
+		Int8U lenght = 0;
+		Char o_message[ 10 ] = { 0 };
+		o_message[ lenght++ ] = (Int8U)(imu_reel.gyr_angles.x >> 8U);
+		o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.x;	
+		o_message[ lenght++ ] = (Int8U)(imu_reel.gyr_angles.y >> 8U);
+		o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.y;
+		o_message[ lenght++ ] = (Int8U)(imu_reel.gyr_angles.z >> 8U);
+		o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.z;
+		o_message[ lenght++ ] = '#';
+		o_message[ lenght++ ] = '#';
+		o_message[ lenght++ ] = '#';
+		o_message[ lenght++ ] = '#';
+		DrvUart0SendMessage( o_message , 10U );
+	}
+	else
+	{
+		Char o_message[ ] = { '*', COMM_ERROR,'#', '#' };
+		DrvUart0SendMessage( o_message , sizeof(o_message) );
+	}
 }
 
 static void SrvCommRepportBarometer( void )
@@ -351,3 +417,190 @@ static void SrvCommRepportData( void )
 	DrvUart0SendMessage( o_message , lenght );
 }
 
+
+
+/*
+if(ma_trame_comm.param[PARAM_0] == COMM_MOTOR )
+	{ 
+		//write speed
+		if( ma_trame_comm.param[PARAM_1] == 1U)
+		{
+			//controle validité data
+			if(
+			   ( ma_trame_comm.param[PARAM_1] >= 0U ) &&
+			   ( ma_trame_comm.param[PARAM_1] <= 1000U ) 
+			  )
+			{
+				//applique la vitesse au moteurs
+				SrvMotorApplyAbsoluteSpeed(ma_trame_comm.param[PARAM_1]);
+				Char o_message[ ] = { 'O','K','#','#','#','#' };
+				DrvUart0SendMessage( o_message , 6U );
+			}
+		}
+		//report motors speed 
+		else if( ma_trame_comm.param[PARAM_1] == 2U)
+		{
+			Int8U lenght = 0;
+			Char o_message[ 10 ] = { 0 };
+			o_message[ lenght++ ] = (Int8U)(imu_reel.moteurs.x >> 8U);
+			o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.x;	
+			o_message[ lenght++ ] = (Int8U)(imu_reel.gyr_angles.y >> 8U);
+			o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.y;
+			o_message[ lenght++ ] = (Int8U)(imu_reel.gyr_angles.z >> 8U);
+			o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.z;
+			o_message[ lenght++ ] = '#';
+			o_message[ lenght++ ] = '#';
+			o_message[ lenght++ ] = '#';
+			o_message[ lenght++ ] = '#';
+			DrvUart0SendMessage( o_message , 10U );
+		}
+	}
+	else if(ma_trame_comm.param[PARAM_0] == COMM_ANGLE )
+	{ 
+		//applique les angle souhaité
+		imu_desire.angles.roulis	= (Int16S)ma_trame_comm.param[PARAM_1];
+		SetLimits((float)imu_desire.angles.roulis, ANGLE_MIN, ANGLE_MAX);
+		imu_desire.angles.tangage	= (Int16S)ma_trame_comm.param[PARAM_2];
+		SetLimits((float)imu_desire.angles.tangage, ANGLE_MIN, ANGLE_MAX);
+		imu_desire.angles.lacet		= (Int16S)ma_trame_comm.param[PARAM_3];
+		Char o_message[ ] = { 'O','K','#','#','#','#' };
+		DrvUart0SendMessage( o_message , 6U );
+	}
+	else if(ma_trame_comm.param[PARAM_0] == COMM_BAROMETER )
+	{ 
+		if(  ma_trame_comm.param[PARAM_1] == 1U )
+		{
+			//on enregistre l'altitude de depart
+			SrvImuSensorsSetAltitudeDepart();
+			Char o_message[ ] = { 'O','K','#','#','#','#' };
+			DrvUart0SendMessage( o_message , 6U );
+		}
+		else if(  ma_trame_comm.param[PARAM_1] == 2U )
+		{
+			Char o_message[ ] = { 'W','E','A','T','H','E','R',':',imu_reel.weather,'#','#','#','#'};
+			DrvUart0SendMessage( o_message , 13U );
+		}	
+		else if(  ma_trame_comm.param[PARAM_1] == 3U )
+		{
+			//on enregistre l'altitude relative a la position de depart
+			SrvImuSensorsSetAltitudeMaintient(ma_trame_comm.param[PARAM_2]);
+			Char o_message[ ] = { 'O','K','#','#','#','#' };
+			DrvUart0SendMessage( o_message , 6U );
+		}		
+		
+	}
+	else if(ma_trame_comm.param[PARAM_0] == COMM_PID )
+	{
+		//Write PID
+		if(  ma_trame_comm.param[PARAM_1] == 1U )
+		{
+			Int8U index = 0;
+			float P = 0;
+			float I = 0;
+			float D = 0;
+			index = ma_trame_comm.param[PARAM_2];
+			P = (float)( ma_trame_comm.param[PARAM_3] / 1000.0 );
+			I = (float)( ma_trame_comm.param[PARAM_4] / 1000.0 );
+			D = (float)( ma_trame_comm.param[PARAM_5] / 1000.0 );
+			DrvEepromWritePID( index, P, I, D );
+			SrvPIDSetValues( index, P, I, D );
+			Char o_message[ ] = { 'O','K','#','#','#','#' };
+			DrvUart0SendMessage( o_message , 6U );
+		}
+		//Read PID
+		else
+		{
+			Int8U index = 0;
+			float P = 0;
+			float I = 0;
+			float D = 0;
+			index = ma_trame_comm.param[PARAM_2];
+			DrvEepromReadPID(index,&P,&I,&D);
+			
+			Char o_message[ ] = { 'P','I','D',':',0,0,0,0,0,0,0,'#','#','#','#'};
+			
+			o_message[ 4U ] = index;
+			
+			o_message[ 5U ] = (Int8U)((Int16S)( P * 1000 ) >> 8U);
+			o_message[ 6U ] = (Int8U)((Int16S)(P * 1000 ));
+			
+			o_message[ 7U ] = (Int8U)((Int16S)( I * 1000 ) >> 8U);
+			o_message[ 8U ] = (Int8U)((Int16S)(I * 1000 ));
+			
+			o_message[ 9U ] = (Int8U)((Int16S)(D * 1000 ) >> 8U);
+			o_message[ 10U ] = (Int8U)((Int16S)(D * 1000 ));
+			DrvUart0SendMessage( o_message , 15U );
+		}
+		
+	}
+	else if(ma_trame_comm.param[PARAM_0] == COMM_EEPROM )
+	{
+		if( ma_trame_comm.param[PARAM_1] == 1U)
+		{
+			DrvEepromDeconfigure();
+		}
+		Char o_message[ ] = { 'O','K','#','#','#','#' };
+		DrvUart0SendMessage( o_message , 6U );
+		RESET_SOFT();
+	}
+	else if (ma_trame_comm.param[PARAM_0] == COMM_REPPORT)
+	{
+		//report angles
+		if( ma_trame_comm.param[PARAM_1] == 1U)
+		{
+			Int8U lenght = 0;
+			Char o_message[ 10 ] = { 0 };
+			o_message[ lenght++ ] = (Int8U)(imu_reel.angles.roulis >> 8U);
+			o_message[ lenght++ ] = (Int8U)imu_reel.angles.roulis;	
+			o_message[ lenght++ ] = (Int8U)(imu_reel.angles.tangage >> 8U);
+			o_message[ lenght++ ] = (Int8U)imu_reel.angles.tangage;
+			o_message[ lenght++ ] = (Int8U)(imu_reel.angles.lacet >> 8U);
+			o_message[ lenght++ ] = (Int8U)imu_reel.angles.lacet;
+			o_message[ lenght++ ] = '#';
+			o_message[ lenght++ ] = '#';
+			o_message[ lenght++ ] = '#';
+			o_message[ lenght++ ] = '#';
+			DrvUart0SendMessage( o_message , 10U );
+		}
+		//report acc angles 
+		else if( ma_trame_comm.param[PARAM_1] == 2U)
+		{
+			Int8U lenght = 0;
+			Char o_message[ 10 ] = { 0 };
+			o_message[ lenght++ ] = (Int8U)(imu_reel.acc_angles.x >> 8U);
+			o_message[ lenght++ ] = (Int8U)imu_reel.acc_angles.x;	
+			o_message[ lenght++ ] = (Int8U)(imu_reel.acc_angles.y >> 8U);
+			o_message[ lenght++ ] = (Int8U)imu_reel.acc_angles.y;
+			o_message[ lenght++ ] = (Int8U)(imu_reel.acc_angles.z >> 8U);
+			o_message[ lenght++ ] = (Int8U)imu_reel.acc_angles.z;
+			o_message[ lenght++ ] = '#';
+			o_message[ lenght++ ] = '#';
+			o_message[ lenght++ ] = '#';
+			o_message[ lenght++ ] = '#';
+			DrvUart0SendMessage( o_message , 10U );
+		}
+		//report gyr angles 
+		else if( ma_trame_comm.param[PARAM_1] == 3U)
+		{
+			Int8U lenght = 0;
+			Char o_message[ 10 ] = { 0 };
+			o_message[ lenght++ ] = (Int8U)(imu_reel.gyr_angles.x >> 8U);
+			o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.x;	
+			o_message[ lenght++ ] = (Int8U)(imu_reel.gyr_angles.y >> 8U);
+			o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.y;
+			o_message[ lenght++ ] = (Int8U)(imu_reel.gyr_angles.z >> 8U);
+			o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.z;
+			o_message[ lenght++ ] = '#';
+			o_message[ lenght++ ] = '#';
+			o_message[ lenght++ ] = '#';
+			o_message[ lenght++ ] = '#';
+			DrvUart0SendMessage( o_message , 10U );
+		}
+		else if (ma_trame_comm.param[PARAM_1] == 2U)
+		{
+			SrvCommRepportData();
+		}
+	}
+
+
+*/
