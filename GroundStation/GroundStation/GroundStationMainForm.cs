@@ -26,7 +26,8 @@ namespace GroundStation
 
         Thread Thread_ListenerModem;
         bool thread_modem = false;
-
+        static bool wait_message = false;
+        
          #region load and exit main form
         public GroundStationMainForm()
         {
@@ -37,23 +38,27 @@ namespace GroundStation
             Process notepad = new Process();
             notepad.StartInfo = notepadStartInfo;
             notepad.Start();
-            Thread.Sleep(200); */ 
+            Thread.Sleep(200); */
           
             /*ProcessStartInfo boussoleStartInfo = new ProcessStartInfo("boussole.exe");
             Process boussole = new Process();
             boussole.StartInfo = boussoleStartInfo;
             boussole.Start();
             Thread.Sleep(200);*/
-            thread_modem = true;
-            Thread_ListenerModem = new Thread(new ThreadStart(ListenerModem));
-            Thread_ListenerModem.Start();
+            
+            
+            /*thread_modem = true;
+            Thread_ListenerModem = new Thread(new Threa dStart(ListenerModem));
+            Thread_ListenerModem.Start();*/
+
+
         }
 
         private void ListenerModem()
         {
             while (thread_modem)
             {
-                GroundStationMainForm.serial.SendMessage("*6+1##");
+                serial.SendMessage("*6+1##");
                 Thread.Sleep(10);
             }
         }
@@ -127,6 +132,7 @@ namespace GroundStation
             command_form.Show();
 
 
+            serial.SendMessage("*6+2##");
             LayoutMdi(MdiLayout.TileVertical);
         }
         public void IncommingMessage(byte[] message)
@@ -134,17 +140,37 @@ namespace GroundStation
             //try
             {
                 //Invoke((FillToolStrip)AddItemToolStrip, message);
-                //if (message.Length == 30)
+                if (message.Length == 32)
                 {
                     graph_form.IncommingMessage(message);
                 }
-                //else
+                else
                 {
                     command_form.IncommingMessage(message);
+                    wait_message = false;
                 }
             }
             //catch { }
+
+            if (wait_message == false)
+            {
+                SendMessage("*6+2##");
+            }
+            
+
         }
+
+        public static void SendMessage(string message)
+        {
+            if (message != "*6+2##")
+            {
+                wait_message = true;
+            }
+            serial.SendMessage(message);
+        }
+
+
+
         void AddItemToolStrip(string value)
         {
             try

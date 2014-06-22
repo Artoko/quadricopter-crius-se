@@ -42,6 +42,7 @@ Int32U pression = 0;
 Int8U step_bmp085 = 0;
 Int16U m_ut = 0;
 Int32U m_up = 0;
+Int8U weather = WEATHER_NONE;
 
 
 //Initialisation du barometre
@@ -49,7 +50,10 @@ Boolean CmpBMP085Init( void )
 {
 	Boolean o_success = FALSE;
 	CmpBMP085ReadCalibration();
-	CmpBMP085LaunchReading();
+	CmpBMP085StateMachine();
+	
+	weather = WEATHER_NONE;
+	
 	o_success = TRUE;
 	return o_success;
 }
@@ -59,37 +63,39 @@ Int16U CmpBMP085GetAltitude(float pressure)
 {
 	float A = pressure/101325.0;
 	float B = 1.0/5.25588;
-	float C = pow(A,B);
-	C = 1 - C;
-	C = C / 0.0000225577;
-	return (Int16U)C;
+	float alt = pow(A,B);
+	alt = 1 - alt;
+	alt = alt / 0.0000225577;
+	return (Int16U)alt;
 }
 
 //Get weather 
 Int8U CmpBMP085GetWeather( float pressure , Int16U altitude )
 {	
 	// calcul de la presion attendu a notre altitudeconst
-	const float currentAltitude = 330.00F; // current altitude in METERS
-	const float ePressure = SEA_PRESSURE * pow((1-currentAltitude/44330.0F), 5.255F);
+	static float currentAltitude = 340.00F; // current altitude in METERS
+	static float ePressure = 0;
+	ePressure = SEA_PRESSURE * pow((1-currentAltitude/44330.0F), 5.255F);
 	// on compare par rapport a la pression mesurée
 	Int16S weatherDiff = (Int16S)( pressure - ePressure );
 	//on retourne le type de temps
 	if(weatherDiff > 250)
 	{
-		return (Int8U)WEATHER_SUNNY;
+		weather = WEATHER_SUNNY;
 	}
 	else if ((weatherDiff <= 250) && (weatherDiff >= -250))
 	{
-		return (Int8U)WEATHER_CLOUDY;
+		weather = WEATHER_CLOUDY;
 	}
 	else
 	{
-		return (Int8U)WEATHER_RAIN;
+		weather = WEATHER_RAIN;
 	}
+	return weather;
 }
 
 //lance la lecture des variables du BMP085
- void CmpBMP085LaunchReading( void )
+ void CmpBMP085StateMachine( void )
  {
 	 CmpBMP085ReadUTReadUP();
  }

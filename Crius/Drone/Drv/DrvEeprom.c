@@ -5,25 +5,26 @@
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
 #define ADDR_EEPROM_CHECK_EEPROM	( Int8U *)0U
-#define ADDR_EEPROM_ACC_CALIB_X		( Int8U *)1U
-#define ADDR_EEPROM_ACC_CALIB_Y		( Int8U *)3U
-#define ADDR_EEPROM_ACC_CALIB_Z		( Int8U *)5U
-#define ADDR_EEPROM_GYRO_CALIB_X	( Int8U *)7U
-#define ADDR_EEPROM_GYRO_CALIB_Y	( Int8U *)9U
-#define ADDR_EEPROM_GYRO_CALIB_Z	( Int8U *)11U
-#define ADDR_EEPROM_PID_X_P			( Int8U *)13U
-#define ADDR_EEPROM_PID_X_I			( Int8U *)17U
-#define ADDR_EEPROM_PID_X_D			( Int8U *)21U
-#define ADDR_EEPROM_PID_Y_P			( Int8U *)25U
-#define ADDR_EEPROM_PID_Y_I			( Int8U *)29U
-#define ADDR_EEPROM_PID_Y_D			( Int8U *)33U
-#define ADDR_EEPROM_PID_Z_P			( Int8U *)37U
-#define ADDR_EEPROM_PID_Z_I			( Int8U *)41U
-#define ADDR_EEPROM_PID_Z_D			( Int8U *)45U
-#define ADDR_EEPROM_PID_ALT_P		( Int8U *)49U
-#define ADDR_EEPROM_PID_ALT_I		( Int8U *)53U
-#define ADDR_EEPROM_PID_ALT_D		( Int8U *)57U
-#define ADDR_EEPROM_ALTITUDE		( Int8U *)60U
+#define ADDR_EEPROM_VERSION			( Int8U *)1U
+#define ADDR_EEPROM_ACC_CALIB_X		( Int8U *)2U
+#define ADDR_EEPROM_ACC_CALIB_Y		( Int8U *)4U
+#define ADDR_EEPROM_ACC_CALIB_Z		( Int8U *)6U
+#define ADDR_EEPROM_GYRO_CALIB_X	( Int8U *)8U
+#define ADDR_EEPROM_GYRO_CALIB_Y	( Int8U *)10U
+#define ADDR_EEPROM_GYRO_CALIB_Z	( Int8U *)12U
+#define ADDR_EEPROM_PID_X_P			( Int8U *)14U
+#define ADDR_EEPROM_PID_X_I			( Int8U *)18U
+#define ADDR_EEPROM_PID_X_D			( Int8U *)22U
+#define ADDR_EEPROM_PID_Y_P			( Int8U *)26U
+#define ADDR_EEPROM_PID_Y_I			( Int8U *)30U
+#define ADDR_EEPROM_PID_Y_D			( Int8U *)34U
+#define ADDR_EEPROM_PID_Z_P			( Int8U *)38U
+#define ADDR_EEPROM_PID_Z_I			( Int8U *)42U
+#define ADDR_EEPROM_PID_Z_D			( Int8U *)46U
+#define ADDR_EEPROM_PID_ALT_P		( Int8U *)50U
+#define ADDR_EEPROM_PID_ALT_I		( Int8U *)54U
+#define ADDR_EEPROM_PID_ALT_D		( Int8U *)58U
+#define ADDR_EEPROM_ALTITUDE		( Int8U *)62U
 
 
 #define VAL_EEPROM_CHECK_OK			0U
@@ -64,6 +65,8 @@ Boolean DrvEepromInit ( void )
 	else
 	{
 		eeprom_is_configured = FALSE;
+		//on ecrit la version 
+		DrvEepromWriteByte(ADDR_EEPROM_VERSION, VERSION);
 	}
 	return o_success;
 }
@@ -87,6 +90,12 @@ void DrvEepromConfigure ( void )
 Boolean DrvEepromIsConfigured ( void )
 {
 	return eeprom_is_configured;
+}
+
+//retourne le numero de version
+void DrvEepromReadVersion ( Int8U *verison )
+{
+	*verison = DrvEepromReadByte( ADDR_EEPROM_VERSION );
 }
 
 //retourne les config de l'accelerometre

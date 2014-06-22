@@ -11,7 +11,7 @@
 
 
 
-#include "Tools/tools_typedefs.h"
+#include "Conf/conf_hard.h"
 
 ////////////////////////////////////////PUBLIC DEFINES/////////////////////////////////////////*
 #define L3G4200D_ADDRESS				0x68
@@ -66,13 +66,12 @@
 #define L3G4200D_CTRL_REG5_ENABLE_LPF2		0x02
 
 ////////////////////////////////////////PUBLIC STRUCTURES////////////////////////////////////////
-typedef struct 
+typedef struct
 {
-	Int16S x; 
-	Int16S y; 
+	Int16S x;
+	Int16S y;
 	Int16S z;
 }S_Gyr_Angle;
-
 ////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 
 //fonction init du capteur

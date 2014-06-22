@@ -141,7 +141,7 @@
         <InterfaceName>debugWIRE</InterfaceName>
       </ToolOptions>
       <ToolType>com.atmel.avrdbg.tool.jtagice3plus</ToolType>
-      <ToolNumber>J30200007192</ToolNumber>
+      <ToolNumber>J30200010429</ToolNumber>
       <ToolName>JTAGICE3</ToolName>
     </com_atmel_avrdbg_tool_jtagice3plus>
   </PropertyGroup>
@@ -290,6 +290,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Srv\SrvComm.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Srv\SrvHeartbeat.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Srv\SrvHeartbeat.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Srv\SrvImu.c">

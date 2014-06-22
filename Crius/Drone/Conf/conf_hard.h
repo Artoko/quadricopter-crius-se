@@ -20,8 +20,11 @@
 
 #include "Tools/tools_typedefs.h"
 
+////////////////////////////////////////PUBLIC VERSION /////////////////////////////////////////////
+//version 1.0
+#define VERSION 0x10
 
-////////////////////////////////////////PUBLIC SENSORS BOARD////////////////////////////////////////
+////////////////////////////////////////PUBLIC SENSORS BOARD ///////////////////////////////////////
 //#define DAISY_7		
 #define CRIUS		
 
@@ -65,9 +68,10 @@
 #define		CONF_EVENT_TIMER_20MS		( 1U << 2U )
 #define		CONF_EVENT_TIMER_50MS		( 1U << 3U )
 #define		CONF_EVENT_TIMER_100MS		( 1U << 4U )
-#define		CONF_EVENT_TIMER_500MS		( 1U << 5U )
-#define		CONF_EVENT_TIMER_1S			( 1U << 6U )
-#define		CONF_EVENT_MSG_RCV			( 1U << 7U )
+#define		CONF_EVENT_TIMER_250MS		( 1U << 5U )
+#define		CONF_EVENT_TIMER_500MS		( 1U << 6U )
+#define		CONF_EVENT_TIMER_1S			( 1U << 7U )
+#define		CONF_EVENT_MSG_RCV			( 1U << 8U )
 
 ////////////////////////////////////PUBLIC SERVOS PORTS///////////////////////////////////////////
 #if defined( DAISY_7 )
@@ -99,13 +103,31 @@
 #define		USE_UART_0		
 
 ////////////////////////////////////////////PUBLIC COMM////////////////////////////////////////////
-#define		COMM_MOTOR			1U
-#define		COMM_ANGLE			2U
-#define		COMM_ALTITUDE		3U
-#define		COMM_PID			4U
-#define		COMM_EEPROM			5U
-#define		COMM_REPPORT		6U
-#define		COMM_REPPORT_ALL	7U
+#define		COMM_GENERAL							1U
+	#define		COMM_GENERAL_VERSION					1U
+	#define		COMM_GENERAL_RESET						2U
+	#define		COMM_GENERAL_FULL_RESET					3U
+#define		COMM_MOTORS								2U
+	#define		COMM_MOTOR_WRITE						1U
+	#define		COMM_MOTOR_READ							2U
+#define		COMM_ANGLES								3U
+	#define		COMM_ANGLE_WRITE						1U
+	#define		COMM_ANGLE_READ							2U
+#define		COMM_SENSORS							4U
+	#define		COMM_SENSOR_ACC_READ					1U
+	#define		COMM_SENSOR_GYR_READ					2U
+#define		COMM_BAROMETER							5U
+	#define		COMM_BAROMETER_ALTITUDE					1U
+		#define		COMM_BAROMETER_ALTITUDE_START			1U
+		#define		COMM_BAROMETER_ALTITUDE_HOLD			2U
+	#define		COMM_BAROMETER_WEATHER					2U
+#define		COMM_PID								6U
+	#define		COMM_PID_WRITE							1U
+	#define		COMM_PID_READ							2U
+#define		COMM_EEPROM								7U
+	#define		COMM_EEPROM_RESET						1U
+#define		COMM_REPPORT							8U
+#define		COMM_ERROR								0xFFU
 
 ////////////////////////////////////////////ANGLES MIN MAX////////////////////////////////////////////
 #define		ANGLE_MAX			40.0
@@ -140,15 +162,34 @@ typedef struct SS_angles
 }S_angles;
 
 //-----------------------------------------------------------------------------------------------//
+typedef struct
+{
+	float x;
+	float y;
+	float z;
+}S_Acc_Angles;
+
+//-----------------------------------------------------------------------------------------------//
+typedef struct
+{
+	float x;
+	float y;
+	float z;
+}S_Gyr_Angles;
+
+
+//-----------------------------------------------------------------------------------------------//
 typedef struct SS_imu
 {
-	S_moteur	moteurs;
-	S_pid		pid_error;
-	S_angles	angles;
-	Int16U		altitude;
-	Int32U		pressure;
-	Int16S		temperature;
-	Int8U		weather;
+	S_Acc_Angles	acc_angles;
+	S_Gyr_Angles	gyr_angles;
+	S_angles		angles;
+	S_moteur		moteurs;
+	S_pid			pid_error;
+	Int16U			altitude;
+	Int32U			pressure;
+	Int16S			temperature;
+	Int8U			weather;
 }S_imu;
 
 //-----------------------------------------------------------------------------------------------//

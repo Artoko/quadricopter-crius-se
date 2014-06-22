@@ -193,6 +193,10 @@ ISR(TIMER2_COMPA_vect)
 	{
 		DrvEventAddEvent(CONF_EVENT_TIMER_100MS );
 	}
+	if(tick_counter_100us % 2500U == 0U )
+	{
+		DrvEventAddEvent(CONF_EVENT_TIMER_250MS );
+	}
 	if(tick_counter_100us % 5000U == 0U )
 	{
 		DrvEventAddEvent(CONF_EVENT_TIMER_500MS );

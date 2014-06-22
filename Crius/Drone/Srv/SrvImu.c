@@ -36,28 +36,15 @@
 ////////////////////////////////////////PRIVATE STRUCTURES///////////////////////////////////////
 
 ////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
-static float SrvImuReadMagnetometerSensor( void );
-static void SrvImuReadGyroscopeSensor( void );
-static void SrvImuReadAccelerometerSensor( void );
-static void SrvImuFusionSensorsRollPitchYaw( void );
+static void SrvImuReadMagnetometerSensor( S_angles *angles );
+static void SrvImuReadGyroscopeSensor( S_Gyr_Angles *gyr_angles, float interval );
+static void SrvImuReadAccelerometerSensor( S_Acc_Angles	*acc_angles );
+static void SrvImuFusionSensorsRollPitchYaw( S_angles *angles, float interval, S_Acc_Angles acc_angles, S_Gyr_Angles gyr_angles, Int16S nord );
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 
 
 //variables de timming
-float interval = 0.0F;
 Int32U lastread = 0U;
-Int32U now = 0U;
-
-
-//angle donne par les capteurs accelerometre et gyroscope
-static float accXangle;
-static float accYangle;
-static float accZangle;
-static float gyroXAngle;
-static float gyroYAngle;
-static float gyroZAngle;
-static float heading_deg;
-
 
 /************************************************************************/
 /*Initialisation des composants                                         */
@@ -89,18 +76,20 @@ Boolean SrvImuInit( void )
 /************************************************************************/
 void SrvImuDispatcher (Event_t in_event)
 {
+	Int32U now = 0U;
+	float interval = 0.0F;
 	// ********************* Calcul du temps de cycle *************************
 	now = DrvTimerGetTimeUs();
 	interval = (float)(now - lastread) / 1000000.0F;
 	lastread = now;
 	
 	// ********************* Mesure des capteurs ******************************	
-	SrvImuReadGyroscopeSensor();
-	SrvImuReadAccelerometerSensor();
-	SrvImuReadMagnetometerSensor();
+	SrvImuReadGyroscopeSensor( &imu_reel.gyr_angles, interval );
+	SrvImuReadAccelerometerSensor( &imu_reel.acc_angles );
+	SrvImuReadMagnetometerSensor( &imu_reel.angles );
 		
 	// ********************* Mise à jour roulis tangage lacet *****************
-	SrvImuFusionSensorsRollPitchYaw();
+	SrvImuFusionSensorsRollPitchYaw( &imu_reel.angles, interval, imu_reel.acc_angles, imu_reel.gyr_angles, imu_reel.angles.nord );
 	
 	// ********************* PID **********************************************
 	imu_reel.pid_error.roulis	= SrvPIDCompute( 0U , imu_desire.angles.roulis	, imu_reel.angles.roulis	, interval);
@@ -117,12 +106,18 @@ void SrvImuDispatcher (Event_t in_event)
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
 	{
 		// *********************Mise à jour du barometre **************************
-		CmpBMP085LaunchReading();
+		CmpBMP085StateMachine();
 		imu_reel.temperature = (Int16S)CmpBMP085GetTemperature();
-		imu_reel.weather = CmpBMP085GetWeather(imu_reel.pressure, imu_reel.altitude);
 		imu_reel.pressure = CmpBMP085GetPressure();
 		imu_reel.altitude = (Int16S)CmpBMP085GetAltitude(imu_reel.pressure);
+		
+		if( ( imu_reel.weather == WEATHER_NONE ) && ( imu_reel.pressure != 0) )
+		{
+			imu_reel.weather = CmpBMP085GetWeather(imu_reel.pressure, imu_reel.altitude);
+		}
 	}	
+	
+	
 }
 
 
@@ -147,7 +142,16 @@ void SrvImuSensorsCalibration( void )
 			else
 			{
 				calibrate_acc = TRUE;
-			}		
+			}	
+			//calib accelerometer
+			if( CmpL3G4200DIsCalibrate() == FALSE)
+			{
+				CmpL3G4200DGetRotation(&rotation);
+			}
+			else
+			{
+				calibrate_gyr = TRUE;
+			}	
 		#elif defined( CRIUS )
 			//calib accelerometer
 			if( CmpBMA180IsCalibrate() == FALSE)
@@ -165,7 +169,7 @@ void SrvImuSensorsCalibration( void )
 			}
 			else
 			{
-				calibrate_acc = TRUE;
+				calibrate_gyr = TRUE;
 			}			
 		#endif
 	} while ((!calibrate_acc) && (!calibrate_gyr));
@@ -204,19 +208,19 @@ void SrvImuSensorsSetAltitudeMaintient( Int8U altitude )
 /************************************************************************/
 /*Fusion des capteurs pour avoir Roll et Pitch                          */
 /************************************************************************/
-static void SrvImuFusionSensorsRollPitchYaw( void )
+static void SrvImuFusionSensorsRollPitchYaw( S_angles *angles, float interval, S_Acc_Angles acc_angles, S_Gyr_Angles gyr_angles, Int16S nord )
 {
-	imu_reel.angles.roulis   = (Int16S)SrvKalmanFilterX( accXangle, gyroYAngle, interval ) ;
-	imu_reel.angles.tangage  = (Int16S)SrvKalmanFilterY( accYangle, gyroXAngle, interval ) ;
-	imu_reel.angles.lacet	 = (Int16S)SrvKalmanFilterZ( heading_deg, gyroZAngle, interval );
+	angles->roulis   = (Int16S)SrvKalmanFilterX( acc_angles.x, gyr_angles.y, interval ) ;
+	angles->tangage  = (Int16S)SrvKalmanFilterY( acc_angles.y, gyr_angles.x, interval ) ;
+	angles->lacet	 = (Int16S)SrvKalmanFilterZ( nord, gyr_angles.z, interval );
 	
-	if(imu_reel.angles.lacet < 0.0)
+	if(angles->lacet < 0.0)
 	{
-		imu_reel.angles.lacet += 360.0;
+		angles->lacet += 360.0;
 	}
-	else if(imu_reel.angles.lacet > 360.0)
+	else if(angles->lacet > 360.0)
 	{
-		imu_reel.angles.lacet -= 360.0;
+		angles->lacet -= 360.0;
 	}
 }
 
@@ -224,19 +228,25 @@ static void SrvImuFusionSensorsRollPitchYaw( void )
 /************************************************************************/
 /*Lecture accelerometer                                                 */
 /************************************************************************/
-static void SrvImuReadAccelerometerSensor( void )
+static void SrvImuReadAccelerometerSensor( S_Acc_Angles	*acc_angles )
 {
 	Boolean acc_read_ok = FALSE;
+	
+	float accXangle;
+	float accYangle;
+	float accZangle;
 	
 	S_Acc_Angle acceleration;
 	acceleration.x = 0;
 	acceleration.y = 0;
 	acceleration.z = 0;
-	
-	acc_read_ok = CmpBMA180GetAcceleration(&acceleration);
-	acceleration.x *= -1;
-	acceleration.y *= -1;
-	acceleration.z *= 1;
+
+	#if ( ACC_BMA180 == 1 )
+		acc_read_ok = CmpBMA180GetAcceleration( &acceleration );
+		acceleration.x *= -1;
+		acceleration.y *= -1;
+		acceleration.z *= 1;
+	#endif
 	
 	//ACC
 	if(acc_read_ok != FALSE)
@@ -247,57 +257,66 @@ static void SrvImuReadAccelerometerSensor( void )
 		accXangle = ToDeg(accXangle);
 		accYangle = ToDeg(accYangle);
 		accZangle = acceleration.z;
+		
+		acc_angles->x = accXangle;
+		acc_angles->y = accYangle;
+		acc_angles->z = accZangle;
 	}
 }
 
 /************************************************************************/
 /*Lecture Gyroscope                                                     */
 /************************************************************************/
-static void SrvImuReadGyroscopeSensor( void )
+static void SrvImuReadGyroscopeSensor( S_Gyr_Angles *gyr_angles, float interval )
 {
 	Boolean gyr_read_ok = FALSE;
+	
 	float gyroRate = 0;	
+	
 	S_Gyr_Angle rotation;
 	rotation.x = 0;
 	rotation.y = 0;
 	rotation.z = 0;
 	
-	gyr_read_ok = CmpITG3205GetRotation(&rotation);
-	rotation.x *= -1;
-	rotation.y *= 1;
-	rotation.z *= -1;
+	#if ( GYR_ITG3205 == 1 )
+		gyr_read_ok = CmpITG3205GetRotation(&rotation);
+		rotation.x *= -1;
+		rotation.y *= 1;
+		rotation.z *= -1;
+	#endif
+	
 	
 	//GYR
 	//sensitivity	=>	14.375
 	if(gyr_read_ok != FALSE)
 	{
 		#if ( GYR_L3G4200D == 1 )
-		gyroRate	=	rotation.x * 0.00875 ;
+			gyroRate = rotation.x * 0.00875 ;
 		#elif ( GYR_ITG3205 == 1 )
-		gyroRate	=	rotation.x / 14.375 ;
+			gyroRate = rotation.x / 14.375 ;
 		#endif
-		gyroXAngle	+=	(float)((float)((gyroRate * interval)));
+		gyr_angles->x += (float)((float)((gyroRate * interval)));
 		
 		#if ( GYR_L3G4200D == 1 )
-		gyroRate	=	rotation.y * 0.00875 ;
+			gyroRate = rotation.y * 0.00875 ;
 		#elif ( GYR_ITG3205 == 1 )
-		gyroRate	=	rotation.y / 14.375 ;
+			gyroRate = rotation.y / 14.375 ;
 		#endif
-		gyroYAngle	+=	(float)((float)((gyroRate * interval) ));
+		gyr_angles->y += (float)((float)((gyroRate * interval) ));
 		
 		#if ( GYR_L3G4200D == 1 )
-		gyroRate	=	rotation.z * 0.00875 ;
+			gyroRate = rotation.z * 0.00875 ;
 		#elif ( GYR_ITG3205 == 1 )
-		gyroRate	=	rotation.z / 14.375 ;
+			gyroRate = rotation.z / 14.375 ;
 		#endif
-		gyroZAngle	+=	(float)((float)((gyroRate * interval)));
+		gyr_angles->z += (float)((float)((gyroRate * interval)));
 	}
 }
 
 /************************************************************************/
 /*Lecture Magnetometer                                                  */
 /************************************************************************/
-static float SrvImuReadMagnetometerSensor( void )
+static void SrvImuReadMagnetometerSensor( S_angles *angles )
 {
 	Boolean mag_read_ok = FALSE;
 	
@@ -306,22 +325,24 @@ static float SrvImuReadMagnetometerSensor( void )
 	magnet.y = 0;
 	magnet.z = 0;
 	
-	mag_read_ok = CmpHMC5883GetHeading(&magnet);
-	magnet.x *= -1;
-	magnet.y *= 1;
-	magnet.z *= -1;
+	#if ( GYR_ITG3205 == 1 )
+		mag_read_ok = CmpHMC5883GetHeading(&magnet);
+		magnet.x *= -1;
+		magnet.y *= 1;
+		magnet.z *= -1;
+	#endif
 	
 	//MAG
 	if(mag_read_ok != FALSE)
 	{
 		//on doit etre en dessous des 40 deg
-		if(!(accXangle > 40 || accXangle < -40 || accYangle > 40 || accYangle < -40))
+		if(!(angles->roulis > 40 || angles->roulis < -40 || angles->tangage > 40 || angles->tangage < -40))
 		{
 			//compensation avec l'accelerometre
-			float cosRoll  = cos( ToRad( accYangle ) );
-			float sinRoll  = sin( ToRad( accYangle ) );
-			float cosPitch = cos( ToRad( accXangle ) );
-			float sinPitch = sin( ToRad( accXangle ) );
+			float cosRoll  = cos( ToRad( angles->tangage ) );
+			float sinRoll  = sin( ToRad( angles->tangage ) );
+			float cosPitch = cos( ToRad( angles->roulis ) );
+			float sinPitch = sin( ToRad( angles->roulis ) );
 			
 			float Xh = magnet.x * cosPitch + magnet.z * sinPitch;
 			float Yh = magnet.x * sinRoll * sinPitch + magnet.y * cosRoll - magnet.z * sinRoll * cosPitch;
@@ -335,8 +356,7 @@ static float SrvImuReadMagnetometerSensor( void )
 			{
 				heading -= 2 * M_PI;
 			}
-			heading_deg = ToDeg(heading);
-			imu_reel.angles.nord = heading_deg;
+			angles->nord = (Int16S)ToDeg(heading);
 		}
 	}
 }

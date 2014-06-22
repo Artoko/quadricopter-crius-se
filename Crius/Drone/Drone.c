@@ -21,10 +21,11 @@
 #include "Srv/SrvPID.h"
 #include "Srv/SrvMotor.h"
 #include "Srv/SrvTimer.h"
+#include "Srv/SrvHeartbeat.h"
 
-////////////////////////////////////////PRIVATE FUNCTIONS////////////////////////////////////////
-//fct appele par le timer
-static void HeartbeatIsrCallbackTimer( void ) ;
+#include "Cmps/CmpBMP085.h"
+
+
 
 ////////////////////////////////////////PRIVATE VARIABLES////////////////////////////////////////
 //event main
@@ -56,7 +57,7 @@ int main(void)
 	imu_reel.altitude			= 0;
 	imu_reel.temperature		= 0;
 	imu_reel.pressure			= 0;  
-	imu_reel.weather		    = 0;
+	imu_reel.weather		    = WEATHER_NONE;
 	imu_reel.pid_error.altitude = 0;
 	imu_reel.pid_error.roulis	= 0;
 	imu_reel.pid_error.tangage	= 0;
@@ -84,9 +85,10 @@ int main(void)
 	SrvPIDInit();
 	SrvImuInit();
 	SrvMotorInit(); 
+	SrvHeartbeatInit();
 	
-	//Wait 2 sec for sensors init
-	DrvTimerDelayMs(3000);
+	//Wait 1 sec for sensors init
+	DrvTimerDelayMs(1000);
 		
 	// ********************* Calibration sensors **************************************
 	SrvImuSensorsCalibration();
@@ -100,8 +102,6 @@ int main(void)
 	// ********************* Reset time ***********************************************
 	SrvTimerTickReset();
 	
-	// ********************* Start Heartbeat ******************************************
-	SrvTimerAddTimer(CONF_TIMER_HEARTBEAT, 500U, E_TIMER_MODE_PERIODIC, HeartbeatIsrCallbackTimer);
 	
     while(TRUE)
     {			
@@ -110,13 +110,9 @@ int main(void)
 		SrvImuDispatcher(current_main_event);
 		// ********************* Receive transmit data ********************************
 		SrvCommDispatcher(current_main_event);
+		// ********************* Still alive  *****************************************
+		SrvHeartbeatDispatcher(current_main_event);
 	}	
-}
-
-//fct appele par le timer
-void HeartbeatIsrCallbackTimer( void)
-{
-	LED_TOGGLE();
 }
 
 
