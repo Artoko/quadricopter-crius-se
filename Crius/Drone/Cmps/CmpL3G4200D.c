@@ -84,7 +84,7 @@ Boolean CmpL3G4200DIsCalibrate(void)
 
 
 //Rotation X Y Z
-Boolean CmpL3G4200DGetRotation(S_Gyr_Angle *rot)
+Boolean CmpL3G4200DGetRotation(S_Gyr_Sensor *rot)
 {
 	Int8U buffer[ 6U ] = { 0, 0, 0, 0, 0, 0 };
 

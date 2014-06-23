@@ -30,7 +30,7 @@ Int8U heartbeat_state = 0U;
 Int8U heartbeat_ramp = 0U;
 
 
-//Init des valeurs d'allumage moteurs
+//Init du hearbeat
 void SrvHeartbeatInit( void )
 {
 	heartbeat_delay = 1U;

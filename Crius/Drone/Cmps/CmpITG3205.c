@@ -79,7 +79,7 @@ Boolean CmpITG3205IsCalibrate(void)
 }
 
 //Rotation X Y Z
-Boolean CmpITG3205GetRotation(S_Gyr_Angle *rot)
+Boolean CmpITG3205GetRotation(S_Gyr_Sensor *rot)
 {
 	Int8U buffer[ 6U ] = { 0, 0, 0, 0, 0, 0 };
 

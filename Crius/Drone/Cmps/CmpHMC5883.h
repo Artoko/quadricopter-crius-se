@@ -42,17 +42,12 @@
 #define HMC5883_IDENT_C      0x0C
 
 ////////////////////////////////////////PUBLIC STRUCTURES/////////////////////////////////////////
-typedef struct
-{
-	Int16S x;
-	Int16S y;
-	Int16S z;
-}S_Mag_Angle;
+
 ////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 
 //fonction init du capteur
 Boolean CmpHMC5883Init(void);
 //mag X Y Z
-Boolean CmpHMC5883GetHeading(S_Mag_Angle *mag);
+Boolean CmpHMC5883GetHeading(S_Mag_Sensor *mag);
 
 #endif /*BMA180_H_*/

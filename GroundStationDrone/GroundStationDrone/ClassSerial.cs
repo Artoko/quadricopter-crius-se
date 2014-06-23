@@ -22,7 +22,7 @@ namespace MySerial
         {
             bool ret = false;
             serialPort1.PortName = port_name;
-            serialPort1.BaudRate = 57600;
+            serialPort1.BaudRate = 115200;
             try
             {
                 serialPort1.Open();
@@ -45,12 +45,14 @@ namespace MySerial
 
             if (ret == true)
             {
+                //serialPort1.DataReceived +=serialPort1_DataReceived;
                 Thread_Listener = new Thread(new ThreadStart(ClassUartThreadListenerModem));
                 Thread_Listener.Start();
                 Thread_Listener_flag = true;
             }
             return ret;
         }
+
 
         public bool Connect(string port_name, callback_message_receive callback)
         {
@@ -85,10 +87,17 @@ namespace MySerial
             }
         }
 
-
-        private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        /*private void serialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-        }
+            List<byte> bytes = Encoding.ASCII.GetBytes(serialPort1.ReadExisting().ToCharArray()).ToList();
+            if ((bytes[0] == '*') && (bytes[bytes.Count - 2] == '#') && (bytes[bytes.Count - 1] == '#'))
+            {
+                bytes.RemoveAt(0);
+                bytes.RemoveAt(bytes.Count - 1);
+                bytes.RemoveAt(bytes.Count - 1);
+                list_callback_messages(bytes.ToArray());
+            }
+        }*/
 
 
         byte[] recpt_buff = new byte[100];
@@ -111,10 +120,10 @@ namespace MySerial
                             {
                                 //if (index == 34)
                                 {
-                                    byte[] frame = new byte[index - 2];
-                                    for (int i = 0; i < index - 2; i++)
+                                    byte[] frame = new byte[index - 3];
+                                    for (int i = 1; i < index - 2; i++)
                                     {
-                                        frame[i] = recpt_buff[i];
+                                        frame[i - 1] = recpt_buff[i];
                                         recpt_buff[i] = 0;
                                     }
                                     list_callback_messages(frame);

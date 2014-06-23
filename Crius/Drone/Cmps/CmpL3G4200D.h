@@ -66,17 +66,14 @@
 #define L3G4200D_CTRL_REG5_ENABLE_LPF2		0x02
 
 ////////////////////////////////////////PUBLIC STRUCTURES////////////////////////////////////////
-typedef struct
-{
-	Int16S x;
-	Int16S y;
-	Int16S z;
-}S_Gyr_Angle;
+
 ////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 
 //fonction init du capteur
 Boolean CmpL3G4200DInit(void);
 //Rotation X Y Z
-Boolean CmpL3G4200DGetRotation(S_Gyr_Angle *rot);
+Boolean CmpL3G4200DGetRotation(S_Gyr_Sensor *rot);
+
+Boolean CmpL3G4200DIsCalibrate(void);
 
 #endif /*CMPL3G4200D_H_*/

@@ -23,7 +23,67 @@ double PX_00 = 0, PX_01 = 0, PX_10 = 0, PX_11 = 0;
 double dtX, yX, SX;
 double KX_0, KX_1;
 
+/* Kalman filter variables and constants */
+const double Q_angleY = 0.001; // Process noise covariance for the accelerometer - Sw
+const double Q_gyroY = 0.003; // Process noise covariance for the gyro - Sw
+const double R_angleY = 0.001; // Measurement noise covariance - Sv
+
+double angleY = 0; // The angle output from the Kalman filter
+double biasY = 0; // The gyro bias calculated by the Kalman filter
+double PY_00 = 0, PY_01 = 0, PY_10 = 0, PY_11 = 0;
+double dtY, yY, SY;
+double KY_0, KY_1;
+
+/* Kalman filter variables and constants */
+const double Q_angleZ = 0.1; // Process noise covariance for the magnetometer - Sw
+const double Q_gyroZ = 0.003; // Process noise covariance for the gyro - Sw
+const double R_angleZ = 0.03; // Measurement noise covariance - Sv
+
+double angleZ = 0; // The angle output from the Kalman filter
+double biasZ = 0; // The gZro bias calculated bZ the Kalman filter
+double PZ_00 = 0, PZ_01 = 0, PZ_10 = 0, PZ_11 = 0;
+double dtZ, ZZ, SZ;
+double KZ_0, KZ_1;
+
+/* Kalman filter variables and constants */
+const double Q_baroALT = 0.001; // Process noise covariance for the barometer - Sw
+const double Q_accelALT = 0.003; // Process noise covariance for the accelerometer - Sw
+const double R_angleALT = 0.03; // Measurement noise covariance - Sv
+
+double angleALT = 0; // The angle output from the Kalman filter
+double biasALT = 0; // The gZro bias calculated bZ the Kalman filter
+double PALT_00 = 0, PALT_01 = 0, PALT_10 = 0, PALT_11 = 0;
+double dtALT, ZALT, SALT;
+double KALT_0, KALT_1;
 ////////////////////////////////////////PUBLIC FONCTIONS////////////////////////////////////////
+void SrvKalmanFilterInit( void )
+{
+	angleX = 0; // The angle output from the Kalman filter
+	biasX = 0; // The gyro bias calculated by the Kalman filter
+	PX_00 = 0, PX_01 = 0, PX_10 = 0, PX_11 = 0;
+	dtX = 0, yX = 0, SX = 0;
+	KX_0 = 0, KX_1 = 0;
+
+	angleY = 0; // The angle output from the Kalman filter
+	biasY = 0; // The gyro bias calculated by the Kalman filter
+	PY_00 = 0, PY_01 = 0, PY_10 = 0, PY_11 = 0;
+	dtY = 0, yY = 0, SY = 0;
+	KY_0 = 0, KY_1 = 0;
+
+	angleZ = 0; // The angle output from the Kalman filter
+	biasZ = 0; // The gZro bias calculated bZ the Kalman filter
+	PZ_00 = 0, PZ_01 = 0, PZ_10 = 0, PZ_11 = 0;
+	dtZ = 0, ZZ, SZ = 0;
+	KZ_0 = 0, KZ_1 = 0;
+	
+	angleALT = 0; // The angle output from the Kalman filter
+	biasALT = 0; // The gZro bias calculated bZ the Kalman filter
+	PALT_00 = 0, PALT_01 = 0, PALT_10 = 0, PALT_11 = 0;
+	dtALT = 0, ZALT = 0, SALT = 0;
+	KALT_0 = 0, KALT_1 = 0;
+}
+
+
 double SrvKalmanFilterX(double newAngle, double newRate, float dtime)
 {						
 	// Discrete Kalman filter time update equations - Time Update ("Predict")
@@ -63,17 +123,6 @@ double SrvKalmanFilterX(double newAngle, double newRate, float dtime)
 	
     return angleX;
 }
-
-/* Kalman filter variables and constants */
-const double Q_angleY = 0.001; // Process noise covariance for the accelerometer - Sw
-const double Q_gyroY = 0.003; // Process noise covariance for the gyro - Sw
-const double R_angleY = 0.001; // Measurement noise covariance - Sv
-
-double angleY = 0; // The angle output from the Kalman filter
-double biasY = 0; // The gyro bias calculated by the Kalman filter
-double PY_00 = 0, PY_01 = 0, PY_10 = 0, PY_11 = 0;
-double dtY, yY, SY;
-double KY_0, KY_1;
 
 double SrvKalmanFilterY(double newAngle, double newRate, float dtime)
 {
@@ -115,19 +164,6 @@ double SrvKalmanFilterY(double newAngle, double newRate, float dtime)
     return angleY;
 }
 
-
-
-/* Kalman filter variables and constants */
-const double Q_angleZ = 0.1; // Process noise covariance for the magnetometer - Sw
-const double Q_gyroZ = 0.003; // Process noise covariance for the gyro - Sw
-const double R_angleZ = 0.03; // Measurement noise covariance - Sv
-
-double angleZ = 0; // The angle output from the Kalman filter
-double biasZ = 0; // The gZro bias calculated bZ the Kalman filter
-double PZ_00 = 0, PZ_01 = 0, PZ_10 = 0, PZ_11 = 0;
-double dtZ, ZZ, SZ;
-double KZ_0, KZ_1;
-
 double SrvKalmanFilterZ(double newAngle, double newRate, float dtime)
 {
         dtZ = dtime; // Convert from microseconds to seconds
@@ -161,18 +197,6 @@ double SrvKalmanFilterZ(double newAngle, double newRate, float dtime)
 
         return angleZ;
 }
-
-
-/* Kalman filter variables and constants */
-const double Q_baroALT = 0.001; // Process noise covariance for the barometer - Sw
-const double Q_accelALT = 0.003; // Process noise covariance for the accelerometer - Sw
-const double R_angleALT = 0.03; // Measurement noise covariance - Sv
-
-double angleALT = 0; // The angle output from the Kalman filter
-double biasALT = 0; // The gZro bias calculated bZ the Kalman filter
-double PALT_00 = 0, PALT_01 = 0, PALT_10 = 0, PALT_11 = 0;
-double dtALT, ZALT, SALT;
-double KALT_0, KALT_1;
 
 double SrvKalmanFilterAlt(double newAngle, double newRate, float dtime)
 {

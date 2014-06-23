@@ -54,12 +54,6 @@
 
 
 ////////////////////////////////////////PUBLIC STRUCTURES/////////////////////////////////////////
-typedef struct
-{
-	Int16S x;
-	Int16S y;
-	Int16S z;
-}S_Acc_Angle;
 
 ////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 
@@ -68,7 +62,7 @@ typedef struct
 //fonction init du capteur
 Boolean CmpLIS331DLHInit(void);
 //Acceleration X Y Z
-Boolean CmpLIS331DLHGetAcceleration(S_Acc_Angle *acc);
+Boolean CmpLIS331DLHGetAcceleration(S_Acc_Sensor *acc);
 Boolean CmpLIS331DLHIsCalibrate(void);
 
 #endif /* CMPLIS331DLH_H_ */
