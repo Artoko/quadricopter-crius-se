@@ -90,7 +90,7 @@ Boolean CmpBMA180IsCalibrate(void)
 
 
 //Rotation X Y Z
-Boolean CmpBMA180GetAcceleration(S_Acc_Angle *acc)
+Boolean CmpBMA180GetAcceleration(S_Acc_Sensor *acc)
 {
 	Int8U buffer[ 6U ] = { 0, 0, 0, 0, 0, 0 };
 

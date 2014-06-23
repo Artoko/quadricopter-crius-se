@@ -35,7 +35,7 @@ Boolean CmpHMC5883Init(void)
 
 
 //Mag X Y Z
-Boolean CmpHMC5883GetHeading(S_Mag_Angle *mag)
+Boolean CmpHMC5883GetHeading(S_Mag_Sensor *mag)
 {	
 	Int8U buffer[ 6U ] = {0U, 0U, 0U, 0U, 0U, 0U};
 	if(DrvTwiReadRegBuf(HMC5883_ADDRESS, HMC5883_X_MSB, buffer, 6U) != TRUE )

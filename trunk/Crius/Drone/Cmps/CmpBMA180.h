@@ -32,12 +32,7 @@
 #define BMA180_REG_OFFSET_LSB1	0x35
 
 ////////////////////////////////////////PUBLIC STRUCTURES/////////////////////////////////////////
-typedef struct
-{
-	Int16S x;
-	Int16S y;
-	Int16S z;
-}S_Acc_Angle;
+
 
 ////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 
@@ -46,7 +41,7 @@ typedef struct
 //fonction init du capteur
 Boolean CmpBMA180Init(void);
 //Acceleration X Y Z
-Boolean CmpBMA180GetAcceleration(S_Acc_Angle *acc);
+Boolean CmpBMA180GetAcceleration(S_Acc_Sensor *acc);
 Boolean CmpBMA180IsCalibrate(void);
 
 #endif /*BMA180_H_*/

@@ -15,6 +15,7 @@
 #include "Drv/DrvEeprom.h"
 #include "Drv/DrvInterrupt.h"
 
+#include "Srv/SrvKalman.h"
 #include "Srv/SrvImu.h"
 #include "Srv/SrvComm.h"
 #include "Srv/SrvStartEngine.h"
@@ -22,6 +23,7 @@
 #include "Srv/SrvMotor.h"
 #include "Srv/SrvTimer.h"
 #include "Srv/SrvHeartbeat.h"
+#include "Srv/SrvSensors.h"
 
 #include "Cmps/CmpBMP085.h"
 
@@ -54,10 +56,6 @@ int main(void)
 	imu_reel.angles.roulis		= 0;
 	imu_reel.angles.tangage		= 0;
 	imu_reel.angles.lacet		= 0;
-	imu_reel.altitude			= 0;
-	imu_reel.temperature		= 0;
-	imu_reel.pressure			= 0;  
-	imu_reel.weather		    = WEATHER_NONE;
 	imu_reel.pid_error.altitude = 0;
 	imu_reel.pid_error.roulis	= 0;
 	imu_reel.pid_error.tangage	= 0;
@@ -73,7 +71,7 @@ int main(void)
 	DrvEventInit();
 	DrvTickInit();
 	DrvTwiInit( TWI_SPEED_400K );
-	DrvUartInit( UART_0, UART_SPEED_57600 );
+	DrvUartInit( UART_0, UART_SPEED_115200 );
 	DrvEepromInit();
 	
 	// ********************* Interrupt Enable *****************************************
@@ -83,15 +81,17 @@ int main(void)
 	SrvCommInit();
 	SrvTimerInit();
 	SrvPIDInit();
+	SrvKalmanFilterInit();
+	SrvSensorsInit();
 	SrvImuInit();
 	SrvMotorInit(); 
-	SrvHeartbeatInit();
+	//SrvHeartbeatInit();
 	
 	//Wait 1 sec for sensors init
 	DrvTimerDelayMs(1000);
 		
 	// ********************* Calibration sensors **************************************
-	SrvImuSensorsCalibration();
+	SrvSensorsSensorsCalibration();
 	
 	//Wait 2 sec for sensors
 	DrvTimerDelayMs(1000);
@@ -106,12 +106,14 @@ int main(void)
     while(TRUE)
     {			
 		current_main_event = DrvEventGetEvent();
+		// ********************* Read sensors ***************s***********************
+		SrvSensorsDispatcher(current_main_event);
 		// ********************* Compute sensors **************************************
 		SrvImuDispatcher(current_main_event);
 		// ********************* Receive transmit data ********************************
 		SrvCommDispatcher(current_main_event);
 		// ********************* Still alive  *****************************************
-		SrvHeartbeatDispatcher(current_main_event);
+		//SrvHeartbeatDispatcher(current_main_event);
 	}	
 }
 

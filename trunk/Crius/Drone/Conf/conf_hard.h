@@ -116,17 +116,12 @@
 #define		COMM_SENSORS							4U
 	#define		COMM_SENSOR_ACC_READ					1U
 	#define		COMM_SENSOR_GYR_READ					2U
-#define		COMM_BAROMETER							5U
-	#define		COMM_BAROMETER_ALTITUDE					1U
-		#define		COMM_BAROMETER_ALTITUDE_START			1U
-		#define		COMM_BAROMETER_ALTITUDE_HOLD			2U
-	#define		COMM_BAROMETER_WEATHER					2U
-#define		COMM_PID								6U
+	#define		COMM_SENSOR_MAG_READ					3U
+	#define		COMM_SENSOR_BAR_READ					4U
+#define		COMM_PID								5U
 	#define		COMM_PID_WRITE							1U
 	#define		COMM_PID_READ							2U
-#define		COMM_EEPROM								7U
-	#define		COMM_EEPROM_RESET						1U
-#define		COMM_REPPORT							8U
+#define		COMM_REPPORT							6U
 #define		COMM_ERROR								0xFFU
 
 ////////////////////////////////////////////ANGLES MIN MAX////////////////////////////////////////////
@@ -177,19 +172,57 @@ typedef struct
 	float z;
 }S_Gyr_Angles;
 
+//-----------------------------------------------------------------------------------------------//
+typedef struct
+{
+	Int16S x;
+	Int16S y;
+	Int16S z;
+}S_Acc_Sensor;
+
+//-----------------------------------------------------------------------------------------------//
+typedef struct
+{
+	Int16S x;
+	Int16S y;
+	Int16S z;
+}S_Gyr_Sensor;
+
+//-----------------------------------------------------------------------------------------------//
+typedef struct
+{
+	Int16S x;
+	Int16S y;
+	Int16S z;
+}S_Mag_Sensor;
+
+//-----------------------------------------------------------------------------------------------//
+typedef struct
+{
+	Int16U			altitude;
+	Int32U			pressure;
+	Int16S			temperature;
+	Int8U			weather;
+}S_Bar_Sensor;
+
+//-----------------------------------------------------------------------------------------------//
+typedef struct
+{
+	S_Acc_Sensor acc;
+	S_Gyr_Sensor gyr;
+	S_Mag_Sensor mag;
+	S_Bar_Sensor bar;
+}S_Sensors;
 
 //-----------------------------------------------------------------------------------------------//
 typedef struct SS_imu
 {
+	S_Sensors		sensors;
 	S_Acc_Angles	acc_angles;
 	S_Gyr_Angles	gyr_angles;
 	S_angles		angles;
 	S_moteur		moteurs;
 	S_pid			pid_error;
-	Int16U			altitude;
-	Int32U			pressure;
-	Int16S			temperature;
-	Int8U			weather;
 }S_imu;
 
 //-----------------------------------------------------------------------------------------------//

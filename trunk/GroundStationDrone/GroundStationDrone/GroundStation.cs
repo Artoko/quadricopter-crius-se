@@ -27,7 +27,9 @@ namespace GroundStationDrone
         {
             if (toolStripStatusLabelVersion.Text == "Version : 0.0")
             {
-                if ((serial_com.Connect("COM7") == true))
+                if ((serial_com.Connect("COM7") == true)||
+                    (serial_com.Connect("COM5") == true)
+                    )
                 {
                     GetVersion();
                 }
@@ -63,9 +65,11 @@ namespace GroundStationDrone
         }
         private void IncommingMessageVersion(byte[] frame)
         {
-            if (frame.Length >= 6)
+            string response = ConvertFrame(frame);
+            if (response.Substring(0, 4) == "1+1+")
             {
-                toolStripStatusLabelVersion.Text = "Version : " + Convert.ToString(frame[5] >> 4) + "." + Convert.ToString(frame[5] & 0x0f);
+                byte version = Encoding.ASCII.GetBytes(response.Replace(response.Substring(0, 4),"").ToCharArray())[0];
+                toolStripStatusLabelVersion.Text = "Version : " + Convert.ToString((version & 0xf0) >> 4) + "." + Convert.ToString(version & 0x0f);
                 toolStripStatusLabelVersion.ForeColor = Color.Blue;
             }
         }
@@ -81,7 +85,7 @@ namespace GroundStationDrone
         private void IncommingMessageReset(byte[] frame)
         {
             string response = ConvertFrame(frame);
-            if (response == "*1+2")
+            if (response == "1+2")
             {
                 GetVersion();
             }
@@ -99,7 +103,7 @@ namespace GroundStationDrone
         private void IncommingMessageFullReset(byte[] frame)
         {
             string response = ConvertFrame(frame);
-            if (response == "*1+3")
+            if (response == "1+3")
             {
                 GetVersion();
             }
@@ -118,11 +122,11 @@ namespace GroundStationDrone
         private void IncommingMessageGetSpeed(byte[] frame)
         {
             string response = ConvertFrame(frame);
-            if (response.Substring(0,4) == "*2+2")
+            if (response.Substring(0,3) == "2+2")
             {
-                toolStripStatusLabelSpeed.Text = "Speed : " + Convert.ToString((short)((frame[12] << 8) + frame[13]));
-                float Number = ((frame[12] << 8) + frame[13]);
-                toolStripStatusLabelSpeed.ForeColor = System.Drawing.Color.FromArgb((byte)(float)(255 * (Number / 1000)), (byte)(float)(255 - (255 * (Number / 1000))), (byte)(50));
+                toolStripStatusLabelSpeed.Text = "Speed : " + Convert.ToString((short)((frame[16] << 8) + frame[17]));
+                float speed = (float)((frame[16] << 8) + frame[17]);
+                toolStripStatusLabelSpeed.ForeColor = System.Drawing.Color.FromArgb((byte)(float)(255 * (speed / 1000)), (byte)(float)(255 - (255 * (speed / 1000))), (byte)(50));
             }
         }
         private void getSpeedToolStripMenuItem_Click(object sender, EventArgs e)
@@ -137,7 +141,7 @@ namespace GroundStationDrone
         private void IncommingMessageSetSpeed(byte[] frame)
         {
             string response = ConvertFrame(frame);
-            if (response.Substring(0, 4) == "*2+1")
+            if (response.Substring(0, 3) == "2+1")
             {
                 GetSpeed();
             }

@@ -42,11 +42,7 @@ static void SrvCommRepportAngles( void );
 
 static void SrvCommRepportSensors( void );
 
-static void SrvCommRepportBarometer( void );
-
 static void SrvCommRepportPID( void );
-
-static void SrvCommRepportEEPROM( void );
 
 static void SrvCommRepportData( void) ;
 
@@ -154,17 +150,9 @@ static void SrvCommExecute ( void )
 	{
 		SrvCommRepportSensors();
 	}
-	else if( ma_trame_comm.param[PARAM_0] == COMM_BAROMETER )
-	{
-		SrvCommRepportBarometer();
-	}
 	else if( ma_trame_comm.param[PARAM_0] == COMM_PID )
 	{
 		SrvCommRepportPID();
-	}
-	else if( ma_trame_comm.param[PARAM_0] == COMM_EEPROM )
-	{
-		SrvCommRepportEEPROM();
 	}
 	else if( ma_trame_comm.param[PARAM_0] == COMM_REPPORT )
 	{
@@ -245,15 +233,19 @@ static void SrvCommRepportMotors( void )
 	else if( ma_trame_comm.param[PARAM_1] == COMM_MOTOR_READ)
 	{
 		//read motors
-		Char o_message[ ] = { '*', '2', '+', '2',
+		Char o_message[ ] = { '*', '2', '+', '2', '+',
 							 (Int8U)(imu_reel.moteurs.frontMotor_R >> 8U),
 							 (Int8U)imu_reel.moteurs.frontMotor_R,
+							 '+',
 							 (Int8U)(imu_reel.moteurs.frontMotor_L >> 8U),
 							 (Int8U)imu_reel.moteurs.frontMotor_L,
+							 '+',
 							 (Int8U)(imu_reel.moteurs.rearMotor_R >> 8U),
 							 (Int8U)imu_reel.moteurs.rearMotor_R,
+							 '+',
 							 (Int8U)(imu_reel.moteurs.rearMotor_L >> 8U),
 							 (Int8U)imu_reel.moteurs.rearMotor_L,
+							 '+',
 							 (Int8U)(imu_reel.moteurs.throttle >> 8U),
 							 (Int8U)imu_reel.moteurs.throttle,			 
 							 '#', '#' };
@@ -285,8 +277,10 @@ static void SrvCommRepportAngles( void )
 		Char o_message[ ] = { '*', '3', '+', '2',
 							(Int8U)(imu_reel.angles.roulis >> 8U),
 							(Int8U)imu_reel.angles.roulis,
+							'+',
 							(Int8U)(imu_reel.angles.tangage >> 8U),
 							(Int8U)imu_reel.angles.tangage,
+							'+',
 							(Int8U)(imu_reel.angles.lacet >> 8U),
 							(Int8U)imu_reel.angles.lacet,			 
 							'#', '#' };
@@ -303,37 +297,67 @@ static void SrvCommRepportSensors( void )
 {
 	//report acc angles 
 	if( ma_trame_comm.param[PARAM_1] == COMM_SENSOR_ACC_READ)
-	{
-		Int8U lenght = 0;
-		Char o_message[ 10 ] = { 0 };
-		o_message[ lenght++ ] = (Int8U)(imu_reel.acc_angles.x >> 8U);
-		o_message[ lenght++ ] = (Int8U)imu_reel.acc_angles.x;	
-		o_message[ lenght++ ] = (Int8U)(imu_reel.acc_angles.y >> 8U);
-		o_message[ lenght++ ] = (Int8U)imu_reel.acc_angles.y;
-		o_message[ lenght++ ] = (Int8U)(imu_reel.acc_angles.z >> 8U);
-		o_message[ lenght++ ] = (Int8U)imu_reel.acc_angles.z;
-		o_message[ lenght++ ] = '#';
-		o_message[ lenght++ ] = '#';
-		o_message[ lenght++ ] = '#';
-		o_message[ lenght++ ] = '#';
-		DrvUart0SendMessage( o_message , 10U );
+	{		
+		Char o_message[ ] = { '*', '4', '+', '1',
+							(Int8U)(imu_reel.sensors.acc.x >> 8U),
+							(Int8U)imu_reel.sensors.acc.x,
+							'+',
+							(Int8U)(imu_reel.sensors.acc.y >> 8U),
+							(Int8U)imu_reel.sensors.acc.y,
+							'+',
+							(Int8U)(imu_reel.sensors.acc.z >> 8U),
+							(Int8U)imu_reel.sensors.acc.z,
+							'#', '#' };
+		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	//report gyr angles 
 	else if( ma_trame_comm.param[PARAM_1] == COMM_SENSOR_GYR_READ)
 	{
-		Int8U lenght = 0;
-		Char o_message[ 10 ] = { 0 };
-		o_message[ lenght++ ] = (Int8U)(imu_reel.gyr_angles.x >> 8U);
-		o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.x;	
-		o_message[ lenght++ ] = (Int8U)(imu_reel.gyr_angles.y >> 8U);
-		o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.y;
-		o_message[ lenght++ ] = (Int8U)(imu_reel.gyr_angles.z >> 8U);
-		o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.z;
-		o_message[ lenght++ ] = '#';
-		o_message[ lenght++ ] = '#';
-		o_message[ lenght++ ] = '#';
-		o_message[ lenght++ ] = '#';
-		DrvUart0SendMessage( o_message , 10U );
+		Char o_message[ ] = { '*', '4', '+', '2',
+							(Int8U)(imu_reel.sensors.gyr.x >> 8U),
+							(Int8U)imu_reel.sensors.gyr.x,
+							'+',
+							(Int8U)(imu_reel.sensors.gyr.y >> 8U),
+							(Int8U)imu_reel.sensors.gyr.y,
+							'+',
+							(Int8U)(imu_reel.sensors.gyr.z >> 8U),
+							(Int8U)imu_reel.sensors.gyr.z,
+							'#', '#' };
+		DrvUart0SendMessage( o_message , sizeof(o_message) );
+	}
+	//report mag angles 
+	else if( ma_trame_comm.param[PARAM_1] == COMM_SENSOR_MAG_READ)
+	{
+		Char o_message[ ] = { '*', '4', '+', '3',
+							(Int8U)(imu_reel.sensors.mag.x >> 8U),
+							(Int8U)imu_reel.sensors.mag.x,
+							'+',
+							(Int8U)(imu_reel.sensors.mag.y >> 8U),
+							(Int8U)imu_reel.sensors.mag.y,
+							'+',
+							(Int8U)(imu_reel.sensors.mag.z >> 8U),
+							(Int8U)imu_reel.sensors.mag.z,
+							'#', '#' };
+		DrvUart0SendMessage( o_message , sizeof(o_message) );
+	}
+	//report baro angles 
+	else if( ma_trame_comm.param[PARAM_1] == COMM_SENSOR_BAR_READ)
+	{
+		Char o_message[ ] = { '*', '4', '+', '4',
+							(Int8U)(imu_reel.sensors.bar.altitude >> 8U),
+							(Int8U)imu_reel.sensors.bar.altitude,
+							'+',
+							(Int8U)(imu_reel.sensors.bar.temperature >> 8U),
+							(Int8U)imu_reel.sensors.bar.temperature,
+							'+',
+							(Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 24U),
+							(Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 16U),
+							(Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 8U),
+							(Int8U)((Int32U)imu_reel.sensors.bar.pressure),
+							'+',
+							(Int8U)imu_reel.sensors.bar.weather,
+							'#', '#' };
+		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	else
 	{
@@ -342,20 +366,11 @@ static void SrvCommRepportSensors( void )
 	}
 }
 
-static void SrvCommRepportBarometer( void )
-{
-	
-}
-
 static void SrvCommRepportPID( void )
 {
 	
 }
 
-static void SrvCommRepportEEPROM( void )
-{
-	
-}
 
 static void SrvCommRepportData( void )
 {
@@ -374,8 +389,8 @@ static void SrvCommRepportData( void )
 	o_message[ lenght++ ] = (Int8U)(imu_reel.angles.nord >> 8U);
 	o_message[ lenght++ ] = (Int8U)imu_reel.angles.nord;
 	
-	o_message[ lenght++ ] = (Int8U)(imu_reel.altitude >> 8U);
-	o_message[ lenght++ ] = (Int8U)imu_reel.altitude;
+	o_message[ lenght++ ] = (Int8U)(imu_reel.sensors.bar.altitude >> 8U);
+	o_message[ lenght++ ] = (Int8U)imu_reel.sensors.bar.altitude;
 	
 	o_message[ lenght++ ] = (Int8U)(imu_reel.pid_error.roulis >> 8U);
 	o_message[ lenght++ ] = (Int8U)imu_reel.pid_error.roulis;
@@ -401,13 +416,13 @@ static void SrvCommRepportData( void )
 	o_message[ lenght++ ] = (Int8U)(imu_reel.moteurs.throttle >> 8U);
 	o_message[ lenght++ ] = (Int8U)imu_reel.moteurs.throttle;
 	
-	o_message[ lenght++ ] = (Int8U)(((Int32U)imu_reel.pressure) >> 24U);
-	o_message[ lenght++ ] = (Int8U)(((Int32U)imu_reel.pressure) >> 16U);
-	o_message[ lenght++ ] = (Int8U)(((Int32U)imu_reel.pressure) >> 8U);
-	o_message[ lenght++ ] = (Int8U)((Int32U)imu_reel.pressure);
+	o_message[ lenght++ ] = (Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 24U);
+	o_message[ lenght++ ] = (Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 16U);
+	o_message[ lenght++ ] = (Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 8U);
+	o_message[ lenght++ ] = (Int8U)((Int32U)imu_reel.sensors.bar.pressure);
 	
-	o_message[ lenght++ ] = (Int8U)(imu_reel.temperature >> 8U);
-	o_message[ lenght++ ] = (Int8U)imu_reel.temperature;
+	o_message[ lenght++ ] = (Int8U)(imu_reel.sensors.bar.temperature >> 8U);
+	o_message[ lenght++ ] = (Int8U)imu_reel.sensors.bar.temperature;
 	
 	o_message[ lenght++ ] = '#';
 	o_message[ lenght++ ] = '#';
