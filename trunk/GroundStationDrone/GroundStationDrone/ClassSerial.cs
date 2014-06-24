@@ -14,9 +14,13 @@ namespace MySerial
 
         public delegate void callback_message_receive(byte[] frame);
         callback_message_receive list_callback_messages;
-        public static bool Thread_Listener_flag = false;
 
         static Thread Thread_Listener;
+        public static bool Thread_Listener_flag = false;
+
+        static Thread Thread_Sender;
+        public static bool Thread_Sender_flag = false;
+        public static Queue<string> SendFifoString = new Queue<string>();
 
         public bool Connect(string port_name)
         {
@@ -49,6 +53,12 @@ namespace MySerial
                 Thread_Listener = new Thread(new ThreadStart(ClassUartThreadListenerModem));
                 Thread_Listener.Start();
                 Thread_Listener_flag = true;
+
+                Thread_Sender = new Thread(new ThreadStart(ClassUartThreadSenderModem));
+                Thread_Sender.Start();
+                Thread_Sender_flag = true;
+                
+                
             }
             return ret;
         }
@@ -68,6 +78,7 @@ namespace MySerial
         public bool Deconnect()
         {
             Thread_Listener_flag = false;
+            Thread_Sender_flag = false;
             if(serialPort1.IsOpen)
             {
                 serialPort1.ReadExisting();
@@ -83,7 +94,19 @@ namespace MySerial
         {
             if (serialPort1.IsOpen)
             {
-                serialPort1.Write(message);
+                SendFifoString.Enqueue(message);
+            }
+        }
+
+        private void ClassUartThreadSenderModem()
+        {
+            while (Thread_Sender_flag)
+            {
+                if (SendFifoString.Count > 0)
+                {
+                    serialPort1.Write(SendFifoString.Dequeue());
+                    //Thread.Sleep(15);
+                }
             }
         }
 
@@ -115,7 +138,7 @@ namespace MySerial
                         while (bytes != 0)
                         {
                             recpt_buff[index++] = (byte)serialPort1.ReadByte();
-                            if (index > 4)
+                            if (index > 3)
                             if ( (recpt_buff[index - 2] == '#') && (recpt_buff[index - 1] == '#'))
                             {
                                 //if (index == 34)

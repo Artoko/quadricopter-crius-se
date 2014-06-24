@@ -30,8 +30,11 @@
         {
             this.statusStripState = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabelVersion = new System.Windows.Forms.ToolStripStatusLabel();
-            this.toolStripSep = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripStatusLabelSpeed = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripStatusLabelAngles = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuStripParams = new System.Windows.Forms.MenuStrip();
             this.generalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.getVersionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -39,7 +42,13 @@
             this.recalibrationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemMotors = new System.Windows.Forms.ToolStripMenuItem();
             this.getSpeedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemAngles = new System.Windows.Forms.ToolStripMenuItem();
+            this.getAnglesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemPID = new System.Windows.Forms.ToolStripMenuItem();
+            this.getPIDToolStripMenuItem = new System.Windows.Forms.ToolStripComboBox();
+            this.setPIDsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.trackBarSpeed = new System.Windows.Forms.TrackBar();
+            this.getPIDsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStripState.SuspendLayout();
             this.menuStripParams.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSpeed)).BeginInit();
@@ -49,8 +58,11 @@
             // 
             this.statusStripState.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabelVersion,
-            this.toolStripSep,
-            this.toolStripStatusLabelSpeed});
+            this.toolStripSeparator1,
+            this.toolStripStatusLabelSpeed,
+            this.toolStripSeparator2,
+            this.toolStripStatusLabelAngles,
+            this.toolStripSeparator3});
             this.statusStripState.Location = new System.Drawing.Point(0, 359);
             this.statusStripState.Name = "statusStripState";
             this.statusStripState.Size = new System.Drawing.Size(756, 23);
@@ -63,10 +75,10 @@
             this.toolStripStatusLabelVersion.Size = new System.Drawing.Size(70, 18);
             this.toolStripStatusLabelVersion.Text = "Version : 0.0";
             // 
-            // toolStripSep
+            // toolStripSeparator1
             // 
-            this.toolStripSep.Name = "toolStripSep";
-            this.toolStripSep.Size = new System.Drawing.Size(6, 23);
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 23);
             // 
             // toolStripStatusLabelSpeed
             // 
@@ -74,11 +86,29 @@
             this.toolStripStatusLabelSpeed.Size = new System.Drawing.Size(59, 18);
             this.toolStripStatusLabelSpeed.Text = "Speed = 0";
             // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 23);
+            // 
+            // toolStripStatusLabelAngles
+            // 
+            this.toolStripStatusLabelAngles.Name = "toolStripStatusLabelAngles";
+            this.toolStripStatusLabelAngles.Size = new System.Drawing.Size(91, 18);
+            this.toolStripStatusLabelAngles.Text = "Angles : 0 , 0 , 0 ";
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 23);
+            // 
             // menuStripParams
             // 
             this.menuStripParams.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.generalToolStripMenuItem,
-            this.toolStripMenuItemMotors});
+            this.toolStripMenuItemMotors,
+            this.toolStripMenuItemAngles,
+            this.toolStripMenuItemPID});
             this.menuStripParams.Location = new System.Drawing.Point(0, 0);
             this.menuStripParams.Name = "menuStripParams";
             this.menuStripParams.Size = new System.Drawing.Size(756, 24);
@@ -131,6 +161,53 @@
             this.getSpeedToolStripMenuItem.Text = "Get Speed";
             this.getSpeedToolStripMenuItem.Click += new System.EventHandler(this.getSpeedToolStripMenuItem_Click);
             // 
+            // toolStripMenuItemAngles
+            // 
+            this.toolStripMenuItemAngles.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.getAnglesToolStripMenuItem});
+            this.toolStripMenuItemAngles.Name = "toolStripMenuItemAngles";
+            this.toolStripMenuItemAngles.Size = new System.Drawing.Size(55, 20);
+            this.toolStripMenuItemAngles.Text = "Angles";
+            // 
+            // getAnglesToolStripMenuItem
+            // 
+            this.getAnglesToolStripMenuItem.Name = "getAnglesToolStripMenuItem";
+            this.getAnglesToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.getAnglesToolStripMenuItem.Text = "Get Angles";
+            this.getAnglesToolStripMenuItem.Click += new System.EventHandler(this.getAnglesToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItemPID
+            // 
+            this.toolStripMenuItemPID.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.getPIDToolStripMenuItem,
+            this.getPIDsToolStripMenuItem,
+            this.setPIDsToolStripMenuItem});
+            this.toolStripMenuItemPID.Name = "toolStripMenuItemPID";
+            this.toolStripMenuItemPID.Size = new System.Drawing.Size(37, 20);
+            this.toolStripMenuItemPID.Text = "PID";
+            // 
+            // getPIDToolStripMenuItem
+            // 
+            this.getPIDToolStripMenuItem.AutoCompleteCustomSource.AddRange(new string[] {
+            "Get PID roulis",
+            "Get PID tangage",
+            "Get PID lacet",
+            "Get PID altitude"});
+            this.getPIDToolStripMenuItem.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.getPIDToolStripMenuItem.Items.AddRange(new object[] {
+            "Get PID roulis",
+            "Get PID tangage",
+            "Get PID lacet",
+            "Get PID altitude"});
+            this.getPIDToolStripMenuItem.Name = "getPIDToolStripMenuItem";
+            this.getPIDToolStripMenuItem.Size = new System.Drawing.Size(152, 23);
+            // 
+            // setPIDsToolStripMenuItem
+            // 
+            this.setPIDsToolStripMenuItem.Name = "setPIDsToolStripMenuItem";
+            this.setPIDsToolStripMenuItem.Size = new System.Drawing.Size(212, 22);
+            this.setPIDsToolStripMenuItem.Text = "Set PIDs";
+            // 
             // trackBarSpeed
             // 
             this.trackBarSpeed.Location = new System.Drawing.Point(30, 54);
@@ -138,10 +215,18 @@
             this.trackBarSpeed.Name = "trackBarSpeed";
             this.trackBarSpeed.Orientation = System.Windows.Forms.Orientation.Vertical;
             this.trackBarSpeed.Size = new System.Drawing.Size(45, 104);
+            this.trackBarSpeed.SmallChange = 5;
             this.trackBarSpeed.TabIndex = 5;
             this.trackBarSpeed.TickFrequency = 100;
             this.trackBarSpeed.TickStyle = System.Windows.Forms.TickStyle.Both;
             this.trackBarSpeed.Scroll += new System.EventHandler(this.trackBarSpeed_Scroll);
+            // 
+            // getPIDsToolStripMenuItem
+            // 
+            this.getPIDsToolStripMenuItem.Name = "getPIDsToolStripMenuItem";
+            this.getPIDsToolStripMenuItem.Size = new System.Drawing.Size(212, 22);
+            this.getPIDsToolStripMenuItem.Text = "Get PIDs";
+            this.getPIDsToolStripMenuItem.Click += new System.EventHandler(this.getPIDsToolStripMenuItem_Click);
             // 
             // GroundStation
             // 
@@ -169,7 +254,9 @@
 
         private System.Windows.Forms.StatusStrip statusStripState;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelVersion;
-        private System.Windows.Forms.ToolStripSeparator toolStripSep;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.MenuStrip menuStripParams;
         private System.Windows.Forms.ToolStripMenuItem generalToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem getVersionToolStripMenuItem;
@@ -179,6 +266,13 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemMotors;
         private System.Windows.Forms.ToolStripMenuItem getSpeedToolStripMenuItem;
         private System.Windows.Forms.TrackBar trackBarSpeed;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemAngles;
+        private System.Windows.Forms.ToolStripMenuItem getAnglesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelAngles;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemPID;
+        private System.Windows.Forms.ToolStripComboBox getPIDToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem setPIDsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem getPIDsToolStripMenuItem;
 
     }
 }

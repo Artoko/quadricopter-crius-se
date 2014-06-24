@@ -66,7 +66,7 @@ void SrvSensorsDispatcher (Event_t in_event)
 	Int32U now = 0U;
 	float interval_baro = 0.0F;
 	
-	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
+	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_250MS ) == TRUE)
 	{
 		now = DrvTimerGetTimeUs();
 		interval_baro = (float)(now - lastread_baro) / 1000000.0F;
