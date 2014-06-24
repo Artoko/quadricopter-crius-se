@@ -52,7 +52,7 @@ int main(void)
 	//start Initialisation
 	LED_ON();
 	
-	// ********************* General variables init *************************************************
+	// ********************* General variables init ***********************************
 	imu_reel.angles.roulis		= 0;
 	imu_reel.angles.tangage		= 0;
 	imu_reel.angles.lacet		= 0;
@@ -77,7 +77,7 @@ int main(void)
 	// ********************* Interrupt Enable *****************************************
 	DrvInterruptSetAllInterrupts();
 	
-	// ********************* Services init ******************************************
+	// ********************* Services init ********************************************
 	SrvCommInit();
 	SrvTimerInit();
 	SrvPIDInit();
@@ -106,7 +106,7 @@ int main(void)
     while(TRUE)
     {			
 		current_main_event = DrvEventGetEvent();
-		// ********************* Read sensors ***************s***********************
+		// ********************* Read sensors ***************s*************************
 		SrvSensorsDispatcher(current_main_event);
 		// ********************* Compute sensors **************************************
 		SrvImuDispatcher(current_main_event);

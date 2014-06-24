@@ -367,8 +367,69 @@ static void SrvCommRepportSensors( void )
 }
 
 static void SrvCommRepportPID( void )
-{
-	
+{		
+	//report pid
+	if( ma_trame_comm.param[ PARAM_1 ] == COMM_PID_WRITE)
+	{
+		//applique les PIDs souhaité
+		Int8U index = 0;
+		float P = 0;
+		float I = 0;
+		float D = 0;
+		index = (Int8U)ma_trame_comm.param[PARAM_2];
+		if( index < NB_PID )
+		{
+			P =  (float)( ma_trame_comm.param[PARAM_3] / 1000.0 );
+			I =  (float)( ma_trame_comm.param[PARAM_4] / 1000.0 );
+			D =  (float)( ma_trame_comm.param[PARAM_5] / 1000.0 );
+			DrvEepromWritePID( index, P, I, D );
+			SrvPIDSetValues( index, P, I, D );
+			Char o_message[ ] = { '*', '5', '+', '1', '#','#' };
+			DrvUart0SendMessage( o_message , sizeof(o_message) );
+		}
+		else
+		{
+			Char o_message[ ] = { '*', COMM_ERROR,'#', '#' };
+			DrvUart0SendMessage( o_message , sizeof(o_message) );
+		}
+	}
+	else if( ma_trame_comm.param[ PARAM_1 ] == COMM_PID_READ)
+	{	
+		Int8U index = 0;
+		float P = 0;
+		float I = 0;
+		float D = 0;
+		index = ma_trame_comm.param[PARAM_2];
+		
+		if( index < NB_PID )
+		{
+			DrvEepromReadPID(index,&P,&I,&D);
+			Char o_message[ ] = { '*', '5', '+', '2', '+',
+								index,
+								'+',
+								(Int8U)((Int16S)( P * 1000 ) >> 8U),
+								(Int8U)((Int16S)( P * 1000 )),
+								'+',
+								(Int8U)((Int16S)( I * 1000 ) >> 8U),
+								(Int8U)((Int16S)( I * 1000 )),
+								'+',
+								(Int8U)((Int16S)( D * 1000 ) >> 8U),
+								(Int8U)((Int16S)( D * 1000 )),			 
+								'#', '#' };
+			DrvUart0SendMessage( o_message , sizeof(o_message) );
+		}
+		else
+		{
+			Char o_message[ ] = { '*', COMM_ERROR,'#', '#' };
+			DrvUart0SendMessage( o_message , sizeof(o_message) );
+		}
+		
+	}
+	else
+	{
+		Char o_message[ ] = { '*', COMM_ERROR,'#', '#' };
+		DrvUart0SendMessage( o_message , sizeof(o_message) );
+	}
 }
 
 
