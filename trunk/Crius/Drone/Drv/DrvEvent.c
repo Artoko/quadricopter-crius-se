@@ -60,6 +60,7 @@ inline Boolean DrvEventAddEvent(Event_t in_event)
 	(
 		event_flags |= in_event ;
 	);
+	
 	return TRUE;
 }
 

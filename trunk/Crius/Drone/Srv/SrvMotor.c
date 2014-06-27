@@ -42,6 +42,17 @@ Boolean SrvMotorInit ( void )
 	return TRUE;
 }	
 
+//dispatcher d'evenements
+void SrvMotorDispatcher (Event_t in_event)
+{
+	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_10MS ) == TRUE)
+	{	
+		// *********************Mise à jour des Moteurs ***************************
+		SrvMotorUpdate( imu_reel.pid_error );
+	}
+}
+
+
 /************************************************************************/
 /*Commande des moteurs en fonction de l'angle                           */
 /************************************************************************/

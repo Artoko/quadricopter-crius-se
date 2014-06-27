@@ -13,8 +13,8 @@
 #include "Tools/tools_typedefs.h"
 
 void SrvKalmanFilterInit( void );
-double SrvKalmanFilterX(double newAngle, double newRate, float dtime) ;
-double SrvKalmanFilterY(double newAngle, double newRate, float dtime) ;
-double SrvKalmanFilterZ(double newAngle, double newRate, float dtime) ;
-double SrvKalmanFilterAlt(double newAngle, double newRate, float dtime) ;
+float SrvKalmanFilterX(float newAngle, float newRate, float dtime) ;
+float SrvKalmanFilterY(float newAngle, float newRate, float dtime) ;
+float SrvKalmanFilterZ(float newAngle, float newRate, float dtime) ;
+float SrvKalmanFilterAlt(float newAngle, float newRate, float dtime) ;
 #endif /* SRVKALMAN_H_ */

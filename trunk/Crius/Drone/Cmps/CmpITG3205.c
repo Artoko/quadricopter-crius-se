@@ -94,9 +94,9 @@ Boolean CmpITG3205GetRotation(S_Gyr_Sensor *rot)
 		rot->y = (Int16S)((Int16U) buffer[2U] << 8U) | ((Int16U) buffer[3U]);
 		rot->z = (Int16S)((Int16U) buffer[4U] << 8U) | ((Int16U) buffer[5U]);
 		//anti gyro glitch
-		rot->x = SetLimits( rot->x, previous_reading[ 0 ] - GYRO_GLITCH_LIMIT ,previous_reading[ 0 ] + GYRO_GLITCH_LIMIT );
-		rot->y = SetLimits( rot->y, previous_reading[ 1 ] - GYRO_GLITCH_LIMIT ,previous_reading[ 1 ] + GYRO_GLITCH_LIMIT );
-		rot->z = SetLimits( rot->z, previous_reading[ 2 ] - GYRO_GLITCH_LIMIT ,previous_reading[ 2 ] + GYRO_GLITCH_LIMIT );
+		//rot->x = SetLimits( rot->x, previous_reading[ 0 ] - GYRO_GLITCH_LIMIT ,previous_reading[ 0 ] + GYRO_GLITCH_LIMIT );
+		//rot->y = SetLimits( rot->y, previous_reading[ 1 ] - GYRO_GLITCH_LIMIT ,previous_reading[ 1 ] + GYRO_GLITCH_LIMIT );
+		//rot->z = SetLimits( rot->z, previous_reading[ 2 ] - GYRO_GLITCH_LIMIT ,previous_reading[ 2 ] + GYRO_GLITCH_LIMIT );
 		
 		if(loop_calibration_itg3205 > 0U)
 		{
@@ -122,14 +122,14 @@ Boolean CmpITG3205GetRotation(S_Gyr_Sensor *rot)
 			rot->z  -= gyro_calib_itg3205[2U];
 			
 			//smooth gyro value
-			rot->x = (Int16S) ( ( (Int32S)((Int32S)gyro_smooth_value[0] * (GYRO_SMOOTHING_X - 1) ) + rot->x + 1 ) / GYRO_SMOOTHING_X);
+			/*rot->x = (Int16S) ( ( (Int32S)((Int32S)gyro_smooth_value[0] * (GYRO_SMOOTHING_X - 1) ) + rot->x + 1 ) / GYRO_SMOOTHING_X);
 			gyro_smooth_value[0] = rot->x;
 			
 			rot->y = (Int16S) ( ( (Int32S)((Int32S)gyro_smooth_value[1] * (GYRO_SMOOTHING_Y - 1) ) + rot->y + 1 ) / GYRO_SMOOTHING_Y);
 			gyro_smooth_value[1] = rot->y;
 			
 			rot->z = (Int16S) ( ( (Int32S)((Int32S)gyro_smooth_value[2] * (GYRO_SMOOTHING_Z - 1) ) + rot->z + 1 ) / GYRO_SMOOTHING_Z);
-			gyro_smooth_value[2] = rot->z;
+			gyro_smooth_value[2] = rot->z;*/
 		}
 		return TRUE;
 	}

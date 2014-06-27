@@ -28,8 +28,8 @@
 //#define DAISY_7		
 #define CRIUS		
 
-//#define QUADX
-#define BI
+#define QUADX
+//#define BI
 
 #if defined( DAISY_7 )
 	#define ACC_LIS331DLH	1
