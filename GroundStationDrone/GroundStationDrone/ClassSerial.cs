@@ -105,7 +105,7 @@ namespace MySerial
                 if (SendFifoString.Count > 0)
                 {
                     serialPort1.Write(SendFifoString.Dequeue());
-                    //Thread.Sleep(15);
+                    //Thread.Sleep(10);
                 }
             }
         }

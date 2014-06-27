@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.statusStripState = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabelVersion = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -46,9 +47,11 @@
             this.getAnglesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemPID = new System.Windows.Forms.ToolStripMenuItem();
             this.getPIDToolStripMenuItem = new System.Windows.Forms.ToolStripComboBox();
+            this.getPIDsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setPIDsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.trackBarSpeed = new System.Windows.Forms.TrackBar();
-            this.getPIDsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.statusStripState.SuspendLayout();
             this.menuStripParams.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSpeed)).BeginInit();
@@ -202,6 +205,13 @@
             this.getPIDToolStripMenuItem.Name = "getPIDToolStripMenuItem";
             this.getPIDToolStripMenuItem.Size = new System.Drawing.Size(152, 23);
             // 
+            // getPIDsToolStripMenuItem
+            // 
+            this.getPIDsToolStripMenuItem.Name = "getPIDsToolStripMenuItem";
+            this.getPIDsToolStripMenuItem.Size = new System.Drawing.Size(212, 22);
+            this.getPIDsToolStripMenuItem.Text = "Get PIDs";
+            this.getPIDsToolStripMenuItem.Click += new System.EventHandler(this.getPIDsToolStripMenuItem_Click);
+            // 
             // setPIDsToolStripMenuItem
             // 
             this.setPIDsToolStripMenuItem.Name = "setPIDsToolStripMenuItem";
@@ -221,18 +231,25 @@
             this.trackBarSpeed.TickStyle = System.Windows.Forms.TickStyle.Both;
             this.trackBarSpeed.Scroll += new System.EventHandler(this.trackBarSpeed_Scroll);
             // 
-            // getPIDsToolStripMenuItem
+            // panel1
             // 
-            this.getPIDsToolStripMenuItem.Name = "getPIDsToolStripMenuItem";
-            this.getPIDsToolStripMenuItem.Size = new System.Drawing.Size(212, 22);
-            this.getPIDsToolStripMenuItem.Text = "Get PIDs";
-            this.getPIDsToolStripMenuItem.Click += new System.EventHandler(this.getPIDsToolStripMenuItem_Click);
+            this.panel1.Location = new System.Drawing.Point(111, 54);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(554, 104);
+            this.panel1.TabIndex = 6;
+            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
+            // 
+            // timer1
+            // 
+            this.timer1.Enabled = true;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // GroundStation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(756, 382);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.trackBarSpeed);
             this.Controls.Add(this.statusStripState);
             this.Controls.Add(this.menuStripParams);
@@ -273,6 +290,8 @@
         private System.Windows.Forms.ToolStripComboBox getPIDToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem setPIDsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem getPIDsToolStripMenuItem;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Timer timer1;
 
     }
 }

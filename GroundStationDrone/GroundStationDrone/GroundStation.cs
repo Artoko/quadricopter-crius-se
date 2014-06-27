@@ -18,8 +18,11 @@ namespace GroundStationDrone
         ClassSerial.callback_message_receive my_callback;
 
         List<Point> points = new List<Point>();
+        List<string> frame_sent = new List<string>();
         Stopwatch sw;
         int time = 0;
+        float speed;
+
         public GroundStation()
         {
             InitializeComponent();
@@ -59,6 +62,7 @@ namespace GroundStationDrone
             message = "*" + message + "##";
             my_callback = callback;
             serial_com.SetCallback(IncommingMessage);
+            frame_sent.Add(message);
             serial_com.SendMessage(message);
         }
         private void IncommingMessage(byte[] frame)
@@ -153,7 +157,14 @@ namespace GroundStationDrone
             }
             else if (response.Substring(0, 3) == "2+2")
             {
-                float speed = (short)((frame[16] << 8) + frame[17]);
+                speed = (short)((frame[16] << 8) + frame[17]);
+                //sw.Stop();
+                //time += (int)(sw.ElapsedMilliseconds /1000);
+                //sw.Start();
+
+
+
+
                 toolStripStatusLabelSpeed.Text = "Speed : " + Convert.ToString(speed);
                 toolStripStatusLabelSpeed.ForeColor = System.Drawing.Color.FromArgb((byte)(float)(255 * (speed / 1000)), (byte)(float)(255 - (255 * (speed / 1000))), (byte)(50));
             }
@@ -256,6 +267,44 @@ namespace GroundStationDrone
         }
 
         #endregion
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            if (points.Count >1)
+            {
+                foreach (Point pt in points)
+                {
+                    g.DrawLines(new Pen(Color.Black), points.ToArray());
+                }
+                g.Dispose();
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            sw.Stop();
+            time += (int)(sw.ElapsedMilliseconds / 1000);
+            sw.Start();
+            points.Add(new Point((int)((time * panel1.Width) / 100), panel1.Height - (int)(((speed) * panel1.Height) / 1000) -1));
+            if (points.Count > 90)
+            {
+                for (int i = 1; i < points.Count; i++)
+                {
+                    if (points[i].X - points[0].X >= 0)
+                    {
+                        points[i - 1] = new Point(points[i].X - points[0].X, points[i].Y);
+                    }
+                    else
+                    {
+                        points[i - 1] = new Point(0, points[i].Y);
+                    }
+                }
+
+                points.RemoveRange(points.Count - 1, 1);
+            }
+            panel1.Refresh();
+        }
 
 
         
