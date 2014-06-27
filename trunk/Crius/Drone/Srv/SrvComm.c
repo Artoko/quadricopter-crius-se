@@ -46,6 +46,7 @@ static void SrvCommRepportPID( void );
 
 static void SrvCommRepportData( void) ;
 
+static void SrvCommRepportError( void) ;
 
 
 
@@ -160,11 +161,17 @@ static void SrvCommExecute ( void )
 	}
 	else
 	{
-		Char o_message[ ] = { '*', COMM_ERROR,'#', '#' };
-		DrvUart0SendMessage( o_message , sizeof(o_message) );
+		SrvCommRepportError();
 	}
 	
 }	
+
+
+static void SrvCommRepportError( void) 
+{
+	Char o_message[ ] = { '*', COMM_ERROR,'#', '#' };
+	DrvUart0SendMessage( o_message , sizeof(o_message) );
+}
 
 /************************************************************************/
 /*on repporte les donnees                                               */
@@ -202,8 +209,7 @@ static void SrvCommRepportGeneral( void )
 	}
 	else
 	{
-		Char o_message[ ] = { '*', COMM_ERROR,'#', '#' };
-		DrvUart0SendMessage( o_message , sizeof(o_message) );
+		SrvCommRepportError();
 	}
 }
 
@@ -226,8 +232,7 @@ static void SrvCommRepportMotors( void )
 		}
 		else
 		{
-			Char o_message[ ] = { '*', COMM_ERROR,'#', '#' };
-			DrvUart0SendMessage( o_message , sizeof(o_message) );
+			SrvCommRepportError();
 		}
 	}
 	else if( ma_trame_comm.param[PARAM_1] == COMM_MOTOR_READ)
@@ -253,8 +258,7 @@ static void SrvCommRepportMotors( void )
 	}
 	else
 	{
-		Char o_message[ ] = { '*', COMM_ERROR,'#', '#' };
-		DrvUart0SendMessage( o_message , sizeof(o_message) );
+		SrvCommRepportError();
 	}
 }
 
@@ -288,8 +292,7 @@ static void SrvCommRepportAngles( void )
 	}
 	else
 	{
-		Char o_message[ ] = { '*', COMM_ERROR,'#', '#' };
-		DrvUart0SendMessage( o_message , sizeof(o_message) );
+		SrvCommRepportError();
 	}
 }
 
@@ -361,8 +364,7 @@ static void SrvCommRepportSensors( void )
 	}
 	else
 	{
-		Char o_message[ ] = { '*', COMM_ERROR,'#', '#' };
-		DrvUart0SendMessage( o_message , sizeof(o_message) );
+		SrvCommRepportError();
 	}
 }
 
@@ -389,8 +391,7 @@ static void SrvCommRepportPID( void )
 		}
 		else
 		{
-			Char o_message[ ] = { '*', COMM_ERROR,'#', '#' };
-			DrvUart0SendMessage( o_message , sizeof(o_message) );
+			SrvCommRepportError();
 		}
 	}
 	else if( ma_trame_comm.param[ PARAM_1 ] == COMM_PID_READ)
@@ -420,15 +421,13 @@ static void SrvCommRepportPID( void )
 		}
 		else
 		{
-			Char o_message[ ] = { '*', COMM_ERROR,'#', '#' };
-			DrvUart0SendMessage( o_message , sizeof(o_message) );
+			SrvCommRepportError();
 		}
 		
 	}
 	else
 	{
-		Char o_message[ ] = { '*', COMM_ERROR,'#', '#' };
-		DrvUart0SendMessage( o_message , sizeof(o_message) );
+		SrvCommRepportError();
 	}
 }
 
