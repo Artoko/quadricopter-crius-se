@@ -26,6 +26,9 @@ typedef struct
 //init des valeurs du PID
 void SrvPIDInit( void ) ;
 
+//Dispatcher d'evenements 
+void SrvPIDDispatcher (Event_t in_event) ;
+
 //set des valeurs du PID
 void SrvPIDSetValues( Int8U index, float p, float i, float d ) ;
 

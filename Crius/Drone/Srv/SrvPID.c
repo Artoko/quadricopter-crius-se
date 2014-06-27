@@ -26,6 +26,9 @@ float p_term = 0.0F;
 float i_term = 0.0F;
 float d_term = 0.0F;
 
+//variables de timming
+Int32U lastread_pid = 0U;
+
 //Init des valeurs du pid
 void SrvPIDInit( void )
 {
@@ -49,6 +52,27 @@ void SrvPIDInit( void )
 	}
 	SrvPIDResetValues( ) ;
 }
+
+/************************************************************************/
+/*Dispatcher d'evenements                                               */
+/************************************************************************/
+void SrvPIDDispatcher (Event_t in_event)
+{
+	Int32U now = 0U;
+	float interval_pid = 0.0F;
+	
+	// ********************* Calcul du temps de cycle *************************
+	now = DrvTimerGetTimeUs();
+	interval_pid = (float)(now - lastread_pid) / 1000000.0F;
+	lastread_pid = now;
+	
+	// ********************* PID **********************************************
+	imu_reel.pid_error.roulis	= SrvPIDCompute( 0U , imu_desire.angles.roulis	, imu_reel.angles.roulis	, interval_pid);
+	imu_reel.pid_error.tangage	= SrvPIDCompute( 1U , imu_desire.angles.tangage	, imu_reel.angles.tangage	, interval_pid);
+	imu_reel.pid_error.lacet	= SrvPIDCompute( 2U , (imu_reel.angles.lacet + imu_desire.angles.lacet)	, imu_reel.angles.lacet	, interval_pid);
+
+}
+
 
 //Set des valeurs du pid
 void SrvPIDSetValues( Int8U index, float p, float i, float d )

@@ -85,7 +85,7 @@ int main(void)
 	SrvSensorsInit();
 	SrvImuInit();
 	SrvMotorInit(); 
-	//SrvHeartbeatInit();
+	SrvHeartbeatInit();
 	
 	//Wait 1 sec for sensors init
 	DrvTimerDelayMs(1000);
@@ -105,15 +105,20 @@ int main(void)
 	
     while(TRUE)
     {			
-		current_main_event = DrvEventGetEvent();
-		// ********************* Read sensors ***************s*************************
-		SrvSensorsDispatcher(current_main_event);
+		
+		current_main_event = DrvEventGetEvent();	
+		// ********************* Read sensors *****************************************
+		SrvSensorsDispatcher(current_main_event);	//2.4ms
 		// ********************* Compute sensors **************************************
-		SrvImuDispatcher(current_main_event);
+		SrvImuDispatcher(current_main_event);		//1.6ms
+		// ********************* PID compute ******************************************
+		SrvImuDispatcher(current_main_event);		//1.6ms
+		// ********************* Update motors ******* ********************************
+		SrvMotorDispatcher(current_main_event);		//0.2ms
 		// ********************* Receive transmit data ********************************
 		SrvCommDispatcher(current_main_event);
 		// ********************* Still alive  *****************************************
-		//SrvHeartbeatDispatcher(current_main_event);
+		SrvHeartbeatDispatcher(current_main_event);
 	}	
 }
 
