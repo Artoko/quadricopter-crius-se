@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MySerial;
@@ -67,6 +68,7 @@ namespace GroundStationDrone
         }
         private void IncommingMessage(byte[] frame)
         {
+            //my_callback(frame);
             Invoke((ClassSerial.callback_message_receive)my_callback, new object[] { frame });
         }
         private void ErrorMessage()
@@ -158,9 +160,8 @@ namespace GroundStationDrone
             else if (response.Substring(0, 3) == "2+2")
             {
                 speed = (short)((frame[16] << 8) + frame[17]);
-                //sw.Stop();
-                //time += (int)(sw.ElapsedMilliseconds /1000);
-                //sw.Start();
+
+                
 
 
 
@@ -283,12 +284,11 @@ namespace GroundStationDrone
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            sw.Stop();
-            time += (int)(sw.ElapsedMilliseconds / 1000);
-            sw.Start();
-            points.Add(new Point((int)((time * panel1.Width) / 100), panel1.Height - (int)(((speed) * panel1.Height) / 1000) -1));
-            if (points.Count > 90)
+            time++;
+            points.Add(new Point((int)((time * panel1.Width / 1000)), panel1.Height - (int)(((speed) * panel1.Height) / 1000) - 1));
+            if (points.Count > 1000)
             {
+                time--;
                 for (int i = 1; i < points.Count; i++)
                 {
                     if (points[i].X - points[0].X >= 0)
@@ -300,14 +300,11 @@ namespace GroundStationDrone
                         points[i - 1] = new Point(0, points[i].Y);
                     }
                 }
-
                 points.RemoveRange(points.Count - 1, 1);
             }
             panel1.Refresh();
         }
 
-
-        
 
 
         #region graph
