@@ -235,13 +235,14 @@
             // 
             this.panel1.Location = new System.Drawing.Point(111, 54);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(554, 104);
+            this.panel1.Size = new System.Drawing.Size(298, 104);
             this.panel1.TabIndex = 6;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
             // timer1
             // 
             this.timer1.Enabled = true;
+            this.timer1.Interval = 10;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // GroundStation

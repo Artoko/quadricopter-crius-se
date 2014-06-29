@@ -196,16 +196,16 @@ ISR(USART0_RX_vect)
 #endif
 {
 	Int8U rcv_byte = UDR0 ;
-	if( rcv_byte == '*' )
-	{
-		buff_uart_0[ 0U ] = '*';
-		ctr_buff_uart_0 = 1U;
-	}
-	else if( ctr_buff_uart_0 > 0 )
+	if( ctr_buff_uart_0 > 0 )
 	{
 		//on enregistre les octet recus
 		buff_uart_0[ ctr_buff_uart_0 ] = rcv_byte;
 		ctr_buff_uart_0++;
+	}
+	else if( rcv_byte == '*' )
+	{
+		buff_uart_0[ 0U ] = '*';
+		ctr_buff_uart_0 = 1U;
 	}
 }
 #endif

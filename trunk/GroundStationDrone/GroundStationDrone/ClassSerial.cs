@@ -22,6 +22,8 @@ namespace MySerial
         public static bool Thread_Sender_flag = false;
         public static Queue<string> SendFifoString = new Queue<string>();
 
+
+        public static bool mutex_send = false;
         public bool Connect(string port_name)
         {
             bool ret = false;
@@ -57,6 +59,8 @@ namespace MySerial
                 Thread_Sender = new Thread(new ThreadStart(ClassUartThreadSenderModem));
                 Thread_Sender.Start();
                 Thread_Sender_flag = true;
+
+                mutex_send = true;
                 
                 
             }
@@ -94,7 +98,13 @@ namespace MySerial
         {
             if (serialPort1.IsOpen)
             {
-                SendFifoString.Enqueue(message);
+                //if (mutex_send)
+                {
+                    SendFifoString.Enqueue(message);
+                    //serialPort1.Write(message);
+                    //mutex_send = false;
+                }
+                
             }
         }
 
@@ -105,8 +115,9 @@ namespace MySerial
                 if (SendFifoString.Count > 0)
                 {
                     serialPort1.Write(SendFifoString.Dequeue());
-                    //Thread.Sleep(10);
+                    
                 }
+                Thread.Sleep(10);
             }
         }
 
@@ -139,21 +150,27 @@ namespace MySerial
                         {
                             recpt_buff[index++] = (byte)serialPort1.ReadByte();
                             if (index > 3)
-                            if ( (recpt_buff[index - 2] == '#') && (recpt_buff[index - 1] == '#'))
                             {
-                                //if (index == 34)
+                                if ((recpt_buff[index - 2] == '#') && (recpt_buff[index - 1] == '#'))
                                 {
+                                    if ((bytes != index))
+                                    {
+                                        recpt_buff[index++] = (byte)serialPort1.ReadByte();
+                                    }
+
                                     byte[] frame = new byte[index - 3];
+
                                     for (int i = 1; i < index - 2; i++)
                                     {
                                         frame[i - 1] = recpt_buff[i];
                                         recpt_buff[i] = 0;
                                     }
                                     list_callback_messages(frame);
+
+                                    bytes -= index;
+                                    if (bytes < 0) bytes = 0;
+                                    index = 0;
                                 }
-                                bytes -= index;
-                                if (bytes < 0) bytes = 0;
-                                index = 0;
                             }
                         }
 
@@ -166,9 +183,9 @@ namespace MySerial
                 }
                 else
                 {
-                    Thread.Sleep(5);
                     index = 0;
                 }
+                Thread.Sleep(5);
             }
         }
 

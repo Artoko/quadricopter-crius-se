@@ -82,20 +82,21 @@ void SrvCommDispatcher (Event_t in_event)
 	//si le buffer est suffisament rempli
 	if(buffer_size > 3U)
 	{
+		static Int8U loop = 1U ;
 		Int8S signe = 1;
 		Char field_in_message[ 10U ];
 		Int8U cpt_message = 0U;
 		Int8U cpt_field = 0U;
 		//on parcours le buffer 
-		for (Int8U loop = 1U ; loop < buffer_size ; loop++)
+		for (loop = 1U ; loop < buffer_size ; loop++)
 		{
 			if(( buffer[ loop - 1U ] == '#' ) && ( buffer[ loop ] == '#' ) && ( buffer[ 0U ] == '*' ))
 			{
-				//on reset pour la prochaine trame
-				DrvUart0ResetBuffer(loop + 1U);
-		
 				//dispatche trame
 				SrvCommExecute();
+				
+				//on reset pour la prochaine trame
+				DrvUart0ResetBuffer(loop + 1U);
 			}
 			else
 			{
@@ -169,7 +170,7 @@ static void SrvCommExecute ( void )
 
 static void SrvCommRepportError( void) 
 {
-	Char o_message[ ] = { '*', COMM_ERROR,'#', '#' };
+	Char o_message[ ] = { '*', COMM_ERROR,};
 	DrvUart0SendMessage( o_message , sizeof(o_message) );
 }
 
@@ -185,13 +186,13 @@ static void SrvCommRepportGeneral( void )
 		//read eeprom
 		Int8U version = 0U;
 		DrvEepromReadVersion(&version);
-		Char o_message[ ] = { '*', '1', '+', '1', '+', version ,'#', '#' };
+		Char o_message[ ] = { '*', '1', '+', '1', '+', version ,};
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	else if( ma_trame_comm.param[PARAM_1] == COMM_GENERAL_RESET)
 	{
 		//reset
-		Char o_message[ ] = { '*', '1', '+', '2', '#', '#' };
+		Char o_message[ ] = { '*', '1', '+', '2', };
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 		//wait for reset
 		DrvTimerDelayMs(10);
@@ -201,7 +202,7 @@ static void SrvCommRepportGeneral( void )
 	{
 		//deconfigure eeprom
 		DrvEepromDeconfigure();
-		Char o_message[ ] = { '*', '1', '+', '3', '#', '#' };
+		Char o_message[ ] = { '*', '1', '+', '3', };
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 		//wait for reset
 		DrvTimerDelayMs(10);
@@ -253,7 +254,7 @@ static void SrvCommRepportMotors( void )
 							 '+',
 							 (Int8U)(imu_reel.moteurs.throttle >> 8U),
 							 (Int8U)imu_reel.moteurs.throttle,			 
-							 '#', '#' };
+							 };
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	else
@@ -287,7 +288,7 @@ static void SrvCommRepportAngles( void )
 							'+',
 							(Int8U)(imu_reel.angles.lacet >> 8U),
 							(Int8U)imu_reel.angles.lacet,			 
-							'#', '#' };
+							};
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	else
@@ -310,7 +311,7 @@ static void SrvCommRepportSensors( void )
 							'+',
 							(Int8U)(imu_reel.sensors.acc.z >> 8U),
 							(Int8U)imu_reel.sensors.acc.z,
-							'#', '#' };
+							};
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	//report gyr angles 
@@ -325,7 +326,7 @@ static void SrvCommRepportSensors( void )
 							'+',
 							(Int8U)(imu_reel.sensors.gyr.z >> 8U),
 							(Int8U)imu_reel.sensors.gyr.z,
-							'#', '#' };
+							};
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	//report mag angles 
@@ -340,7 +341,7 @@ static void SrvCommRepportSensors( void )
 							'+',
 							(Int8U)(imu_reel.sensors.mag.z >> 8U),
 							(Int8U)imu_reel.sensors.mag.z,
-							'#', '#' };
+							};
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	//report baro angles 
@@ -359,7 +360,7 @@ static void SrvCommRepportSensors( void )
 							(Int8U)((Int32U)imu_reel.sensors.bar.pressure),
 							'+',
 							(Int8U)imu_reel.sensors.bar.weather,
-							'#', '#' };
+							};
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	else
@@ -416,7 +417,7 @@ static void SrvCommRepportPID( void )
 								'+',
 								(Int8U)((Int16S)( D * 1000 ) >> 8U),
 								(Int8U)((Int16S)( D * 1000 )),			 
-								'#', '#' };
+								};
 			DrvUart0SendMessage( o_message , sizeof(o_message) );
 		}
 		else
@@ -484,198 +485,7 @@ static void SrvCommRepportData( void )
 	o_message[ lenght++ ] = (Int8U)(imu_reel.sensors.bar.temperature >> 8U);
 	o_message[ lenght++ ] = (Int8U)imu_reel.sensors.bar.temperature;
 	
-	o_message[ lenght++ ] = '#';
-	o_message[ lenght++ ] = '#';
-	o_message[ lenght++ ] = '#';
-	o_message[ lenght++ ] = '#';
-	
 	DrvUart0SendMessage( o_message , lenght );
 }
 
 
-
-/*
-if(ma_trame_comm.param[PARAM_0] == COMM_MOTOR )
-	{ 
-		//write speed
-		if( ma_trame_comm.param[PARAM_1] == 1U)
-		{
-			//controle validité data
-			if(
-			   ( ma_trame_comm.param[PARAM_1] >= 0U ) &&
-			   ( ma_trame_comm.param[PARAM_1] <= 1000U ) 
-			  )
-			{
-				//applique la vitesse au moteurs
-				SrvMotorApplyAbsoluteSpeed(ma_trame_comm.param[PARAM_1]);
-				Char o_message[ ] = { 'O','K','#','#','#','#' };
-				DrvUart0SendMessage( o_message , 6U );
-			}
-		}
-		//report motors speed 
-		else if( ma_trame_comm.param[PARAM_1] == 2U)
-		{
-			Int8U lenght = 0;
-			Char o_message[ 10 ] = { 0 };
-			o_message[ lenght++ ] = (Int8U)(imu_reel.moteurs.x >> 8U);
-			o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.x;	
-			o_message[ lenght++ ] = (Int8U)(imu_reel.gyr_angles.y >> 8U);
-			o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.y;
-			o_message[ lenght++ ] = (Int8U)(imu_reel.gyr_angles.z >> 8U);
-			o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.z;
-			o_message[ lenght++ ] = '#';
-			o_message[ lenght++ ] = '#';
-			o_message[ lenght++ ] = '#';
-			o_message[ lenght++ ] = '#';
-			DrvUart0SendMessage( o_message , 10U );
-		}
-	}
-	else if(ma_trame_comm.param[PARAM_0] == COMM_ANGLE )
-	{ 
-		//applique les angle souhaité
-		imu_desire.angles.roulis	= (Int16S)ma_trame_comm.param[PARAM_1];
-		SetLimits((float)imu_desire.angles.roulis, ANGLE_MIN, ANGLE_MAX);
-		imu_desire.angles.tangage	= (Int16S)ma_trame_comm.param[PARAM_2];
-		SetLimits((float)imu_desire.angles.tangage, ANGLE_MIN, ANGLE_MAX);
-		imu_desire.angles.lacet		= (Int16S)ma_trame_comm.param[PARAM_3];
-		Char o_message[ ] = { 'O','K','#','#','#','#' };
-		DrvUart0SendMessage( o_message , 6U );
-	}
-	else if(ma_trame_comm.param[PARAM_0] == COMM_BAROMETER )
-	{ 
-		if(  ma_trame_comm.param[PARAM_1] == 1U )
-		{
-			//on enregistre l'altitude de depart
-			SrvImuSensorsSetAltitudeDepart();
-			Char o_message[ ] = { 'O','K','#','#','#','#' };
-			DrvUart0SendMessage( o_message , 6U );
-		}
-		else if(  ma_trame_comm.param[PARAM_1] == 2U )
-		{
-			Char o_message[ ] = { 'W','E','A','T','H','E','R',':',imu_reel.weather,'#','#','#','#'};
-			DrvUart0SendMessage( o_message , 13U );
-		}	
-		else if(  ma_trame_comm.param[PARAM_1] == 3U )
-		{
-			//on enregistre l'altitude relative a la position de depart
-			SrvImuSensorsSetAltitudeMaintient(ma_trame_comm.param[PARAM_2]);
-			Char o_message[ ] = { 'O','K','#','#','#','#' };
-			DrvUart0SendMessage( o_message , 6U );
-		}		
-		
-	}
-	else if(ma_trame_comm.param[PARAM_0] == COMM_PID )
-	{
-		//Write PID
-		if(  ma_trame_comm.param[PARAM_1] == 1U )
-		{
-			Int8U index = 0;
-			float P = 0;
-			float I = 0;
-			float D = 0;
-			index = ma_trame_comm.param[PARAM_2];
-			P = (float)( ma_trame_comm.param[PARAM_3] / 1000.0 );
-			I = (float)( ma_trame_comm.param[PARAM_4] / 1000.0 );
-			D = (float)( ma_trame_comm.param[PARAM_5] / 1000.0 );
-			DrvEepromWritePID( index, P, I, D );
-			SrvPIDSetValues( index, P, I, D );
-			Char o_message[ ] = { 'O','K','#','#','#','#' };
-			DrvUart0SendMessage( o_message , 6U );
-		}
-		//Read PID
-		else
-		{
-			Int8U index = 0;
-			float P = 0;
-			float I = 0;
-			float D = 0;
-			index = ma_trame_comm.param[PARAM_2];
-			DrvEepromReadPID(index,&P,&I,&D);
-			
-			Char o_message[ ] = { 'P','I','D',':',0,0,0,0,0,0,0,'#','#','#','#'};
-			
-			o_message[ 4U ] = index;
-			
-			o_message[ 5U ] = (Int8U)((Int16S)( P * 1000 ) >> 8U);
-			o_message[ 6U ] = (Int8U)((Int16S)(P * 1000 ));
-			
-			o_message[ 7U ] = (Int8U)((Int16S)( I * 1000 ) >> 8U);
-			o_message[ 8U ] = (Int8U)((Int16S)(I * 1000 ));
-			
-			o_message[ 9U ] = (Int8U)((Int16S)(D * 1000 ) >> 8U);
-			o_message[ 10U ] = (Int8U)((Int16S)(D * 1000 ));
-			DrvUart0SendMessage( o_message , 15U );
-		}
-		
-	}
-	else if(ma_trame_comm.param[PARAM_0] == COMM_EEPROM )
-	{
-		if( ma_trame_comm.param[PARAM_1] == 1U)
-		{
-			DrvEepromDeconfigure();
-		}
-		Char o_message[ ] = { 'O','K','#','#','#','#' };
-		DrvUart0SendMessage( o_message , 6U );
-		RESET_SOFT();
-	}
-	else if (ma_trame_comm.param[PARAM_0] == COMM_REPPORT)
-	{
-		//report angles
-		if( ma_trame_comm.param[PARAM_1] == 1U)
-		{
-			Int8U lenght = 0;
-			Char o_message[ 10 ] = { 0 };
-			o_message[ lenght++ ] = (Int8U)(imu_reel.angles.roulis >> 8U);
-			o_message[ lenght++ ] = (Int8U)imu_reel.angles.roulis;	
-			o_message[ lenght++ ] = (Int8U)(imu_reel.angles.tangage >> 8U);
-			o_message[ lenght++ ] = (Int8U)imu_reel.angles.tangage;
-			o_message[ lenght++ ] = (Int8U)(imu_reel.angles.lacet >> 8U);
-			o_message[ lenght++ ] = (Int8U)imu_reel.angles.lacet;
-			o_message[ lenght++ ] = '#';
-			o_message[ lenght++ ] = '#';
-			o_message[ lenght++ ] = '#';
-			o_message[ lenght++ ] = '#';
-			DrvUart0SendMessage( o_message , 10U );
-		}
-		//report acc angles 
-		else if( ma_trame_comm.param[PARAM_1] == 2U)
-		{
-			Int8U lenght = 0;
-			Char o_message[ 10 ] = { 0 };
-			o_message[ lenght++ ] = (Int8U)(imu_reel.acc_angles.x >> 8U);
-			o_message[ lenght++ ] = (Int8U)imu_reel.acc_angles.x;	
-			o_message[ lenght++ ] = (Int8U)(imu_reel.acc_angles.y >> 8U);
-			o_message[ lenght++ ] = (Int8U)imu_reel.acc_angles.y;
-			o_message[ lenght++ ] = (Int8U)(imu_reel.acc_angles.z >> 8U);
-			o_message[ lenght++ ] = (Int8U)imu_reel.acc_angles.z;
-			o_message[ lenght++ ] = '#';
-			o_message[ lenght++ ] = '#';
-			o_message[ lenght++ ] = '#';
-			o_message[ lenght++ ] = '#';
-			DrvUart0SendMessage( o_message , 10U );
-		}
-		//report gyr angles 
-		else if( ma_trame_comm.param[PARAM_1] == 3U)
-		{
-			Int8U lenght = 0;
-			Char o_message[ 10 ] = { 0 };
-			o_message[ lenght++ ] = (Int8U)(imu_reel.gyr_angles.x >> 8U);
-			o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.x;	
-			o_message[ lenght++ ] = (Int8U)(imu_reel.gyr_angles.y >> 8U);
-			o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.y;
-			o_message[ lenght++ ] = (Int8U)(imu_reel.gyr_angles.z >> 8U);
-			o_message[ lenght++ ] = (Int8U)imu_reel.gyr_angles.z;
-			o_message[ lenght++ ] = '#';
-			o_message[ lenght++ ] = '#';
-			o_message[ lenght++ ] = '#';
-			o_message[ lenght++ ] = '#';
-			DrvUart0SendMessage( o_message , 10U );
-		}
-		else if (ma_trame_comm.param[PARAM_1] == 2U)
-		{
-			SrvCommRepportData();
-		}
-	}
-
-
-*/
