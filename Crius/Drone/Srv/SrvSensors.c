@@ -178,14 +178,15 @@ void SrvSensorsReadAccelerometerSensor( S_Acc_Angles *acc_angles, S_Acc_Sensor *
 	{
 		
 		//Roll & Pitch 
-		
-		acc_angles->x  = (float)atan2((double)(sensors->x) , (double)sqrt((double)(((double)(sensors->y * sensors->y)) + ((double)(sensors->z * sensors->z)))));
-		acc_angles->y = (float)atan2((double)(sensors->y) , (double)sqrt((double)(((double)(sensors->x * sensors->x)) + ((double)(sensors->z * sensors->z)))));
+		acc_angles->x  = (float)atan2((double)(sensors->x) , (double)sqrt((double)(pow((double)sensors->y,2)+pow((double)sensors->z,2))));
+        acc_angles->y = (float)atan2((double)(sensors->y) , (double)sqrt((double)(pow((double)sensors->x,2)+pow((double)sensors->z,2))));
+		//acc_angles->x  = (float)atan2((double)(sensors->x) , (double)sqrt((double)(((double)(sensors->y * sensors->y)) + ((double)(sensors->z * sensors->z)))));
+		//acc_angles->y = (float)atan2((double)(sensors->y) , (double)sqrt((double)(((double)(sensors->x * sensors->x)) + ((double)(sensors->z * sensors->z)))));
 		//acc_angles->z = sensors->z;
 		
 		acc_angles->x = ToDeg(acc_angles->x);
 		acc_angles->y = ToDeg(acc_angles->y);
-		acc_angles->z = ToDeg(sensors->z);
+		acc_angles->z = sensors->z;
 	}
 }
 

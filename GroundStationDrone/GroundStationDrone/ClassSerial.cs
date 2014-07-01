@@ -94,17 +94,12 @@ namespace MySerial
         }
 
 
-        public void SendMessage(string message)
+        public void SendMessage(byte[] message)
         {
             if (serialPort1.IsOpen)
             {
-                //if (mutex_send)
-                {
-                    SendFifoString.Enqueue(message);
-                    //serialPort1.Write(message);
-                    //mutex_send = false;
-                }
-                
+                serialPort1.Write(message, 0, message.Length);
+                Thread.Sleep(5);
             }
         }
 
@@ -117,7 +112,6 @@ namespace MySerial
                     serialPort1.Write(SendFifoString.Dequeue());
                     
                 }
-                Thread.Sleep(10);
             }
         }
 
@@ -148,8 +142,29 @@ namespace MySerial
                         int bytes = serialPort1.BytesToRead;
                         while (bytes != 0)
                         {
-                            recpt_buff[index++] = (byte)serialPort1.ReadByte();
-                            if (index > 3)
+                            byte received_byte = (byte)serialPort1.ReadByte();
+                            if (index != 0)
+                            {
+                                recpt_buff[index++] = received_byte;
+                                if ((received_byte == '*') && (recpt_buff[1] == index) && (recpt_buff[index - 1] == '*'))
+                                {
+                                    byte[] frame = new byte[index - 3];
+
+                                    for (int i = 2; i < index - 1; i++)
+                                    {
+                                        frame[i - 2] = recpt_buff[i];
+                                        recpt_buff[i] = 0;
+                                    }
+                                    list_callback_messages(frame);
+                                    index = 0;
+                                }
+                            }
+                            else if (received_byte == '*')
+                            {
+                                recpt_buff[index++] = received_byte;
+                            }
+
+                            /*if (index > 3)
                             {
                                 if ((recpt_buff[index - 2] == '#') && (recpt_buff[index - 1] == '#'))
                                 {
@@ -171,7 +186,7 @@ namespace MySerial
                                     if (bytes < 0) bytes = 0;
                                     index = 0;
                                 }
-                            }
+                            }*/
                         }
 
                         bytes = 0;
