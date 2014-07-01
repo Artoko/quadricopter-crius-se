@@ -40,9 +40,9 @@ static void SrvCommRepportMotors( Int8U comm_type_motor, Int16U motor_speed );
 
 static void SrvCommRepportAngles( Int8U comm_type_angle, Int16S angles_roulis, Int16S angles_tangage, Int16S angles_lacet);
 
-static void SrvCommRepportSensors( void );
+static void SrvCommRepportSensors( Int8U comm_type_sensor );
 
-static void SrvCommRepportPID( void );
+static void SrvCommRepportPID( Int8U comm_type_pid );
 
 static void SrvCommRepportData( void) ;
 
@@ -122,11 +122,11 @@ static void SrvCommExecute ( void )
 	}
 	else if( buffer[ 2U ] == COMM_SENSORS )
 	{
-		SrvCommRepportSensors();
+		SrvCommRepportSensors( buffer[ 4U ] );
 	}
 	else if( buffer[ 2U ] == COMM_PID )
 	{
-		SrvCommRepportPID();
+		SrvCommRepportPID( buffer[ 4U ] );
 	}
 	else if( buffer[ 2U ] == COMM_REPPORT )
 	{
@@ -278,10 +278,10 @@ static void SrvCommRepportAngles( Int8U comm_type_angle, Int16S angles_roulis, I
 	}
 }
 
-static void SrvCommRepportSensors( void )
+static void SrvCommRepportSensors( Int8U comm_type_sensor )
 {
 	//report acc angles 
-	if( ma_trame_comm.param[PARAM_1] == COMM_SENSOR_ACC_READ)
+	if( comm_type_sensor == COMM_SENSOR_ACC_READ)
 	{		
 		Char o_message[ ] = { '*', 0x00, '4', '+', '1',
 							(Int8U)(imu_reel.sensors.acc.x >> 8U),
@@ -298,7 +298,7 @@ static void SrvCommRepportSensors( void )
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	//report gyr angles 
-	else if( ma_trame_comm.param[PARAM_1] == COMM_SENSOR_GYR_READ)
+	else if( comm_type_sensor == COMM_SENSOR_GYR_READ)
 	{
 		Char o_message[ ] = { '*', 0x00, '4', '+', '2',
 							(Int8U)(imu_reel.sensors.gyr.x >> 8U),
@@ -315,7 +315,7 @@ static void SrvCommRepportSensors( void )
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	//report mag angles 
-	else if( ma_trame_comm.param[PARAM_1] == COMM_SENSOR_MAG_READ)
+	else if( comm_type_sensor == COMM_SENSOR_MAG_READ)
 	{
 		Char o_message[ ] = { '*', 0x00, '4', '+', '3',
 							(Int8U)(imu_reel.sensors.mag.x >> 8U),
@@ -332,7 +332,7 @@ static void SrvCommRepportSensors( void )
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	//report baro angles 
-	else if( ma_trame_comm.param[PARAM_1] == COMM_SENSOR_BAR_READ)
+	else if( comm_type_sensor == COMM_SENSOR_BAR_READ)
 	{
 		Char o_message[ ] = { '*', 0x00, '4', '+', '4',
 							(Int8U)(imu_reel.sensors.bar.altitude >> 8U),
@@ -358,10 +358,10 @@ static void SrvCommRepportSensors( void )
 	}
 }
 
-static void SrvCommRepportPID( void )
+static void SrvCommRepportPID( Int8U comm_type_pid )
 {		
 	//report pid
-	if( ma_trame_comm.param[ PARAM_1 ] == COMM_PID_WRITE)
+	if( comm_type_pid == COMM_PID_WRITE)
 	{
 		//applique les PIDs souhaité
 		Int8U index = 0;
@@ -385,7 +385,7 @@ static void SrvCommRepportPID( void )
 			SrvCommRepportError();
 		}
 	}
-	else if( ma_trame_comm.param[ PARAM_1 ] == COMM_PID_READ)
+	else if( comm_type_pid == COMM_PID_READ)
 	{	
 		Int8U index = 0;
 		float P = 0;
@@ -427,6 +427,31 @@ static void SrvCommRepportPID( void )
 
 static void SrvCommRepportData( void )
 {
+	Char o_message[ ] = { '*', 0x00, '5', '+', 
+				(Int8U)(imu_reel.angles.roulis >> 8U),
+				(Int8U)imu_reel.angles.roulis,
+				'+',
+				(Int8U)(imu_reel.angles.tangage >> 8U),
+				(Int8U)imu_reel.angles.tangage,
+				'+',
+				(Int8U)(imu_reel.angles.lacet >> 8U),
+				(Int8U)imu_reel.angles.lacet,
+				'+',
+				(Int8U)(imu_reel.angles.nord >> 8U),
+				(Int8U)imu_reel.angles.nord,
+				'+',
+				(Int8U)(imu_reel.sensors.bar.altitude >> 8U),
+				(Int8U)imu_reel.sensors.bar.altitude,
+				'+',
+				(Int8U)(imu_reel.moteurs.throttle >> 8U),
+				(Int8U)imu_reel.moteurs.throttle,
+				'+',
+				(Int8U)(imu_reel.angles.nord >> 8U),
+				(Int8U)imu_reel.angles.nord,
+				'*'
+			};
+	o_message[ 1U ] = sizeof(o_message);
+	DrvUart0SendMessage( o_message , sizeof(o_message) );
 	/*Char o_message[ 38U ];
 	Int8U lenght = 0;
 	o_message[ lenght++ ] = '*';
