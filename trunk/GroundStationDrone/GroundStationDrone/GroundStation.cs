@@ -18,6 +18,9 @@ namespace GroundStationDrone
     {
         AirSpeedIndicatorInstrumentControl air_speed_indicator = new AirSpeedIndicatorInstrumentControl();
         AttitudeIndicatorInstrumentControl horizon_indicator = new AttitudeIndicatorInstrumentControl();
+        HeadingIndicatorInstrumentControl heading_indicator = new HeadingIndicatorInstrumentControl();
+        AltimeterInstrumentControl altimeter_indicator = new AltimeterInstrumentControl();
+        VerticalSpeedIndicatorInstrumentControl turn_indicator = new VerticalSpeedIndicatorInstrumentControl();
 
         public static ClassSerial serial_com = new ClassSerial();
         ClassSerial.callback_message_receive my_callback;
@@ -25,6 +28,11 @@ namespace GroundStationDrone
         List<Point> points = new List<Point>();
         List<string> frame_sent = new List<string>();
         float speed;
+
+        int speed_track = 0;
+        static Thread thread_sequence;
+        public static bool thread_sequence_flag = false;
+
 
         public GroundStation()
         {
@@ -40,8 +48,26 @@ namespace GroundStationDrone
             horizon_indicator.Visible = true;
             this.Controls.Add(this.horizon_indicator);
 
+            heading_indicator.Location = new Point(10 + 150 + 10 + 150 + 10, 24);
+            heading_indicator.Size = new System.Drawing.Size(150, 150);
+            heading_indicator.Visible = true;
+            this.Controls.Add(this.heading_indicator);
+
+            altimeter_indicator.Location = new Point(10 + 150 + 10 + 150 + 10 + 150 + 10, 24);
+            altimeter_indicator.Size = new System.Drawing.Size(150, 150);
+            altimeter_indicator.Visible = true;
+            this.Controls.Add(this.altimeter_indicator);
+
+            turn_indicator.Location = new Point(10 + 150 + 10 + 150 + 10 + 150 + 10 + 150 + 10, 24);
+            turn_indicator.Size = new System.Drawing.Size(150, 150);
+            turn_indicator.Visible = true;
+            this.Controls.Add(this.turn_indicator);
+
             getPIDToolStripMenuItem.SelectedIndex = 0;
             getPIDToolStripMenuItem.SelectedIndexChanged += new System.EventHandler(this.getPIDToolStripMenuItem_SelectedIndexChanged);
+
+
+            thread_sequence = new Thread(new ThreadStart(ThreadSequence));
         }
         private void GroundStation_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -113,6 +139,8 @@ namespace GroundStationDrone
                 byte version = Encoding.ASCII.GetBytes(response.Replace(response.Substring(0, 4),"").ToCharArray())[0];
                 toolStripStatusLabelVersion.Text = "Version : " + Convert.ToString((version & 0xf0) >> 4) + "." + Convert.ToString(version & 0x0f);
                 toolStripStatusLabelVersion.ForeColor = Color.Blue;
+                thread_sequence_flag = true;
+                //thread_sequence.Start();
             }
         }
         private void getVersionToolStripMenuItem_Click(object sender, EventArgs e)
@@ -207,7 +235,8 @@ namespace GroundStationDrone
         }
         private void trackBarSpeed_Scroll(object sender, EventArgs e)
         {
-            SetSpeed((short)trackBarSpeed.Value);
+           speed_track = trackBarSpeed.Value;
+           //SetSpeed((short)trackBarSpeed.Value);
         }
 
         private void showIndicatorToolStripMenuItem_Click(object sender, EventArgs e)
@@ -241,6 +270,7 @@ namespace GroundStationDrone
                 short angle_tangage = (short)((frame[6] << 8) + frame[7]);
                 short angle_lacet = (short)((frame[9] << 8) + frame[10]);
                 horizon_indicator.SetAttitudeIndicatorParameters(angle_tangage, angle_roulis);
+                heading_indicator.SetHeadingIndicatorParameters(angle_lacet);
 
                 toolStripStatusLabelAngles.Text = "Angles : " + Convert.ToString(angle_roulis) + " , " + Convert.ToString(angle_tangage) + " , " + Convert.ToString(angle_lacet);
             }
@@ -249,6 +279,104 @@ namespace GroundStationDrone
         {
             GetAngles();
         } 
+        #endregion
+
+        #region Sensors
+        private void GetBarometer()
+        {
+            SendSerialMessage("4+4", IncommingMessageGetBarometer);
+        }
+        private void IncommingMessageGetBarometer(byte[] frame)
+        {
+            string response = ConvertFrame(frame);
+            if (response.Length < 3)
+            {
+                ErrorMessage(frame);
+            }
+            else if (response.Substring(0, 3) == "4+4")
+            {
+                short altitude = (short)((frame[3] << 8) + frame[4]);
+                short temperature = (short)((frame[6] << 8) + frame[7]);
+                Int32 pressure = (Int32)((frame[9] << 24) + (frame[10] << 16) + (frame[11] << 8) + (frame[12]));
+                byte wheather = (byte)(frame[14]);
+                altimeter_indicator.SetAlimeterParameters(altitude);
+
+                toolStripStatusLabelAltitude.Text = "Altitude = " + Convert.ToString(altitude) ;
+            }
+        }
+        private void getAltitudeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GetBarometer();
+        }
+
+        private void GetAccelerometer()
+        {
+            SendSerialMessage("4+1", IncommingMessageGetAccelerometer);
+        }
+        private void IncommingMessageGetAccelerometer(byte[] frame)
+        {
+            string response = ConvertFrame(frame);
+            if (response.Length < 3)
+            {
+                ErrorMessage(frame);
+            }
+            else if (response.Substring(0, 3) == "4+1")
+            {
+                short x = (short)((frame[3] << 8) + frame[4]);
+                short y = (short)((frame[6] << 8) + frame[7]);
+                short z = (short)((frame[9] << 8) + frame[10]);
+            }
+        }
+        private void getAccelerometerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GetAccelerometer();
+        }
+
+        private void GetGyroscope()
+        {
+            SendSerialMessage("4+2", IncommingMessageGetGyroscope);
+        }
+        private void IncommingMessageGetGyroscope(byte[] frame)
+        {
+            string response = ConvertFrame(frame);
+            if (response.Length < 3)
+            {
+                ErrorMessage(frame);
+            }
+            else if (response.Substring(0, 3) == "4+2")
+            {
+                short x = (short)((frame[3] << 8) + frame[4]);
+                short y = (short)((frame[6] << 8) + frame[7]);
+                short z = (short)((frame[9] << 8) + frame[10]);
+            }
+        }
+        private void getGyroscopeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GetGyroscope();
+        }
+
+        private void GetMagnetometer()
+        {
+            SendSerialMessage("4+2", IncommingMessageGetMagnetometer);
+        }
+        private void IncommingMessageGetMagnetometer(byte[] frame)
+        {
+            string response = ConvertFrame(frame);
+            if (response.Length < 3)
+            {
+                ErrorMessage(frame);
+            }
+            else if (response.Substring(0, 3) == "4+3")
+            {
+                short x = (short)((frame[3] << 8) + frame[4]);
+                short y = (short)((frame[6] << 8) + frame[7]);
+                short z = (short)((frame[9] << 8) + frame[10]);
+            }
+        }
+        private void getMagnetometerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GetMagnetometer();
+        }
         #endregion
 
         #region PID
@@ -297,6 +425,33 @@ namespace GroundStationDrone
 
         #endregion
 
+        int i = 0;
+        private void ThreadSequence()
+        {
+            while (thread_sequence_flag)
+            {
+                if (i++ < 5)
+                {
+                    GetAngles();
+                    Thread.Sleep(10);
+                } 
+                else if (i++ == 6)
+                {
+                    GetBarometer();
+                    Thread.Sleep(15);
+                }
+                else
+                {
+                    i = 0;
+                    SetSpeed((short)speed_track);
+                    Thread.Sleep(30);
+                }
+                /*Thread.Sleep(10);
+                SetSpeed((short)speed);*/
+                //GetSpeed();
+            }
+        }
+
         #region graph
 
         
@@ -313,7 +468,7 @@ namespace GroundStationDrone
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            time++;
+            /*time++;
             points.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height - (int)(((speed - 1) * panel1.Height) / 1000) - 1));
             if (points.Count > 250)
             {
@@ -331,13 +486,18 @@ namespace GroundStationDrone
                 }
                 points.RemoveRange(points.Count - 1, 1);
             }
-            panel1.Refresh();
-            //GetAngles();
+            panel1.Refresh();*/
+
+            GetAngles();
         }
 
         #endregion
 
         
+
+
+        
+
 
 
 

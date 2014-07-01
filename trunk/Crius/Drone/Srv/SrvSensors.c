@@ -180,9 +180,6 @@ void SrvSensorsReadAccelerometerSensor( S_Acc_Angles *acc_angles, S_Acc_Sensor *
 		//Roll & Pitch 
 		acc_angles->x  = (float)atan2((double)(sensors->x) , (double)sqrt((double)(pow((double)sensors->y,2)+pow((double)sensors->z,2))));
         acc_angles->y = (float)atan2((double)(sensors->y) , (double)sqrt((double)(pow((double)sensors->x,2)+pow((double)sensors->z,2))));
-		//acc_angles->x  = (float)atan2((double)(sensors->x) , (double)sqrt((double)(((double)(sensors->y * sensors->y)) + ((double)(sensors->z * sensors->z)))));
-		//acc_angles->y = (float)atan2((double)(sensors->y) , (double)sqrt((double)(((double)(sensors->x * sensors->x)) + ((double)(sensors->z * sensors->z)))));
-		//acc_angles->z = sensors->z;
 		
 		acc_angles->x = ToDeg(acc_angles->x);
 		acc_angles->y = ToDeg(acc_angles->y);
@@ -253,19 +250,20 @@ void SrvSensorsReadMagnetometerSensor( S_angles *angles, S_Mag_Sensor *sensors )
 	if(mag_read_ok != FALSE)
 	{
 		//on doit etre en dessous des 40 deg
-		//if(!(angles->roulis > 40 || angles->roulis < -40 || angles->tangage > 40 || angles->tangage < -40))
+		if(!(angles->roulis > 40 || angles->roulis < -40 || angles->tangage > 40 || angles->tangage < -40))
 		{
 			//compensation avec l'accelerometre
-			/*float cosRoll  = cos( ToRad( angles->tangage ) );
+			float cosRoll  = cos( ToRad( angles->tangage ) );
 			float sinRoll  = sin( ToRad( angles->tangage ) );
 			float cosPitch = cos( ToRad( angles->roulis ) );
 			float sinPitch = sin( ToRad( angles->roulis ) );
 			
 			float Xh = sensors->x * cosPitch + sensors->z * sinPitch;
-			float Yh = sensors->x * sinRoll * sinPitch + sensors->y * cosRoll - sensors->z * sinRoll * cosPitch;*/
+			float Yh = sensors->x * sinRoll * sinPitch + sensors->y * cosRoll - sensors->z * sinRoll * cosPitch;
 			
 			
-			float heading = atan2(sensors->y, sensors->x);
+			float heading = atan2(Yh, Xh);
+			//float heading = atan2(sensors->y, sensors->x);
 			heading += LOCAL_MAGNETIC_DECLINAISON;
 			if(heading < 0)
 			{
