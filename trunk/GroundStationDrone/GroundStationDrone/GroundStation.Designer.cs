@@ -52,6 +52,7 @@
             this.trackBarSpeed = new System.Windows.Forms.TrackBar();
             this.panel1 = new System.Windows.Forms.Panel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.showIndicatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStripState.SuspendLayout();
             this.menuStripParams.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSpeed)).BeginInit();
@@ -152,7 +153,8 @@
             // toolStripMenuItemMotors
             // 
             this.toolStripMenuItemMotors.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.getSpeedToolStripMenuItem});
+            this.getSpeedToolStripMenuItem,
+            this.showIndicatorToolStripMenuItem});
             this.toolStripMenuItemMotors.Name = "toolStripMenuItemMotors";
             this.toolStripMenuItemMotors.Size = new System.Drawing.Size(57, 20);
             this.toolStripMenuItemMotors.Text = "Motors";
@@ -220,7 +222,7 @@
             // 
             // trackBarSpeed
             // 
-            this.trackBarSpeed.Location = new System.Drawing.Point(30, 54);
+            this.trackBarSpeed.Location = new System.Drawing.Point(395, 27);
             this.trackBarSpeed.Maximum = 1000;
             this.trackBarSpeed.Name = "trackBarSpeed";
             this.trackBarSpeed.Orientation = System.Windows.Forms.Orientation.Vertical;
@@ -233,7 +235,7 @@
             // 
             // panel1
             // 
-            this.panel1.Location = new System.Drawing.Point(111, 54);
+            this.panel1.Location = new System.Drawing.Point(446, 27);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(298, 104);
             this.panel1.TabIndex = 6;
@@ -245,6 +247,13 @@
             this.timer1.Interval = 10;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // showIndicatorToolStripMenuItem
+            // 
+            this.showIndicatorToolStripMenuItem.Name = "showIndicatorToolStripMenuItem";
+            this.showIndicatorToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.showIndicatorToolStripMenuItem.Text = "Show Indicator";
+            this.showIndicatorToolStripMenuItem.Click += new System.EventHandler(this.showIndicatorToolStripMenuItem_Click);
+            // 
             // GroundStation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -255,7 +264,7 @@
             this.Controls.Add(this.statusStripState);
             this.Controls.Add(this.menuStripParams);
             this.Name = "GroundStation";
-            this.Text = "GroundStation";
+            this.Text = "GroundStationDrone";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GroundStation_FormClosing);
             this.Load += new System.EventHandler(this.GroundStation_Load);
             this.statusStripState.ResumeLayout(false);
@@ -293,6 +302,7 @@
         private System.Windows.Forms.ToolStripMenuItem getPIDsToolStripMenuItem;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.ToolStripMenuItem showIndicatorToolStripMenuItem;
 
     }
 }

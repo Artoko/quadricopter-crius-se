@@ -34,11 +34,11 @@
 static void SrvCommExecute ( void );
 
 //on repporte les donnees
-static void SrvCommRepportGeneral( void );
+static void SrvCommRepportGeneral( Int8U comm_type_general );
 
-static void SrvCommRepportMotors( void );
+static void SrvCommRepportMotors( Int8U comm_type_motor, Int16U motor_speed );
 
-static void SrvCommRepportAngles( void );
+static void SrvCommRepportAngles( Int8U comm_type_angle, Int16S angles_roulis, Int16S angles_tangage, Int16S angles_lacet);
 
 static void SrvCommRepportSensors( void );
 
@@ -77,86 +77,58 @@ Int8U buffer_size = 0U;
 void SrvCommDispatcher (Event_t in_event) 
 {
 	//on lit le buffer
-	DrvUart0ReadBuffer(buffer ,&buffer_size);
-		
-	//si le buffer est suffisament rempli
-	if(buffer_size > 3U)
+	if( TRUE == DrvUart0ReadBuffer(buffer ,&buffer_size) )
 	{
-		static Int8U loop = 1U ;
-		Int8S signe = 1;
-		Char field_in_message[ 10U ];
-		Int8U cpt_message = 0U;
-		Int8U cpt_field = 0U;
-		//on parcours le buffer 
-		for (loop = 1U ; loop < buffer_size ; loop++)
-		{
-			if(( buffer[ loop - 1U ] == '#' ) && ( buffer[ loop ] == '#' ) && ( buffer[ 0U ] == '*' ))
-			{
-				//dispatche trame
-				SrvCommExecute();
-				
-				//on reset pour la prochaine trame
-				DrvUart0ResetBuffer(loop + 1U);
-			}
-			else
-			{
-				//on cherche le + ou le -
-				if( ! ( ( buffer[ loop ] == '-' ) || ( buffer[ loop ] == '+' ) || ( buffer[ loop ] == '#' ) ) )
-				{
-					field_in_message[ cpt_message ] = buffer[ loop ];
-					cpt_message ++;
-					//on efface au fur et à mesure
-					buffer[ loop ] = 0U ;
-				}
-				else
-				{
-					field_in_message[ cpt_message ] = '\0';
-					ma_trame_comm.param[ cpt_field ] = atoi(field_in_message) * signe;
-					//on met a zero le compteur
-					cpt_message = 0;
-					//on incremente pour remplir le prochain champ
-					cpt_field++;
-					//on determine le signe du prochain champ
-					if( buffer[ loop ] == '-' )
-					{
-						signe = -1;
-					}
-					else
-					{
-						signe = 1;
-					}
-				}
-			}
-		}
+		//dispatche trame
+		SrvCommExecute();
 	}
+	
+	if(buffer_size > 0U)
+	{
+		DrvUart0ResetBuffer(buffer_size);
+	}
+	
+		
 }
+
+/*//reset ma_trame_comm
+	for( Int8U loop = 0U; loop < NB_PARAM ; loop++)
+	{
+		ma_trame_comm.param[ loop ] = 0U;
+	}*/
 
 /************************************************************************/
 /*execute message entrant                                               */
 /************************************************************************/
 static void SrvCommExecute ( void )
 {
-	if( ma_trame_comm.param[PARAM_0] == COMM_GENERAL )
+	buffer[ 2U ] = buffer[ 2U ] - 0x30;
+	buffer[ 4U ] = buffer[ 4U ] - 0x30;
+	if( buffer[ 2U ] == COMM_GENERAL )
 	{
-		SrvCommRepportGeneral();
+		SrvCommRepportGeneral( buffer[ 4U ] );
 	}
-	else if( ma_trame_comm.param[PARAM_0] == COMM_MOTORS )
+	else if( buffer[ 2U ] == COMM_MOTORS )
 	{
-		SrvCommRepportMotors();
+		Int16U motor_speed = (buffer[ 6U ] << 8U) | (buffer[ 7U ]); 
+		SrvCommRepportMotors(buffer[ 4U ] , motor_speed);
 	}
-	else if( ma_trame_comm.param[PARAM_0] == COMM_ANGLES )
+	else if( buffer[ 2U ] == COMM_ANGLES )
 	{
-		SrvCommRepportAngles();
+		Int16S angles_roulis = (buffer[ 6U ] << 8U) | (buffer[ 7U ]);
+		Int16S angles_tangage = (buffer[ 9U ] << 8U) | (buffer[ 10U ]);
+		Int16S angles_lacet = (buffer[ 12U ] << 8U) | (buffer[ 13U ]);
+		SrvCommRepportAngles( buffer[ 4U ], angles_roulis, angles_tangage, angles_lacet);
 	}
-	else if( ma_trame_comm.param[PARAM_0] == COMM_SENSORS )
+	else if( buffer[ 2U ] == COMM_SENSORS )
 	{
 		SrvCommRepportSensors();
 	}
-	else if( ma_trame_comm.param[PARAM_0] == COMM_PID )
+	else if( buffer[ 2U ] == COMM_PID )
 	{
 		SrvCommRepportPID();
 	}
-	else if( ma_trame_comm.param[PARAM_0] == COMM_REPPORT )
+	else if( buffer[ 2U ] == COMM_REPPORT )
 	{
 		SrvCommRepportData();
 	}
@@ -164,13 +136,13 @@ static void SrvCommExecute ( void )
 	{
 		SrvCommRepportError();
 	}
-	
 }	
 
 
-static void SrvCommRepportError( void) 
-{
-	Char o_message[ ] = { '*', COMM_ERROR,};
+static void SrvCommRepportError( void ) 
+{ 
+	Char o_message[ ] = { '*', 0x00 , COMM_ERROR , '*' };
+	o_message[ 1U ] = sizeof(o_message);
 	DrvUart0SendMessage( o_message , sizeof(o_message) );
 }
 
@@ -178,31 +150,34 @@ static void SrvCommRepportError( void)
 /*on repporte les donnees                                               */
 /************************************************************************/
 //report general commands
-static void SrvCommRepportGeneral( void )
-{	
+static void SrvCommRepportGeneral( Int8U comm_type_general )
+{		
 	//read version
-	if( ma_trame_comm.param[PARAM_1] == COMM_GENERAL_VERSION)
+	if( comm_type_general == COMM_GENERAL_VERSION)
 	{
 		//read eeprom
 		Int8U version = 0U;
 		DrvEepromReadVersion(&version);
-		Char o_message[ ] = { '*', '1', '+', '1', '+', version ,};
+		Char o_message[ ] = { '*', 0x00, '1', '+', '1', '+', version, '*' };
+		o_message[ 1U ] = sizeof(o_message);
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
-	else if( ma_trame_comm.param[PARAM_1] == COMM_GENERAL_RESET)
+	else if( comm_type_general == COMM_GENERAL_RESET)
 	{
 		//reset
-		Char o_message[ ] = { '*', '1', '+', '2', };
+		Char o_message[ ] = { '*', 0x00, '1', '+', '2', '*' };
+		o_message[ 1U ] = sizeof(o_message);
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 		//wait for reset
 		DrvTimerDelayMs(10);
 		RESET_SOFT();
 	}
-	else if( ma_trame_comm.param[PARAM_1] == COMM_GENERAL_FULL_RESET)
+	else if( comm_type_general == COMM_GENERAL_FULL_RESET)
 	{
 		//deconfigure eeprom
 		DrvEepromDeconfigure();
-		Char o_message[ ] = { '*', '1', '+', '3', };
+		Char o_message[ ] = { '*', 0x00, '1', '+', '3', '*' };
+		o_message[ 1U ] = sizeof(o_message);
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 		//wait for reset
 		DrvTimerDelayMs(10);
@@ -215,20 +190,21 @@ static void SrvCommRepportGeneral( void )
 }
 
 //report or write motors values
-static void SrvCommRepportMotors( void )
+static void SrvCommRepportMotors( Int8U comm_type_motor, Int16U motor_speed )
 {
-	if( ma_trame_comm.param[PARAM_1] == COMM_MOTOR_WRITE)
+	if( comm_type_motor == COMM_MOTOR_WRITE)
 	{
 		//write puissance
 		//controle validité data
 		if(
-			( ma_trame_comm.param[PARAM_2] >= 0U ) &&
-			( ma_trame_comm.param[PARAM_2] <= 1000U )
+			( motor_speed >= 0U ) &&
+			( motor_speed <= 1000U )
 		)
 		{
 			//applique la vitesse au moteurs
-			SrvMotorApplyAbsoluteSpeed(ma_trame_comm.param[PARAM_2]);
-			Char o_message[ ] = { '*', '2', '+', '1', '#','#' };
+			SrvMotorApplyAbsoluteSpeed(motor_speed);
+			Char o_message[ ] = { '*', 0x00, '2', '+', '1', '*'};
+			o_message[ 1U ] = sizeof(o_message);
 			DrvUart0SendMessage( o_message , sizeof(o_message) );
 		}
 		else
@@ -236,10 +212,10 @@ static void SrvCommRepportMotors( void )
 			SrvCommRepportError();
 		}
 	}
-	else if( ma_trame_comm.param[PARAM_1] == COMM_MOTOR_READ)
+	else if( comm_type_motor == COMM_MOTOR_READ)
 	{
 		//read motors
-		Char o_message[ ] = { '*', '2', '+', '2', '+',
+		Char o_message[ ] = { '*', 0x00, '2', '+', '2', '+',
 							 (Int8U)(imu_reel.moteurs.frontMotor_R >> 8U),
 							 (Int8U)imu_reel.moteurs.frontMotor_R,
 							 '+',
@@ -253,8 +229,10 @@ static void SrvCommRepportMotors( void )
 							 (Int8U)imu_reel.moteurs.rearMotor_L,
 							 '+',
 							 (Int8U)(imu_reel.moteurs.throttle >> 8U),
-							 (Int8U)imu_reel.moteurs.throttle,			 
-							 };
+							 (Int8U)imu_reel.moteurs.throttle,
+							 '*'		 
+						 };
+		o_message[ 1U ] = sizeof(o_message);
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	else
@@ -263,23 +241,24 @@ static void SrvCommRepportMotors( void )
 	}
 }
 
-static void SrvCommRepportAngles( void )
+static void SrvCommRepportAngles( Int8U comm_type_angle, Int16S angles_roulis, Int16S angles_tangage, Int16S angles_lacet)
 {
 	//report angles
-	if( ma_trame_comm.param[ PARAM_1 ] == COMM_ANGLE_WRITE)
+	if( comm_type_angle == COMM_ANGLE_WRITE)
 	{
 		//applique les angle souhaité
-		imu_desire.angles.roulis	= (Int16S)ma_trame_comm.param[PARAM_2];
+		imu_desire.angles.roulis	= angles_roulis;
 		SetLimits((float)imu_desire.angles.roulis, ANGLE_MIN, ANGLE_MAX);
-		imu_desire.angles.tangage	= (Int16S)ma_trame_comm.param[PARAM_3];
+		imu_desire.angles.tangage	= angles_tangage;
 		SetLimits((float)imu_desire.angles.tangage, ANGLE_MIN, ANGLE_MAX);
-		imu_desire.angles.lacet		= (Int16S)ma_trame_comm.param[PARAM_4];
-		Char o_message[ ] = { '*', '3', '+', '1', '#','#' };
+		imu_desire.angles.lacet		= angles_lacet;
+		Char o_message[ ] = { '*', 0x00, '3', '+', '1' , '*' };
+		o_message[ 1U ] = sizeof(o_message);
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
-	else if( ma_trame_comm.param[ PARAM_1 ] == COMM_ANGLE_READ)
+	else if( comm_type_angle == COMM_ANGLE_READ)
 	{
-		Char o_message[ ] = { '*', '3', '+', '2',
+		Char o_message[ ] = { '*', 0x00, '3', '+', '2',
 							(Int8U)(imu_reel.angles.roulis >> 8U),
 							(Int8U)imu_reel.angles.roulis,
 							'+',
@@ -287,8 +266,10 @@ static void SrvCommRepportAngles( void )
 							(Int8U)imu_reel.angles.tangage,
 							'+',
 							(Int8U)(imu_reel.angles.lacet >> 8U),
-							(Int8U)imu_reel.angles.lacet,			 
+							(Int8U)imu_reel.angles.lacet,
+							'*'			 
 							};
+		o_message[ 1U ] = sizeof(o_message);
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	else
@@ -302,7 +283,7 @@ static void SrvCommRepportSensors( void )
 	//report acc angles 
 	if( ma_trame_comm.param[PARAM_1] == COMM_SENSOR_ACC_READ)
 	{		
-		Char o_message[ ] = { '*', '4', '+', '1',
+		Char o_message[ ] = { '*', 0x00, '4', '+', '1',
 							(Int8U)(imu_reel.sensors.acc.x >> 8U),
 							(Int8U)imu_reel.sensors.acc.x,
 							'+',
@@ -311,13 +292,15 @@ static void SrvCommRepportSensors( void )
 							'+',
 							(Int8U)(imu_reel.sensors.acc.z >> 8U),
 							(Int8U)imu_reel.sensors.acc.z,
+							'*'
 							};
+		o_message[ 1U ] = sizeof(o_message);
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	//report gyr angles 
 	else if( ma_trame_comm.param[PARAM_1] == COMM_SENSOR_GYR_READ)
 	{
-		Char o_message[ ] = { '*', '4', '+', '2',
+		Char o_message[ ] = { '*', 0x00, '4', '+', '2',
 							(Int8U)(imu_reel.sensors.gyr.x >> 8U),
 							(Int8U)imu_reel.sensors.gyr.x,
 							'+',
@@ -326,13 +309,15 @@ static void SrvCommRepportSensors( void )
 							'+',
 							(Int8U)(imu_reel.sensors.gyr.z >> 8U),
 							(Int8U)imu_reel.sensors.gyr.z,
+							'*'
 							};
+		o_message[ 1U ] = sizeof(o_message);
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	//report mag angles 
 	else if( ma_trame_comm.param[PARAM_1] == COMM_SENSOR_MAG_READ)
 	{
-		Char o_message[ ] = { '*', '4', '+', '3',
+		Char o_message[ ] = { '*', 0x00, '4', '+', '3',
 							(Int8U)(imu_reel.sensors.mag.x >> 8U),
 							(Int8U)imu_reel.sensors.mag.x,
 							'+',
@@ -341,13 +326,15 @@ static void SrvCommRepportSensors( void )
 							'+',
 							(Int8U)(imu_reel.sensors.mag.z >> 8U),
 							(Int8U)imu_reel.sensors.mag.z,
+							'*'
 							};
+		o_message[ 1U ] = sizeof(o_message);
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	//report baro angles 
 	else if( ma_trame_comm.param[PARAM_1] == COMM_SENSOR_BAR_READ)
 	{
-		Char o_message[ ] = { '*', '4', '+', '4',
+		Char o_message[ ] = { '*', 0x00, '4', '+', '4',
 							(Int8U)(imu_reel.sensors.bar.altitude >> 8U),
 							(Int8U)imu_reel.sensors.bar.altitude,
 							'+',
@@ -360,7 +347,9 @@ static void SrvCommRepportSensors( void )
 							(Int8U)((Int32U)imu_reel.sensors.bar.pressure),
 							'+',
 							(Int8U)imu_reel.sensors.bar.weather,
+							'*'
 							};
+		o_message[ 1U ] = sizeof(o_message);
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 	}
 	else
@@ -387,7 +376,8 @@ static void SrvCommRepportPID( void )
 			D =  (float)( ma_trame_comm.param[PARAM_5] / 1000.0 );
 			DrvEepromWritePID( index, P, I, D );
 			SrvPIDSetValues( index, P, I, D );
-			Char o_message[ ] = { '*', '5', '+', '1', '#','#' };
+			Char o_message[ ] = { '*', 0x00, '5', '+', '1', '*' };
+			o_message[ 1U ] = sizeof(o_message);
 			DrvUart0SendMessage( o_message , sizeof(o_message) );
 		}
 		else
@@ -406,7 +396,7 @@ static void SrvCommRepportPID( void )
 		if( index < NB_PID )
 		{
 			DrvEepromReadPID(index,&P,&I,&D);
-			Char o_message[ ] = { '*', '5', '+', '2', '+',
+			Char o_message[ ] = { '*', 0x00, '5', '+', '2', '+',
 								index,
 								'+',
 								(Int8U)((Int16S)( P * 1000 ) >> 8U),
@@ -416,8 +406,10 @@ static void SrvCommRepportPID( void )
 								(Int8U)((Int16S)( I * 1000 )),
 								'+',
 								(Int8U)((Int16S)( D * 1000 ) >> 8U),
-								(Int8U)((Int16S)( D * 1000 )),			 
+								(Int8U)((Int16S)( D * 1000 )),
+								'*'		 
 								};
+			o_message[ 1U ] = sizeof(o_message);
 			DrvUart0SendMessage( o_message , sizeof(o_message) );
 		}
 		else
@@ -435,8 +427,10 @@ static void SrvCommRepportPID( void )
 
 static void SrvCommRepportData( void )
 {
-	Char o_message[ 36U ];
+	/*Char o_message[ 38U ];
 	Int8U lenght = 0;
+	o_message[ lenght++ ] = '*';
+	o_message[ lenght++ ] = 0x00;
 					
 	o_message[ lenght++ ] = (Int8U)(imu_reel.angles.roulis >> 8U);
 	o_message[ lenght++ ] = (Int8U)imu_reel.angles.roulis;	
@@ -485,7 +479,8 @@ static void SrvCommRepportData( void )
 	o_message[ lenght++ ] = (Int8U)(imu_reel.sensors.bar.temperature >> 8U);
 	o_message[ lenght++ ] = (Int8U)imu_reel.sensors.bar.temperature;
 	
-	DrvUart0SendMessage( o_message , lenght );
+	o_message[ 1U ] = sizeof(o_message);
+	DrvUart0SendMessage( o_message , lenght );*/
 }
 
 

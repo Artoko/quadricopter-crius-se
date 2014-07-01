@@ -125,8 +125,8 @@
 #define		COMM_ERROR								0xFFU
 
 ////////////////////////////////////////////ANGLES MIN MAX////////////////////////////////////////////
-#define		ANGLE_MAX			40.0
-#define		ANGLE_MIN			-40.0
+#define		ANGLE_MAX			90.0
+#define		ANGLE_MIN			-90.0
 
 //-----------------------------------------------------------------------------------------------//
 typedef struct SS_moteur

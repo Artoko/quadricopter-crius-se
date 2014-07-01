@@ -9,28 +9,39 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GroundStationDrone;
 using MySerial;
 
 namespace GroundStationDrone
 {
     public partial class GroundStation : Form
     {
+        AirSpeedIndicatorInstrumentControl air_speed_indicator = new AirSpeedIndicatorInstrumentControl();
+        AttitudeIndicatorInstrumentControl horizon_indicator = new AttitudeIndicatorInstrumentControl();
+
         public static ClassSerial serial_com = new ClassSerial();
         ClassSerial.callback_message_receive my_callback;
-
+        Graphics g = null;
         List<Point> points = new List<Point>();
         List<string> frame_sent = new List<string>();
-        Stopwatch sw;
-        int time = 0;
         float speed;
 
         public GroundStation()
         {
             InitializeComponent();
+
+            air_speed_indicator.Location = new Point(10, 24);
+            air_speed_indicator.Size = new System.Drawing.Size(150, 150);
+            air_speed_indicator.Visible = true;
+            this.Controls.Add(this.air_speed_indicator);
+
+            horizon_indicator.Location = new Point(10 + 150 + 10 , 24);
+            horizon_indicator.Size = new System.Drawing.Size(150, 150);
+            horizon_indicator.Visible = true;
+            this.Controls.Add(this.horizon_indicator);
+
             getPIDToolStripMenuItem.SelectedIndex = 0;
             getPIDToolStripMenuItem.SelectedIndexChanged += new System.EventHandler(this.getPIDToolStripMenuItem_SelectedIndexChanged);
-
-            sw = Stopwatch.StartNew(); 
         }
         private void GroundStation_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -60,18 +71,26 @@ namespace GroundStationDrone
         }
         private void SendSerialMessage(string message, ClassSerial.callback_message_receive callback)
         {
-            message = "*" + message + "##";
+            message = "*" + Convert.ToChar(Convert.ToByte(message.Length + 3)) +  message + "*";          
             my_callback = callback;
             serial_com.SetCallback(IncommingMessage);
             frame_sent.Add(message);
-            serial_com.SendMessage(message);
+
+            byte[] mess = new byte[message.Length];
+            for (int i = 0; i < message.Length; i++)
+            {
+                mess[i] = Convert.ToByte(message.Substring(i, 1).ToCharArray()[0]);
+            }
+
+            serial_com.SendMessage(mess);
+            if (frame_sent.Count > 5) frame_sent.RemoveAt(0);
         }
         private void IncommingMessage(byte[] frame)
         {
             //my_callback(frame);
             Invoke((ClassSerial.callback_message_receive)my_callback, new object[] { frame });
         }
-        private void ErrorMessage()
+        private void ErrorMessage(byte[] frame)
         {
             toolStripStatusLabelVersion.Text = "Frame Error : ";
             toolStripStatusLabelVersion.ForeColor = Color.Red;
@@ -87,7 +106,7 @@ namespace GroundStationDrone
             string response = ConvertFrame(frame);
             if (response.Length < 3)
             {
-                ErrorMessage();
+                ErrorMessage(frame);
             }
             else if (response.Substring(0, 4) == "1+1+")
             {
@@ -110,7 +129,7 @@ namespace GroundStationDrone
             string response = ConvertFrame(frame);
             if (response.Length < 3)
             {
-                ErrorMessage();
+                ErrorMessage(frame);
             }
             else if (response == "1+2")
             {
@@ -132,7 +151,7 @@ namespace GroundStationDrone
             string response = ConvertFrame(frame);
             if (response.Length < 3)
             {
-                ErrorMessage();
+                ErrorMessage(frame);
             }
             else if (response == "1+3")
             {
@@ -155,17 +174,12 @@ namespace GroundStationDrone
             string response = ConvertFrame(frame);
             if (response.Length < 3)
             {
-                ErrorMessage();
+                ErrorMessage(frame);
             }
             else if (response.Substring(0, 3) == "2+2")
             {
                 speed = (short)((frame[16] << 8) + frame[17]);
-
-                
-
-
-
-
+                air_speed_indicator.SetAirSpeedIndicatorParameters((int)speed);
                 toolStripStatusLabelSpeed.Text = "Speed : " + Convert.ToString(speed);
                 toolStripStatusLabelSpeed.ForeColor = System.Drawing.Color.FromArgb((byte)(float)(255 * (speed / 1000)), (byte)(float)(255 - (255 * (speed / 1000))), (byte)(50));
             }
@@ -175,16 +189,16 @@ namespace GroundStationDrone
             GetSpeed();
         }
         
-        private void SetSpeed( int speed )
+        private void SetSpeed( short speed )
         {
-            SendSerialMessage("2+1+" + speed, IncommingMessageSetSpeed);
+            SendSerialMessage("2+1+" + Convert.ToChar(Convert.ToByte(speed >> 8)) + Convert.ToChar(Convert.ToByte((byte)speed )), IncommingMessageSetSpeed);
         }
         private void IncommingMessageSetSpeed(byte[] frame)
         {
             string response = ConvertFrame(frame);
             if (response.Length < 3)
             {
-                ErrorMessage();
+                ErrorMessage(frame);
             }
             else if (response.Substring(0, 3) == "2+1")
             {
@@ -193,7 +207,19 @@ namespace GroundStationDrone
         }
         private void trackBarSpeed_Scroll(object sender, EventArgs e)
         {
-            SetSpeed(trackBarSpeed.Value);
+            SetSpeed((short)trackBarSpeed.Value);
+        }
+
+        private void showIndicatorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (air_speed_indicator.Visible)
+            {
+                air_speed_indicator.Visible = false;
+            }
+            else
+            {
+                air_speed_indicator.Visible = true;
+            }
         }
         #endregion
 
@@ -207,13 +233,15 @@ namespace GroundStationDrone
             string response = ConvertFrame(frame);
             if (response.Length < 3)
             {
-                ErrorMessage();
+                ErrorMessage(frame);
             }
             else if (response.Substring(0, 3) == "3+2")
             {
                 short angle_roulis = (short)((frame[3] << 8) + frame[4]);
                 short angle_tangage = (short)((frame[6] << 8) + frame[7]);
                 short angle_lacet = (short)((frame[9] << 8) + frame[10]);
+                horizon_indicator.SetAttitudeIndicatorParameters(angle_tangage, angle_roulis);
+
                 toolStripStatusLabelAngles.Text = "Angles : " + Convert.ToString(angle_roulis) + " , " + Convert.ToString(angle_tangage) + " , " + Convert.ToString(angle_lacet);
             }
         }
@@ -269,24 +297,25 @@ namespace GroundStationDrone
 
         #endregion
 
+        #region graph
+
+        
+        int time = 0;
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
-            Graphics g = e.Graphics;
-            if (points.Count >1)
+            g = e.Graphics;
+            if (points.Count > 1)
             {
-                foreach (Point pt in points)
-                {
-                    g.DrawLines(new Pen(Color.Black), points.ToArray());
-                }
-                g.Dispose();
+                g.DrawLines(new Pen(Color.Black), points.ToArray());
             }
+            g.Dispose();
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
             time++;
-            points.Add(new Point((int)((time * panel1.Width / 1000)), panel1.Height - (int)(((speed) * panel1.Height) / 1000) - 1));
-            if (points.Count > 1000)
+            points.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height - (int)(((speed - 1) * panel1.Height) / 1000) - 1));
+            if (points.Count > 250)
             {
                 time--;
                 for (int i = 1; i < points.Count; i++)
@@ -303,16 +332,12 @@ namespace GroundStationDrone
                 points.RemoveRange(points.Count - 1, 1);
             }
             panel1.Refresh();
+            //GetAngles();
         }
 
-
-
-        #region graph
-
-
-
-
         #endregion
+
+        
 
 
 

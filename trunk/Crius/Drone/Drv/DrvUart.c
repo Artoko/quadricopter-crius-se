@@ -75,30 +75,35 @@ void DrvUartInit( Int8U index_uart, Int32U baud_rate )
 	#endif
 }
 
+
 void DrvUart0ResetBuffer( Int8U size )
 {
-	Int8U loop = 0U;
-	for( loop = 0U; loop < size ; loop++)
+	for( Int8U loop = 0U; loop < ctr_buff_uart_0 ; loop++)
 	{
 		buff_uart_0[ loop ] = 0U;
 	}
-	for( loop = size; loop < ctr_buff_uart_0 ; loop++)
-	{
-		buff_uart_0[ loop - size ] = buff_uart_0[ loop ];
-	}
 	ctr_buff_uart_0 = 0U;
 }
-void DrvUart0ReadBuffer( Int8U *trame ,Int8U *lenght )
+Boolean DrvUart0ReadBuffer( Int8U *trame ,Int8U *lenght )
 {
-	if(buff_uart_0[ 0U ] == '*')
+	Boolean o_success = FALSE;
+	//commence par une '*'
+	if(buff_uart_0[ 0U ] == '*') 
 	{
-		for( Int8U loop = 0U; loop < BUFFER_MAX ; loop++)
+		//termine par une '*'
+		if( buff_uart_0[ buff_uart_0[ 1U ] - 1U ] == '*')
 		{
-			trame[ loop ] = buff_uart_0[ loop ];
-			if(( buff_uart_0[ loop - 1U ] == '#' ) && ( buff_uart_0[ loop ] == '#' ))
+			//on confirme termine par une '*'
+			if(buff_uart_0[ ctr_buff_uart_0 - 1U ] == '*')
 			{
-				lenght[ 0U ] = loop + 1U;
-				loop = BUFFER_MAX;
+				*lenght = buff_uart_0[ 1U ];
+				//nb caract recu en [1] 
+				for( Int8U loop = 0U; loop < *lenght ; loop++)
+				{
+					trame[ loop ] = buff_uart_0[ loop ];
+					buff_uart_0[ loop ] = 0U;
+				}
+				o_success = TRUE;
 			}
 		}
 	}
@@ -106,6 +111,7 @@ void DrvUart0ReadBuffer( Int8U *trame ,Int8U *lenght )
 	{
 		lenght[ 0U ] = 0U;
 	}
+	return o_success;
 }
 
 //on recupere le message
