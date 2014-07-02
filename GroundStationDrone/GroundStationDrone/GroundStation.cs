@@ -16,11 +16,6 @@ namespace GroundStationDrone
 {
     public partial class GroundStation : Form
     {
-        AirSpeedIndicatorInstrumentControl air_speed_indicator = new AirSpeedIndicatorInstrumentControl();
-        AttitudeIndicatorInstrumentControl horizon_indicator = new AttitudeIndicatorInstrumentControl();
-        HeadingIndicatorInstrumentControl heading_indicator = new HeadingIndicatorInstrumentControl();
-        AltimeterInstrumentControl altimeter_indicator = new AltimeterInstrumentControl();
-        VerticalSpeedIndicatorInstrumentControl turn_indicator = new VerticalSpeedIndicatorInstrumentControl();
 
         public static ClassSerial serial_com = new ClassSerial();
         ClassSerial.callback_message_receive my_callback;
@@ -38,31 +33,6 @@ namespace GroundStationDrone
         {
             InitializeComponent();
 
-            air_speed_indicator.Location = new Point(10, 24);
-            air_speed_indicator.Size = new System.Drawing.Size(150, 150);
-            air_speed_indicator.Visible = true;
-            this.Controls.Add(this.air_speed_indicator);
-
-            horizon_indicator.Location = new Point(10 + 150 + 10 , 24);
-            horizon_indicator.Size = new System.Drawing.Size(150, 150);
-            horizon_indicator.Visible = true;
-            this.Controls.Add(this.horizon_indicator);
-
-            heading_indicator.Location = new Point(10 + 150 + 10 + 150 + 10, 24);
-            heading_indicator.Size = new System.Drawing.Size(150, 150);
-            heading_indicator.Visible = true;
-            this.Controls.Add(this.heading_indicator);
-
-            altimeter_indicator.Location = new Point(10 + 150 + 10 + 150 + 10 + 150 + 10, 24);
-            altimeter_indicator.Size = new System.Drawing.Size(150, 150);
-            altimeter_indicator.Visible = true;
-            this.Controls.Add(this.altimeter_indicator);
-
-            turn_indicator.Location = new Point(10 + 150 + 10 + 150 + 10 + 150 + 10 + 150 + 10, 24);
-            turn_indicator.Size = new System.Drawing.Size(150, 150);
-            turn_indicator.Visible = true;
-            this.Controls.Add(this.turn_indicator);
-
             getPIDToolStripMenuItem.SelectedIndex = 0;
             getPIDToolStripMenuItem.SelectedIndexChanged += new System.EventHandler(this.getPIDToolStripMenuItem_SelectedIndexChanged);
 
@@ -71,6 +41,7 @@ namespace GroundStationDrone
         }
         private void GroundStation_FormClosing(object sender, FormClosingEventArgs e)
         {
+            thread_sequence_flag = false;
             serial_com.Deconnect();
         }
         private void GroundStation_Load(object sender, EventArgs e)
@@ -134,7 +105,7 @@ namespace GroundStationDrone
             {
                 ErrorMessage(frame);
             }
-            else if (response.Substring(0, 4) == "1+1+")
+            else if (response.Substring(0, 3) == "1+1")
             {
                 byte version = Encoding.ASCII.GetBytes(response.Replace(response.Substring(0, 4),"").ToCharArray())[0];
                 toolStripStatusLabelVersion.Text = "Version : " + Convert.ToString((version & 0xf0) >> 4) + "." + Convert.ToString(version & 0x0f);
@@ -209,7 +180,6 @@ namespace GroundStationDrone
                 speed = (short)((frame[16] << 8) + frame[17]);
                 air_speed_indicator.SetAirSpeedIndicatorParameters((int)speed);
                 toolStripStatusLabelSpeed.Text = "Speed : " + Convert.ToString(speed);
-                toolStripStatusLabelSpeed.ForeColor = System.Drawing.Color.FromArgb((byte)(float)(255 * (speed / 1000)), (byte)(float)(255 - (255 * (speed / 1000))), (byte)(50));
             }
         }
         private void getSpeedToolStripMenuItem_Click(object sender, EventArgs e)
@@ -270,6 +240,7 @@ namespace GroundStationDrone
                 short angle_tangage = (short)((frame[6] << 8) + frame[7]);
                 short angle_lacet = (short)((frame[9] << 8) + frame[10]);
                 horizon_indicator.SetAttitudeIndicatorParameters(angle_tangage, angle_roulis);
+                turn_indicator.SetTurnCoordinatorParameters(angle_roulis / 10, angle_roulis / 10);
                 heading_indicator.SetHeadingIndicatorParameters(angle_lacet);
 
                 toolStripStatusLabelAngles.Text = "Angles : " + Convert.ToString(angle_roulis) + " , " + Convert.ToString(angle_tangage) + " , " + Convert.ToString(angle_lacet);
@@ -302,6 +273,8 @@ namespace GroundStationDrone
                 altimeter_indicator.SetAlimeterParameters(altitude);
 
                 toolStripStatusLabelAltitude.Text = "Altitude = " + Convert.ToString(altitude) ;
+                toolStripStatusLabelTemperature.Text = "Temperature : " + Convert.ToString(temperature) + " °C";
+                toolStripStatusLabelPresssion.Text = "Pression : " + Convert.ToString(pressure) + " Pa";
             }
         }
         private void getAltitudeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -357,7 +330,7 @@ namespace GroundStationDrone
 
         private void GetMagnetometer()
         {
-            SendSerialMessage("4+2", IncommingMessageGetMagnetometer);
+            SendSerialMessage("4+3", IncommingMessageGetMagnetometer);
         }
         private void IncommingMessageGetMagnetometer(byte[] frame)
         {
@@ -424,6 +397,37 @@ namespace GroundStationDrone
         }
 
         #endregion
+
+        private void GetAll()
+        {
+            SendSerialMessage("6", IncommingMessageGetAll);
+        }
+        private void IncommingMessageGetAll(byte[] frame)
+        {
+            string response = ConvertFrame(frame);
+            if (response.Length < 1)
+            {
+                ErrorMessage(frame);
+            }
+            else if (response.Substring(0, 1) == "6")
+            {
+                short angle_roulis = (short)((frame[3] << 8) + frame[4]);
+                short angle_tangage = (short)((frame[6] << 8) + frame[7]);
+                short angle_lacet = (short)((frame[9] << 8) + frame[10]);
+                short angle_nord = (short)((frame[11] << 8) + frame[12]);
+                byte wheather = (byte)(frame[14]);
+                altimeter_indicator.SetAlimeterParameters(altitude);
+
+                toolStripStatusLabelAltitude.Text = "Altitude = " + Convert.ToString(altitude);
+                toolStripStatusLabelTemperature.Text = "Temperature : " + Convert.ToString(temperature) + " °C";
+                toolStripStatusLabelPresssion.Text = "Pression : " + Convert.ToString(pressure) + " Pa";
+            }
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            GetAll();
+        }
+
 
         int i = 0;
         private void ThreadSequence()
@@ -492,6 +496,8 @@ namespace GroundStationDrone
         }
 
         #endregion
+
+        
 
         
 

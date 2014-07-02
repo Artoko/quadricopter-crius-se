@@ -94,13 +94,15 @@ namespace MySerial
         }
 
 
-        public void SendMessage(byte[] message)
+        public bool SendMessage(byte[] message)
         {
             if (serialPort1.IsOpen)
             {
                 serialPort1.Write(message, 0, message.Length);
-                Thread.Sleep(5);
+                //Thread.Sleep(5);
+                return true;
             }
+            return false;
         }
 
         private void ClassUartThreadSenderModem()

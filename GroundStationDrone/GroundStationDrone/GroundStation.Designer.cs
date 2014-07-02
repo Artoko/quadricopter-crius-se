@@ -37,6 +37,9 @@
             this.toolStripStatusLabelAngles = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripStatusLabelAltitude = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripStatusLabelTemperature = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.menuStripParams = new System.Windows.Forms.MenuStrip();
             this.generalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.getVersionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -48,6 +51,9 @@
             this.toolStripMenuItemAngles = new System.Windows.Forms.ToolStripMenuItem();
             this.getAnglesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemSensors = new System.Windows.Forms.ToolStripMenuItem();
+            this.getAccelerometerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.getGyroscopeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.getMagnetometerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.getBarometerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemPID = new System.Windows.Forms.ToolStripMenuItem();
             this.getPIDToolStripMenuItem = new System.Windows.Forms.ToolStripComboBox();
@@ -56,9 +62,14 @@
             this.trackBarSpeed = new System.Windows.Forms.TrackBar();
             this.panel1 = new System.Windows.Forms.Panel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.getAccelerometerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.getGyroscopeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.getMagnetometerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripStatusLabelPresssion = new System.Windows.Forms.ToolStripStatusLabel();
+            this.turn_indicator = new GroundStationDrone.TurnCoordinatorInstrumentControl();
+            this.vario_indicator = new GroundStationDrone.VerticalSpeedIndicatorInstrumentControl();
+            this.altimeter_indicator = new GroundStationDrone.AltimeterInstrumentControl();
+            this.heading_indicator = new GroundStationDrone.HeadingIndicatorInstrumentControl();
+            this.horizon_indicator = new GroundStationDrone.AttitudeIndicatorInstrumentControl();
+            this.air_speed_indicator = new GroundStationDrone.AirSpeedIndicatorInstrumentControl();
+            this.button1 = new System.Windows.Forms.Button();
             this.statusStripState.SuspendLayout();
             this.menuStripParams.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSpeed)).BeginInit();
@@ -73,7 +84,11 @@
             this.toolStripSeparator2,
             this.toolStripStatusLabelAngles,
             this.toolStripSeparator3,
-            this.toolStripStatusLabelAltitude});
+            this.toolStripStatusLabelAltitude,
+            this.toolStripSeparator4,
+            this.toolStripStatusLabelTemperature,
+            this.toolStripSeparator5,
+            this.toolStripStatusLabelPresssion});
             this.statusStripState.Location = new System.Drawing.Point(0, 359);
             this.statusStripState.Name = "statusStripState";
             this.statusStripState.Size = new System.Drawing.Size(895, 23);
@@ -118,6 +133,22 @@
             this.toolStripStatusLabelAltitude.Name = "toolStripStatusLabelAltitude";
             this.toolStripStatusLabelAltitude.Size = new System.Drawing.Size(69, 18);
             this.toolStripStatusLabelAltitude.Text = "Altitude = 0";
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 23);
+            // 
+            // toolStripStatusLabelTemperature
+            // 
+            this.toolStripStatusLabelTemperature.Name = "toolStripStatusLabelTemperature";
+            this.toolStripStatusLabelTemperature.Size = new System.Drawing.Size(106, 18);
+            this.toolStripStatusLabelTemperature.Text = "Temperature : 0 °C";
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 23);
             // 
             // menuStripParams
             // 
@@ -213,6 +244,27 @@
             this.toolStripMenuItemSensors.Size = new System.Drawing.Size(59, 20);
             this.toolStripMenuItemSensors.Text = "Sensors";
             // 
+            // getAccelerometerToolStripMenuItem
+            // 
+            this.getAccelerometerToolStripMenuItem.Name = "getAccelerometerToolStripMenuItem";
+            this.getAccelerometerToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
+            this.getAccelerometerToolStripMenuItem.Text = "Get Accelerometer";
+            this.getAccelerometerToolStripMenuItem.Click += new System.EventHandler(this.getAccelerometerToolStripMenuItem_Click);
+            // 
+            // getGyroscopeToolStripMenuItem
+            // 
+            this.getGyroscopeToolStripMenuItem.Name = "getGyroscopeToolStripMenuItem";
+            this.getGyroscopeToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
+            this.getGyroscopeToolStripMenuItem.Text = "Get Gyroscope";
+            this.getGyroscopeToolStripMenuItem.Click += new System.EventHandler(this.getGyroscopeToolStripMenuItem_Click);
+            // 
+            // getMagnetometerToolStripMenuItem
+            // 
+            this.getMagnetometerToolStripMenuItem.Name = "getMagnetometerToolStripMenuItem";
+            this.getMagnetometerToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
+            this.getMagnetometerToolStripMenuItem.Text = "Get Magnetometer";
+            this.getMagnetometerToolStripMenuItem.Click += new System.EventHandler(this.getMagnetometerToolStripMenuItem_Click);
+            // 
             // getBarometerToolStripMenuItem
             // 
             this.getBarometerToolStripMenuItem.Name = "getBarometerToolStripMenuItem";
@@ -261,7 +313,7 @@
             // 
             // trackBarSpeed
             // 
-            this.trackBarSpeed.Location = new System.Drawing.Point(396, 252);
+            this.trackBarSpeed.Location = new System.Drawing.Point(811, 135);
             this.trackBarSpeed.Maximum = 800;
             this.trackBarSpeed.Name = "trackBarSpeed";
             this.trackBarSpeed.Orientation = System.Windows.Forms.Orientation.Vertical;
@@ -274,9 +326,9 @@
             // 
             // panel1
             // 
-            this.panel1.Location = new System.Drawing.Point(447, 252);
+            this.panel1.Location = new System.Drawing.Point(707, 252);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(298, 104);
+            this.panel1.Size = new System.Drawing.Size(176, 104);
             this.panel1.TabIndex = 6;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
@@ -285,32 +337,82 @@
             this.timer1.Interval = 10;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // getAccelerometerToolStripMenuItem
+            // toolStripStatusLabelPresssion
             // 
-            this.getAccelerometerToolStripMenuItem.Name = "getAccelerometerToolStripMenuItem";
-            this.getAccelerometerToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
-            this.getAccelerometerToolStripMenuItem.Text = "Get Accelerometer";
-            this.getAccelerometerToolStripMenuItem.Click += new System.EventHandler(this.getAccelerometerToolStripMenuItem_Click);
+            this.toolStripStatusLabelPresssion.Name = "toolStripStatusLabelPresssion";
+            this.toolStripStatusLabelPresssion.Size = new System.Drawing.Size(82, 18);
+            this.toolStripStatusLabelPresssion.Text = "Pression : 0 Pa";
             // 
-            // getGyroscopeToolStripMenuItem
+            // turn_indicator
             // 
-            this.getGyroscopeToolStripMenuItem.Name = "getGyroscopeToolStripMenuItem";
-            this.getGyroscopeToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
-            this.getGyroscopeToolStripMenuItem.Text = "Get Gyroscope";
-            this.getGyroscopeToolStripMenuItem.Click += new System.EventHandler(this.getGyroscopeToolStripMenuItem_Click);
+            this.turn_indicator.Location = new System.Drawing.Point(324, 183);
+            this.turn_indicator.Name = "turn_indicator";
+            this.turn_indicator.Size = new System.Drawing.Size(150, 150);
+            this.turn_indicator.TabIndex = 12;
+            this.turn_indicator.Text = "turnCoordinatorInstrumentControl1";
             // 
-            // getMagnetometerToolStripMenuItem
+            // vario_indicator
             // 
-            this.getMagnetometerToolStripMenuItem.Name = "getMagnetometerToolStripMenuItem";
-            this.getMagnetometerToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
-            this.getMagnetometerToolStripMenuItem.Text = "Get Magnetometer";
-            this.getMagnetometerToolStripMenuItem.Click += new System.EventHandler(this.getMagnetometerToolStripMenuItem_Click);
+            this.vario_indicator.Location = new System.Drawing.Point(168, 183);
+            this.vario_indicator.Name = "vario_indicator";
+            this.vario_indicator.Size = new System.Drawing.Size(150, 150);
+            this.vario_indicator.TabIndex = 11;
+            this.vario_indicator.Text = "verticalSpeedIndicatorInstrumentControl1";
+            // 
+            // altimeter_indicator
+            // 
+            this.altimeter_indicator.Location = new System.Drawing.Point(480, 105);
+            this.altimeter_indicator.Name = "altimeter_indicator";
+            this.altimeter_indicator.Size = new System.Drawing.Size(150, 150);
+            this.altimeter_indicator.TabIndex = 10;
+            this.altimeter_indicator.Text = "altimeterInstrumentControl1";
+            // 
+            // heading_indicator
+            // 
+            this.heading_indicator.Location = new System.Drawing.Point(324, 27);
+            this.heading_indicator.Name = "heading_indicator";
+            this.heading_indicator.Size = new System.Drawing.Size(150, 150);
+            this.heading_indicator.TabIndex = 9;
+            this.heading_indicator.Text = "headingIndicatorInstrumentControl1";
+            // 
+            // horizon_indicator
+            // 
+            this.horizon_indicator.Location = new System.Drawing.Point(168, 27);
+            this.horizon_indicator.Name = "horizon_indicator";
+            this.horizon_indicator.Size = new System.Drawing.Size(150, 150);
+            this.horizon_indicator.TabIndex = 8;
+            this.horizon_indicator.Text = "attitudeIndicatorInstrumentControl1";
+            // 
+            // air_speed_indicator
+            // 
+            this.air_speed_indicator.Location = new System.Drawing.Point(12, 105);
+            this.air_speed_indicator.Name = "air_speed_indicator";
+            this.air_speed_indicator.Size = new System.Drawing.Size(150, 150);
+            this.air_speed_indicator.TabIndex = 7;
+            this.air_speed_indicator.Text = "airSpeedIndicatorInstrumentControl1";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(754, 75);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 13;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // GroundStation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(895, 382);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.turn_indicator);
+            this.Controls.Add(this.vario_indicator);
+            this.Controls.Add(this.altimeter_indicator);
+            this.Controls.Add(this.heading_indicator);
+            this.Controls.Add(this.horizon_indicator);
+            this.Controls.Add(this.air_speed_indicator);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.trackBarSpeed);
             this.Controls.Add(this.statusStripState);
@@ -336,6 +438,8 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.MenuStrip menuStripParams;
         private System.Windows.Forms.ToolStripMenuItem generalToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem getVersionToolStripMenuItem;
@@ -361,6 +465,15 @@
         private System.Windows.Forms.ToolStripMenuItem getAccelerometerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem getGyroscopeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem getMagnetometerToolStripMenuItem;
+        private AirSpeedIndicatorInstrumentControl air_speed_indicator;
+        private AttitudeIndicatorInstrumentControl horizon_indicator;
+        private HeadingIndicatorInstrumentControl heading_indicator;
+        private AltimeterInstrumentControl altimeter_indicator;
+        private VerticalSpeedIndicatorInstrumentControl vario_indicator;
+        private TurnCoordinatorInstrumentControl turn_indicator;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelTemperature;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelPresssion;
+        private System.Windows.Forms.Button button1;
 
     }
 }
