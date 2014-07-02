@@ -427,7 +427,7 @@ static void SrvCommRepportPID( Int8U comm_type_pid )
 
 static void SrvCommRepportData( void )
 {
-	Char o_message[ ] = { '*', 0x00, '5', '+', 
+	Char o_message[ ] = { '*', 0x00, '6', '+', 
 				(Int8U)(imu_reel.angles.roulis >> 8U),
 				(Int8U)imu_reel.angles.roulis,
 				'+',
@@ -446,8 +446,13 @@ static void SrvCommRepportData( void )
 				(Int8U)(imu_reel.moteurs.throttle >> 8U),
 				(Int8U)imu_reel.moteurs.throttle,
 				'+',
-				(Int8U)(imu_reel.angles.nord >> 8U),
-				(Int8U)imu_reel.angles.nord,
+				(Int8U)(imu_reel.sensors.bar.temperature >> 8U);
+				(Int8U)imu_reel.sensors.bar.temperature;
+				'+',
+				(Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 24U);
+				(Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 16U);
+				(Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 8U);
+				(Int8U)((Int32U)imu_reel.sensors.bar.pressure);
 				'*'
 			};
 	o_message[ 1U ] = sizeof(o_message);
