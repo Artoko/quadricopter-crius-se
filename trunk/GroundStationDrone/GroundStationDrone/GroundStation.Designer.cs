@@ -40,6 +40,7 @@
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripStatusLabelTemperature = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripStatusLabelPresssion = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStripParams = new System.Windows.Forms.MenuStrip();
             this.generalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.getVersionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -62,14 +63,12 @@
             this.trackBarSpeed = new System.Windows.Forms.TrackBar();
             this.panel1 = new System.Windows.Forms.Panel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.toolStripStatusLabelPresssion = new System.Windows.Forms.ToolStripStatusLabel();
             this.turn_indicator = new GroundStationDrone.TurnCoordinatorInstrumentControl();
             this.vario_indicator = new GroundStationDrone.VerticalSpeedIndicatorInstrumentControl();
             this.altimeter_indicator = new GroundStationDrone.AltimeterInstrumentControl();
             this.heading_indicator = new GroundStationDrone.HeadingIndicatorInstrumentControl();
             this.horizon_indicator = new GroundStationDrone.AttitudeIndicatorInstrumentControl();
             this.air_speed_indicator = new GroundStationDrone.AirSpeedIndicatorInstrumentControl();
-            this.button1 = new System.Windows.Forms.Button();
             this.statusStripState.SuspendLayout();
             this.menuStripParams.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSpeed)).BeginInit();
@@ -149,6 +148,12 @@
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
             this.toolStripSeparator5.Size = new System.Drawing.Size(6, 23);
+            // 
+            // toolStripStatusLabelPresssion
+            // 
+            this.toolStripStatusLabelPresssion.Name = "toolStripStatusLabelPresssion";
+            this.toolStripStatusLabelPresssion.Size = new System.Drawing.Size(82, 18);
+            this.toolStripStatusLabelPresssion.Text = "Pression : 0 Pa";
             // 
             // menuStripParams
             // 
@@ -337,12 +342,6 @@
             this.timer1.Interval = 10;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // toolStripStatusLabelPresssion
-            // 
-            this.toolStripStatusLabelPresssion.Name = "toolStripStatusLabelPresssion";
-            this.toolStripStatusLabelPresssion.Size = new System.Drawing.Size(82, 18);
-            this.toolStripStatusLabelPresssion.Text = "Pression : 0 Pa";
-            // 
             // turn_indicator
             // 
             this.turn_indicator.Location = new System.Drawing.Point(324, 183);
@@ -391,22 +390,11 @@
             this.air_speed_indicator.TabIndex = 7;
             this.air_speed_indicator.Text = "airSpeedIndicatorInstrumentControl1";
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(754, 75);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 13;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // GroundStation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(895, 382);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.turn_indicator);
             this.Controls.Add(this.vario_indicator);
             this.Controls.Add(this.altimeter_indicator);
@@ -473,7 +461,6 @@
         private TurnCoordinatorInstrumentControl turn_indicator;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelTemperature;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelPresssion;
-        private System.Windows.Forms.Button button1;
 
     }
 }

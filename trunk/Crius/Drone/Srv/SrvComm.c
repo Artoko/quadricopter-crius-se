@@ -446,71 +446,26 @@ static void SrvCommRepportData( void )
 				(Int8U)(imu_reel.moteurs.throttle >> 8U),
 				(Int8U)imu_reel.moteurs.throttle,
 				'+',
-				(Int8U)(imu_reel.sensors.bar.temperature >> 8U);
-				(Int8U)imu_reel.sensors.bar.temperature;
+				(Int8U)(imu_reel.sensors.bar.temperature >> 8U),
+				(Int8U)imu_reel.sensors.bar.temperature,
 				'+',
-				(Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 24U);
-				(Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 16U);
-				(Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 8U);
-				(Int8U)((Int32U)imu_reel.sensors.bar.pressure);
-				'*'
+				(Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 24U),
+				(Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 16U),
+				(Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 8U),
+				(Int8U)((Int32U)imu_reel.sensors.bar.pressure),
+				'+',
+				(Int8U)(imu_reel.sensors.acc.x >> 8U),
+				(Int8U)imu_reel.sensors.acc.x,
+				'+',
+				(Int8U)(imu_reel.sensors.acc.y >> 8U),
+				(Int8U)imu_reel.sensors.acc.y,
+				'+',
+				(Int8U)(imu_reel.sensors.acc.z >> 8U),
+				(Int8U)imu_reel.sensors.acc.z,
+				'*',
 			};
 	o_message[ 1U ] = sizeof(o_message);
 	DrvUart0SendMessage( o_message , sizeof(o_message) );
-	/*Char o_message[ 38U ];
-	Int8U lenght = 0;
-	o_message[ lenght++ ] = '*';
-	o_message[ lenght++ ] = 0x00;
-					
-	o_message[ lenght++ ] = (Int8U)(imu_reel.angles.roulis >> 8U);
-	o_message[ lenght++ ] = (Int8U)imu_reel.angles.roulis;	
-	
-	o_message[ lenght++ ] = (Int8U)(imu_reel.angles.tangage >> 8U);
-	o_message[ lenght++ ] = (Int8U)imu_reel.angles.tangage;
-	
-	o_message[ lenght++ ] = (Int8U)(imu_reel.angles.lacet >> 8U);
-	o_message[ lenght++ ] = (Int8U)imu_reel.angles.lacet;
-	
-	o_message[ lenght++ ] = (Int8U)(imu_reel.angles.nord >> 8U);
-	o_message[ lenght++ ] = (Int8U)imu_reel.angles.nord;
-	
-	o_message[ lenght++ ] = (Int8U)(imu_reel.sensors.bar.altitude >> 8U);
-	o_message[ lenght++ ] = (Int8U)imu_reel.sensors.bar.altitude;
-	
-	o_message[ lenght++ ] = (Int8U)(imu_reel.pid_error.roulis >> 8U);
-	o_message[ lenght++ ] = (Int8U)imu_reel.pid_error.roulis;
-	
-	o_message[ lenght++ ] = (Int8U)(imu_reel.pid_error.tangage >> 8U);
-	o_message[ lenght++ ] = (Int8U)imu_reel.pid_error.tangage;
-	
-	o_message[ lenght++ ] = (Int8U)(imu_reel.pid_error.lacet >> 8U);
-	o_message[ lenght++ ] = (Int8U)imu_reel.pid_error.lacet;
-	
-	o_message[ lenght++ ] = (Int8U)(imu_reel.moteurs.frontMotor_R >> 8U);
-	o_message[ lenght++ ] = (Int8U)imu_reel.moteurs.frontMotor_R;
-	
-	o_message[ lenght++ ] = (Int8U)(imu_reel.moteurs.frontMotor_L >> 8U);
-	o_message[ lenght++ ] = (Int8U)imu_reel.moteurs.frontMotor_L;
-	
-	o_message[ lenght++ ] = (Int8U)(imu_reel.moteurs.rearMotor_R >> 8U);
-	o_message[ lenght++ ] = (Int8U)imu_reel.moteurs.rearMotor_R;
-	
-	o_message[ lenght++ ] = (Int8U)(imu_reel.moteurs.rearMotor_L >> 8U);
-	o_message[ lenght++ ] = (Int8U)imu_reel.moteurs.rearMotor_L;
-	
-	o_message[ lenght++ ] = (Int8U)(imu_reel.moteurs.throttle >> 8U);
-	o_message[ lenght++ ] = (Int8U)imu_reel.moteurs.throttle;
-	
-	o_message[ lenght++ ] = (Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 24U);
-	o_message[ lenght++ ] = (Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 16U);
-	o_message[ lenght++ ] = (Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 8U);
-	o_message[ lenght++ ] = (Int8U)((Int32U)imu_reel.sensors.bar.pressure);
-	
-	o_message[ lenght++ ] = (Int8U)(imu_reel.sensors.bar.temperature >> 8U);
-	o_message[ lenght++ ] = (Int8U)imu_reel.sensors.bar.temperature;
-	
-	o_message[ 1U ] = sizeof(o_message);
-	DrvUart0SendMessage( o_message , lenght );*/
 }
 
 

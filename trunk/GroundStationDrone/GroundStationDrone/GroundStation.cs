@@ -22,9 +22,10 @@ namespace GroundStationDrone
         Graphics g = null;
         List<Point> points = new List<Point>();
         List<string> frame_sent = new List<string>();
-        float speed;
 
-        int speed_track = 0;
+        short speed_track = 0;
+        bool speed_change = false;
+
         static Thread thread_sequence;
         public static bool thread_sequence_flag = false;
 
@@ -111,7 +112,7 @@ namespace GroundStationDrone
                 toolStripStatusLabelVersion.Text = "Version : " + Convert.ToString((version & 0xf0) >> 4) + "." + Convert.ToString(version & 0x0f);
                 toolStripStatusLabelVersion.ForeColor = Color.Blue;
                 thread_sequence_flag = true;
-                //thread_sequence.Start();
+                thread_sequence.Start();
             }
         }
         private void getVersionToolStripMenuItem_Click(object sender, EventArgs e)
@@ -177,7 +178,7 @@ namespace GroundStationDrone
             }
             else if (response.Substring(0, 3) == "2+2")
             {
-                speed = (short)((frame[16] << 8) + frame[17]);
+                short speed = (short)((frame[16] << 8) + frame[17]);
                 air_speed_indicator.SetAirSpeedIndicatorParameters((int)speed);
                 toolStripStatusLabelSpeed.Text = "Speed : " + Convert.ToString(speed);
             }
@@ -200,13 +201,13 @@ namespace GroundStationDrone
             }
             else if (response.Substring(0, 3) == "2+1")
             {
-                GetSpeed();
+                speed_change = false;
             }
         }
         private void trackBarSpeed_Scroll(object sender, EventArgs e)
         {
-           speed_track = trackBarSpeed.Value;
-           //SetSpeed((short)trackBarSpeed.Value);
+            speed_track = (short)trackBarSpeed.Value; 
+            speed_change = true;
         }
 
         private void showIndicatorToolStripMenuItem_Click(object sender, EventArgs e)
@@ -411,48 +412,48 @@ namespace GroundStationDrone
             }
             else if (response.Substring(0, 1) == "6")
             {
-                short angle_roulis = (short)((frame[3] << 8) + frame[4]);
-                short angle_tangage = (short)((frame[6] << 8) + frame[7]);
-                short angle_lacet = (short)((frame[9] << 8) + frame[10]);
+                short angle_roulis = (short)((frame[2] << 8) + frame[3]);
+                short angle_tangage = (short)((frame[5] << 8) + frame[6]);
+                short angle_lacet = (short)((frame[8] << 8) + frame[9]);
                 short angle_nord = (short)((frame[11] << 8) + frame[12]);
-                byte wheather = (byte)(frame[14]);
-                altimeter_indicator.SetAlimeterParameters(altitude);
+                short altitude = (short)((frame[14] << 8) + frame[15]);
+                short speed = (short)((frame[17] << 8) + frame[18]);
+                short temperature = (short)((frame[20] << 8) + frame[21]);
+                Int32 pressure = (Int32)((frame[23] << 24) + (frame[24] << 16) + (frame[25] << 8) + (frame[26]));
+                short x = (short)((frame[28] << 8) + frame[29]);
+                short y = (short)((frame[31] << 8) + frame[32]);
+                short z = (short)((frame[34] << 8) + frame[35]);
 
+
+                horizon_indicator.SetAttitudeIndicatorParameters(angle_tangage, angle_roulis);
+                turn_indicator.SetTurnCoordinatorParameters(angle_roulis / 10, angle_roulis / 10);
+                heading_indicator.SetHeadingIndicatorParameters(angle_lacet);
+                altimeter_indicator.SetAlimeterParameters(altitude);
+                air_speed_indicator.SetAirSpeedIndicatorParameters((int)speed);
+                vario_indicator.SetVerticalSpeedIndicatorParameters(((z-255) *6000 )/ 255);
+
+                toolStripStatusLabelAngles.Text = "Angles : " + Convert.ToString(angle_roulis) + " , " + Convert.ToString(angle_tangage) + " , " + Convert.ToString(angle_lacet);
+                toolStripStatusLabelSpeed.Text = "Speed : " + Convert.ToString(speed);
                 toolStripStatusLabelAltitude.Text = "Altitude = " + Convert.ToString(altitude);
                 toolStripStatusLabelTemperature.Text = "Temperature : " + Convert.ToString(temperature) + " °C";
                 toolStripStatusLabelPresssion.Text = "Pression : " + Convert.ToString(pressure) + " Pa";
             }
         }
-        private void button1_Click(object sender, EventArgs e)
-        {
-            GetAll();
-        }
-
 
         int i = 0;
         private void ThreadSequence()
         {
             while (thread_sequence_flag)
             {
-                if (i++ < 5)
+                if (!speed_change)
                 {
-                    GetAngles();
-                    Thread.Sleep(10);
+                    GetAll();
                 } 
-                else if (i++ == 6)
-                {
-                    GetBarometer();
-                    Thread.Sleep(15);
-                }
                 else
                 {
-                    i = 0;
-                    SetSpeed((short)speed_track);
-                    Thread.Sleep(30);
+                    SetSpeed(speed_track);
                 }
-                /*Thread.Sleep(10);
-                SetSpeed((short)speed);*/
-                //GetSpeed();
+                Thread.Sleep(50);
             }
         }
 
