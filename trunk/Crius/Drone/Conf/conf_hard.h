@@ -121,7 +121,7 @@
 #define		COMM_PID								5U
 	#define		COMM_PID_WRITE							1U
 	#define		COMM_PID_READ							2U
-#define		COMM_REPPORT							6U
+#define		COMM_WRITE_ALL							6U
 #define		COMM_ERROR								0xFFU
 
 ////////////////////////////////////////////ANGLES MIN MAX////////////////////////////////////////////

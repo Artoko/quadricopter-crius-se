@@ -32,7 +32,9 @@ Int32U lastread_pid = 0U;
 //Init des valeurs du pid
 void SrvPIDInit( void )
 {
-	float p,i,d = 0.0F;
+	float p = 0.0F;
+	float i = 0.0F;
+	float d = 0.0F;
 	Boolean eep_config = DrvEepromIsConfigured();
 	
 	for(Int8U loop_pid = 0U ; loop_pid < NB_PID ; loop_pid++ )

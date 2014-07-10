@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.statusStripState = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabelVersion = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -57,12 +56,13 @@
             this.getMagnetometerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.getBarometerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemPID = new System.Windows.Forms.ToolStripMenuItem();
-            this.getPIDToolStripMenuItem = new System.Windows.Forms.ToolStripComboBox();
             this.getPIDsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setPIDsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemView = new System.Windows.Forms.ToolStripMenuItem();
+            this.cockpitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.graphToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.trackBarSpeed = new System.Windows.Forms.TrackBar();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.turn_indicator = new GroundStationDrone.TurnCoordinatorInstrumentControl();
             this.vario_indicator = new GroundStationDrone.VerticalSpeedIndicatorInstrumentControl();
             this.altimeter_indicator = new GroundStationDrone.AltimeterInstrumentControl();
@@ -162,7 +162,8 @@
             this.toolStripMenuItemMotors,
             this.toolStripMenuItemAngles,
             this.toolStripMenuItemSensors,
-            this.toolStripMenuItemPID});
+            this.toolStripMenuItemPID,
+            this.toolStripMenuItemView});
             this.menuStripParams.Location = new System.Drawing.Point(0, 0);
             this.menuStripParams.Name = "menuStripParams";
             this.menuStripParams.Size = new System.Drawing.Size(895, 24);
@@ -280,41 +281,47 @@
             // toolStripMenuItemPID
             // 
             this.toolStripMenuItemPID.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.getPIDToolStripMenuItem,
             this.getPIDsToolStripMenuItem,
             this.setPIDsToolStripMenuItem});
             this.toolStripMenuItemPID.Name = "toolStripMenuItemPID";
             this.toolStripMenuItemPID.Size = new System.Drawing.Size(37, 20);
             this.toolStripMenuItemPID.Text = "PID";
             // 
-            // getPIDToolStripMenuItem
-            // 
-            this.getPIDToolStripMenuItem.AutoCompleteCustomSource.AddRange(new string[] {
-            "Get PID roulis",
-            "Get PID tangage",
-            "Get PID lacet",
-            "Get PID altitude"});
-            this.getPIDToolStripMenuItem.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.getPIDToolStripMenuItem.Items.AddRange(new object[] {
-            "Get PID roulis",
-            "Get PID tangage",
-            "Get PID lacet",
-            "Get PID altitude"});
-            this.getPIDToolStripMenuItem.Name = "getPIDToolStripMenuItem";
-            this.getPIDToolStripMenuItem.Size = new System.Drawing.Size(152, 23);
-            // 
             // getPIDsToolStripMenuItem
             // 
             this.getPIDsToolStripMenuItem.Name = "getPIDsToolStripMenuItem";
-            this.getPIDsToolStripMenuItem.Size = new System.Drawing.Size(212, 22);
+            this.getPIDsToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
             this.getPIDsToolStripMenuItem.Text = "Get PIDs";
             this.getPIDsToolStripMenuItem.Click += new System.EventHandler(this.getPIDsToolStripMenuItem_Click);
             // 
             // setPIDsToolStripMenuItem
             // 
             this.setPIDsToolStripMenuItem.Name = "setPIDsToolStripMenuItem";
-            this.setPIDsToolStripMenuItem.Size = new System.Drawing.Size(212, 22);
+            this.setPIDsToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
             this.setPIDsToolStripMenuItem.Text = "Set PIDs";
+            this.setPIDsToolStripMenuItem.Click += new System.EventHandler(this.setPIDsToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItemView
+            // 
+            this.toolStripMenuItemView.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cockpitToolStripMenuItem,
+            this.graphToolStripMenuItem});
+            this.toolStripMenuItemView.Name = "toolStripMenuItemView";
+            this.toolStripMenuItemView.Size = new System.Drawing.Size(44, 20);
+            this.toolStripMenuItemView.Text = "View";
+            // 
+            // cockpitToolStripMenuItem
+            // 
+            this.cockpitToolStripMenuItem.Name = "cockpitToolStripMenuItem";
+            this.cockpitToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.cockpitToolStripMenuItem.Text = "Cockpit";
+            this.cockpitToolStripMenuItem.Click += new System.EventHandler(this.cockpitToolStripMenuItem_Click);
+            // 
+            // graphToolStripMenuItem
+            // 
+            this.graphToolStripMenuItem.Name = "graphToolStripMenuItem";
+            this.graphToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.graphToolStripMenuItem.Text = "Graph";
             // 
             // trackBarSpeed
             // 
@@ -331,16 +338,12 @@
             // 
             // panel1
             // 
-            this.panel1.Location = new System.Drawing.Point(707, 252);
+            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Location = new System.Drawing.Point(636, 252);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(176, 104);
+            this.panel1.Size = new System.Drawing.Size(247, 104);
             this.panel1.TabIndex = 6;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
-            // 
-            // timer1
-            // 
-            this.timer1.Interval = 10;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // turn_indicator
             // 
@@ -349,6 +352,7 @@
             this.turn_indicator.Size = new System.Drawing.Size(150, 150);
             this.turn_indicator.TabIndex = 12;
             this.turn_indicator.Text = "turnCoordinatorInstrumentControl1";
+            this.turn_indicator.Visible = false;
             // 
             // vario_indicator
             // 
@@ -357,6 +361,7 @@
             this.vario_indicator.Size = new System.Drawing.Size(150, 150);
             this.vario_indicator.TabIndex = 11;
             this.vario_indicator.Text = "verticalSpeedIndicatorInstrumentControl1";
+            this.vario_indicator.Visible = false;
             // 
             // altimeter_indicator
             // 
@@ -365,6 +370,7 @@
             this.altimeter_indicator.Size = new System.Drawing.Size(150, 150);
             this.altimeter_indicator.TabIndex = 10;
             this.altimeter_indicator.Text = "altimeterInstrumentControl1";
+            this.altimeter_indicator.Visible = false;
             // 
             // heading_indicator
             // 
@@ -373,6 +379,7 @@
             this.heading_indicator.Size = new System.Drawing.Size(150, 150);
             this.heading_indicator.TabIndex = 9;
             this.heading_indicator.Text = "headingIndicatorInstrumentControl1";
+            this.heading_indicator.Visible = false;
             // 
             // horizon_indicator
             // 
@@ -381,6 +388,7 @@
             this.horizon_indicator.Size = new System.Drawing.Size(150, 150);
             this.horizon_indicator.TabIndex = 8;
             this.horizon_indicator.Text = "attitudeIndicatorInstrumentControl1";
+            this.horizon_indicator.Visible = false;
             // 
             // air_speed_indicator
             // 
@@ -389,6 +397,7 @@
             this.air_speed_indicator.Size = new System.Drawing.Size(150, 150);
             this.air_speed_indicator.TabIndex = 7;
             this.air_speed_indicator.Text = "airSpeedIndicatorInstrumentControl1";
+            this.air_speed_indicator.Visible = false;
             // 
             // GroundStation
             // 
@@ -441,11 +450,9 @@
         private System.Windows.Forms.ToolStripMenuItem getAnglesToolStripMenuItem;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelAngles;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemPID;
-        private System.Windows.Forms.ToolStripComboBox getPIDToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem setPIDsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem getPIDsToolStripMenuItem;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.ToolStripMenuItem showIndicatorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemSensors;
         private System.Windows.Forms.ToolStripMenuItem getBarometerToolStripMenuItem;
@@ -461,6 +468,9 @@
         private TurnCoordinatorInstrumentControl turn_indicator;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelTemperature;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelPresssion;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemView;
+        private System.Windows.Forms.ToolStripMenuItem cockpitToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem graphToolStripMenuItem;
 
     }
 }

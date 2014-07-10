@@ -20,11 +20,12 @@ namespace GroundStationDrone
         public static ClassSerial serial_com = new ClassSerial();
         ClassSerial.callback_message_receive my_callback;
         Graphics g = null;
-        List<Point> points = new List<Point>();
+        List<Point> points_roulis = new List<Point>();
+        List<Point> points_tangage = new List<Point>();
+        List<Point> points_lacet = new List<Point>();
         List<string> frame_sent = new List<string>();
 
         short speed_track = 0;
-        bool speed_change = false;
 
         static Thread thread_sequence;
         public static bool thread_sequence_flag = false;
@@ -33,11 +34,6 @@ namespace GroundStationDrone
         public GroundStation()
         {
             InitializeComponent();
-
-            getPIDToolStripMenuItem.SelectedIndex = 0;
-            getPIDToolStripMenuItem.SelectedIndexChanged += new System.EventHandler(this.getPIDToolStripMenuItem_SelectedIndexChanged);
-
-
             thread_sequence = new Thread(new ThreadStart(ThreadSequence));
         }
         private void GroundStation_FormClosing(object sender, FormClosingEventArgs e)
@@ -112,7 +108,7 @@ namespace GroundStationDrone
                 toolStripStatusLabelVersion.Text = "Version : " + Convert.ToString((version & 0xf0) >> 4) + "." + Convert.ToString(version & 0x0f);
                 toolStripStatusLabelVersion.ForeColor = Color.Blue;
                 thread_sequence_flag = true;
-                thread_sequence.Start();
+                //thread_sequence.Start();
             }
         }
         private void getVersionToolStripMenuItem_Click(object sender, EventArgs e)
@@ -354,8 +350,6 @@ namespace GroundStationDrone
         #endregion
 
         #region PID
-        bool read_all = false;
-        int read_pid_index = 0 ;
         private void GetPID(string index)
         {
             SendSerialMessage("5+2+" + index, IncommingMessageGetPIDs);
@@ -370,8 +364,7 @@ namespace GroundStationDrone
             
             if (response.Length < 3)
             {
-                read_all = false;
-                read_pid_index = 0;
+                ErrorMessage(frame);
             }
             else if (response.Substring(0, 3) == "5+2")
             {
@@ -379,31 +372,71 @@ namespace GroundStationDrone
                 short pid_P = (short)((frame[6] << 8) + frame[7]);
                 short pid_I = (short)((frame[9] << 8) + frame[10]);
                 short pid_D = (short)((frame[12] << 8) + frame[13]);
-                if (read_all == true)
-                {
-                    read_pid_index++;
-                    GetPID(read_pid_index);
-                }
             }
-        }
-        private void getPIDToolStripMenuItem_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            GetPID(getPIDToolStripMenuItem.SelectedIndex);
-            read_all = false;
         }
         private void getPIDsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             GetPID(0);
-            read_all = true;
+        }
+
+
+
+        private void SetPID(short index, short pid_P, short pid_I, short pid_D)
+        {
+            SendSerialMessage("5+1+" +
+                Convert.ToChar(Convert.ToByte(index >> 8)) +
+                "+" +
+                Convert.ToChar(Convert.ToByte(pid_P >> 8)) +
+                Convert.ToChar(Convert.ToByte((byte)pid_P)) +
+                "+" +
+                Convert.ToChar(Convert.ToByte(pid_I >> 8)) +
+                Convert.ToChar(Convert.ToByte((byte)pid_I)) +
+                "+" +
+                Convert.ToChar(Convert.ToByte(pid_D >> 8)) +
+                Convert.ToChar(Convert.ToByte((byte)pid_D))
+                , IncommingMessageSetPIDs);
+        }
+        private void IncommingMessageSetPIDs(byte[] frame)
+        {
+            string response = ConvertFrame(frame);
+
+            if (response.Length < 3)
+            {
+                ErrorMessage(frame);
+            }
+            else if (response.Substring(0, 3) == "5+1")
+            {
+                byte pid_index = frame[4];
+                short pid_P = (short)((frame[6] << 8) + frame[7]);
+                short pid_I = (short)((frame[9] << 8) + frame[10]);
+                short pid_D = (short)((frame[12] << 8) + frame[13]);
+            }
+        }
+        private void setPIDsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetPID(0,0,0,0);
         }
 
         #endregion
 
-        private void GetAll()
+        int time = 0;
+        private void SetAll(short speed, short roulis, short tangage, short lacet)
         {
-            SendSerialMessage("6", IncommingMessageGetAll);
+            SendSerialMessage("6+" +
+                Convert.ToChar(Convert.ToByte(speed >> 8)) +
+                Convert.ToChar(Convert.ToByte((byte)speed)) +
+                "+" +
+                Convert.ToChar(Convert.ToByte(roulis >> 8)) +
+                Convert.ToChar(Convert.ToByte((byte)roulis)) +
+                "+" +
+                Convert.ToChar(Convert.ToByte(tangage >> 8)) +
+                Convert.ToChar(Convert.ToByte((byte)tangage)) +
+                "+" +
+                Convert.ToChar(Convert.ToByte(lacet >> 8)) +
+                Convert.ToChar(Convert.ToByte((byte)lacet))
+                ,IncommingMessageSetAll);
         }
-        private void IncommingMessageGetAll(byte[] frame)
+        private void IncommingMessageSetAll(byte[] frame)
         {
             string response = ConvertFrame(frame);
             if (response.Length < 1)
@@ -430,29 +463,65 @@ namespace GroundStationDrone
                 heading_indicator.SetHeadingIndicatorParameters(angle_lacet);
                 altimeter_indicator.SetAlimeterParameters(altitude);
                 air_speed_indicator.SetAirSpeedIndicatorParameters((int)speed);
-                vario_indicator.SetVerticalSpeedIndicatorParameters(((z-255) *6000 )/ 255);
+                vario_indicator.SetVerticalSpeedIndicatorParameters(((z - 255) * -6000) / 255);
 
                 toolStripStatusLabelAngles.Text = "Angles : " + Convert.ToString(angle_roulis) + " , " + Convert.ToString(angle_tangage) + " , " + Convert.ToString(angle_lacet);
                 toolStripStatusLabelSpeed.Text = "Speed : " + Convert.ToString(speed);
                 toolStripStatusLabelAltitude.Text = "Altitude = " + Convert.ToString(altitude);
                 toolStripStatusLabelTemperature.Text = "Temperature : " + Convert.ToString(temperature) + " °C";
                 toolStripStatusLabelPresssion.Text = "Pression : " + Convert.ToString(pressure) + " Pa";
+                time++;
+                
+                points_roulis.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((angle_roulis - 1) * panel1.Height) / 180) - 1));
+                points_tangage.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((angle_tangage - 1) * panel1.Height) / 180) - 1));
+                points_lacet.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height - (int)(((angle_lacet - 1) * panel1.Height) / 360) - 1));
+
+                if (points_roulis.Count > 250)
+                {
+                    time--;
+                    for (int i = 1; i < points_roulis.Count; i++)
+                    {
+                        if (points_roulis[i].X - points_roulis[0].X >= 0)
+                        {
+                            points_roulis[i - 1] = new Point(points_roulis[i].X - points_roulis[0].X, points_roulis[i].Y);
+                        }
+                        else
+                        {
+                            points_roulis[i - 1] = new Point(0, points_roulis[i].Y);
+                        }
+
+                        if (points_tangage[i].X - points_tangage[0].X >= 0)
+                        {
+                            points_tangage[i - 1] = new Point(points_tangage[i].X - points_tangage[0].X, points_tangage[i].Y);
+                        }
+                        else
+                        {
+                            points_tangage[i - 1] = new Point(0, points_tangage[i].Y);
+                        }
+
+                        if (points_lacet[i].X - points_lacet[0].X >= 0)
+                        {
+                            points_lacet[i - 1] = new Point(points_lacet[i].X - points_lacet[0].X, points_lacet[i].Y);
+                        }
+                        else
+                        {
+                            points_lacet[i - 1] = new Point(0, points_lacet[i].Y);
+                        }
+                    }
+                    points_roulis.RemoveRange(points_roulis.Count - 1, 1);
+                    points_tangage.RemoveRange(points_tangage.Count - 1, 1);
+                    points_lacet.RemoveRange(points_lacet.Count - 1, 1);
+                }
+                panel1.Refresh();
+                //SetAll(speed_track, 0, 0, 0);
             }
         }
 
-        int i = 0;
         private void ThreadSequence()
         {
             while (thread_sequence_flag)
             {
-                if (!speed_change)
-                {
-                    GetAll();
-                } 
-                else
-                {
-                    SetSpeed(speed_track);
-                }
+                SetAll(speed_track, 0, 0, 0);
                 Thread.Sleep(50);
             }
         }
@@ -460,43 +529,44 @@ namespace GroundStationDrone
         #region graph
 
         
-        int time = 0;
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
             g = e.Graphics;
-            if (points.Count > 1)
+            if (points_roulis.Count > 1)
             {
-                g.DrawLines(new Pen(Color.Black), points.ToArray());
+                g.DrawLines(new Pen(Color.Red), points_roulis.ToArray());
+                g.DrawLines(new Pen(Color.Green), points_tangage.ToArray());
+                g.DrawLines(new Pen(Color.Blue), points_lacet.ToArray());
             }
             g.Dispose();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            /*time++;
-            points.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height - (int)(((speed - 1) * panel1.Height) / 1000) - 1));
-            if (points.Count > 250)
-            {
-                time--;
-                for (int i = 1; i < points.Count; i++)
-                {
-                    if (points[i].X - points[0].X >= 0)
-                    {
-                        points[i - 1] = new Point(points[i].X - points[0].X, points[i].Y);
-                    }
-                    else
-                    {
-                        points[i - 1] = new Point(0, points[i].Y);
-                    }
-                }
-                points.RemoveRange(points.Count - 1, 1);
-            }
-            panel1.Refresh();*/
-
-            GetAngles();
-        }
-
         #endregion
+        
+        #region View
+        private void cockpitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!horizon_indicator.Visible)
+            {
+                horizon_indicator.Visible = true;
+                turn_indicator.Visible = true;
+                heading_indicator.Visible = true;
+                altimeter_indicator.Visible = true;
+                air_speed_indicator.Visible = true;
+                vario_indicator.Visible = true;
+            }
+            else
+            {
+                horizon_indicator.Visible = false;
+                turn_indicator.Visible = false;
+                heading_indicator.Visible = false;
+                altimeter_indicator.Visible = false;
+                air_speed_indicator.Visible = false;
+                vario_indicator.Visible = false;
+            }
+        }
+        #endregion
+
 
         
 

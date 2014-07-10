@@ -76,14 +76,7 @@ void DrvUartInit( Int8U index_uart, Int32U baud_rate )
 }
 
 
-void DrvUart0ResetBuffer( Int8U size )
-{
-	for( Int8U loop = 0U; loop < ctr_buff_uart_0 ; loop++)
-	{
-		buff_uart_0[ loop ] = 0U;
-	}
-	ctr_buff_uart_0 = 0U;
-}
+
 Boolean DrvUart0ReadBuffer( Int8U *trame ,Int8U *lenght )
 {
 	Boolean o_success = FALSE;
@@ -103,6 +96,7 @@ Boolean DrvUart0ReadBuffer( Int8U *trame ,Int8U *lenght )
 					trame[ loop ] = buff_uart_0[ loop ];
 					buff_uart_0[ loop ] = 0U;
 				}
+				ctr_buff_uart_0 = 0U;
 				o_success = TRUE;
 			}
 		}
