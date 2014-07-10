@@ -44,6 +44,8 @@ static void SrvCommRepportSensors( Int8U comm_type_sensor );
 
 static void SrvCommRepportPID( Int8U comm_type_pid );
 
+static void SrvCommWriteAllData( Int16U motor_speed, Int16S angles_roulis, Int16S angles_tangage, Int16S angles_lacet );
+
 static void SrvCommRepportData( void) ;
 
 static void SrvCommRepportError( void) ;
@@ -71,7 +73,7 @@ Boolean SrvCommInit (void)
 /************************************************************************/
 /*dispatcher d'evenements                                               */
 /************************************************************************/
-Int8U buffer[ BUFFER_MAX ];
+static Int8U buffer[ BUFFER_MAX ];
 Int8U buffer_size = 0U;
 
 void SrvCommDispatcher (Event_t in_event) 
@@ -82,55 +84,53 @@ void SrvCommDispatcher (Event_t in_event)
 		//dispatche trame
 		SrvCommExecute();
 	}
-	
-	if(buffer_size > 0U)
-	{
-		DrvUart0ResetBuffer(buffer_size);
-	}
-	
-		
 }
-
-/*//reset ma_trame_comm
-	for( Int8U loop = 0U; loop < NB_PARAM ; loop++)
-	{
-		ma_trame_comm.param[ loop ] = 0U;
-	}*/
-
 /************************************************************************/
 /*execute message entrant                                               */
 /************************************************************************/
 static void SrvCommExecute ( void )
 {
 	buffer[ 2U ] = buffer[ 2U ] - 0x30;
-	buffer[ 4U ] = buffer[ 4U ] - 0x30;
+	Int16U motor_speed ;
+	Int16S angles_roulis ;
+	Int16S angles_tangage;
+	Int16S angles_lacet ;
 	if( buffer[ 2U ] == COMM_GENERAL )
 	{
+		buffer[ 4U ] = buffer[ 4U ] - 0x30;
 		SrvCommRepportGeneral( buffer[ 4U ] );
 	}
 	else if( buffer[ 2U ] == COMM_MOTORS )
 	{
-		Int16U motor_speed = (buffer[ 6U ] << 8U) | (buffer[ 7U ]); 
+		buffer[ 4U ] = buffer[ 4U ] - 0x30;
+		motor_speed = (buffer[ 6U ] << 8U) | (buffer[ 7U ]); 
 		SrvCommRepportMotors(buffer[ 4U ] , motor_speed);
 	}
 	else if( buffer[ 2U ] == COMM_ANGLES )
 	{
-		Int16S angles_roulis = (buffer[ 6U ] << 8U) | (buffer[ 7U ]);
-		Int16S angles_tangage = (buffer[ 9U ] << 8U) | (buffer[ 10U ]);
-		Int16S angles_lacet = (buffer[ 12U ] << 8U) | (buffer[ 13U ]);
+		buffer[ 4U ] = buffer[ 4U ] - 0x30;
+		angles_roulis = (buffer[ 6U ] << 8U) | (buffer[ 7U ]);
+		angles_tangage = (buffer[ 9U ] << 8U) | (buffer[ 10U ]);
+		angles_lacet = (buffer[ 12U ] << 8U) | (buffer[ 13U ]);
 		SrvCommRepportAngles( buffer[ 4U ], angles_roulis, angles_tangage, angles_lacet);
 	}
 	else if( buffer[ 2U ] == COMM_SENSORS )
 	{
+		buffer[ 4U ] = buffer[ 4U ] - 0x30;
 		SrvCommRepportSensors( buffer[ 4U ] );
 	}
 	else if( buffer[ 2U ] == COMM_PID )
 	{
+		buffer[ 4U ] = buffer[ 4U ] - 0x30;
 		SrvCommRepportPID( buffer[ 4U ] );
 	}
-	else if( buffer[ 2U ] == COMM_REPPORT )
+	else if( buffer[ 2U ] == COMM_WRITE_ALL )
 	{
-		SrvCommRepportData();
+		motor_speed = (buffer[ 4U ] << 8U) | (buffer[ 5U ]);
+		angles_roulis = (buffer[ 7U ] << 8U) | (buffer[ 8U ]);
+		angles_tangage = (buffer[ 10U ] << 8U) | (buffer[ 11U ]);
+		angles_lacet = (buffer[ 13U ] << 8U) | (buffer[ 14U ]);
+		SrvCommWriteAllData(motor_speed, angles_roulis, angles_tangage, angles_lacet);
 	}
 	else
 	{
@@ -376,7 +376,21 @@ static void SrvCommRepportPID( Int8U comm_type_pid )
 			D =  (float)( ma_trame_comm.param[PARAM_5] / 1000.0 );
 			DrvEepromWritePID( index, P, I, D );
 			SrvPIDSetValues( index, P, I, D );
-			Char o_message[ ] = { '*', 0x00, '5', '+', '1', '*' };
+			//on renvoie les valeures PID
+			DrvEepromReadPID(index,&P,&I,&D);
+			Char o_message[ ] = { '*', 0x00, '5', '+', '1', '+',
+								index,
+								'+',
+								(Int8U)((Int16S)( P * 1000 ) >> 8U),
+								(Int8U)((Int16S)( P * 1000 )),
+								'+',
+								(Int8U)((Int16S)( I * 1000 ) >> 8U),
+								(Int8U)((Int16S)( I * 1000 )),
+								'+',
+								(Int8U)((Int16S)( D * 1000 ) >> 8U),
+								(Int8U)((Int16S)( D * 1000 )),
+								'*'		 
+								};
 			o_message[ 1U ] = sizeof(o_message);
 			DrvUart0SendMessage( o_message , sizeof(o_message) );
 		}
@@ -424,6 +438,28 @@ static void SrvCommRepportPID( Int8U comm_type_pid )
 	}
 }
 
+static void SrvCommWriteAllData( Int16U motor_speed, Int16S angles_roulis, Int16S angles_tangage, Int16S angles_lacet )
+{
+	if(
+		( motor_speed >= 0U ) &&
+		( motor_speed <= 1000U )
+	)
+	{
+		//applique la vitesse au moteurs
+		SrvMotorApplyAbsoluteSpeed(motor_speed);
+		Char o_message[ ] = { '*', 0x00, '2', '+', '1', '*'};
+		o_message[ 1U ] = sizeof(o_message);
+		DrvUart0SendMessage( o_message , sizeof(o_message) );
+	}
+	//applique les angles souhaités
+	imu_desire.angles.roulis	= angles_roulis;
+	SetLimits((float)imu_desire.angles.roulis, ANGLE_MIN, ANGLE_MAX);
+	imu_desire.angles.tangage	= angles_tangage;
+	SetLimits((float)imu_desire.angles.tangage, ANGLE_MIN, ANGLE_MAX);
+	imu_desire.angles.lacet		= angles_lacet;
+	SrvCommRepportData();
+	
+}
 
 static void SrvCommRepportData( void )
 {
