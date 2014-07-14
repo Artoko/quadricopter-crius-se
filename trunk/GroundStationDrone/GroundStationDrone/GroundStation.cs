@@ -108,7 +108,7 @@ namespace GroundStationDrone
                 toolStripStatusLabelVersion.Text = "Version : " + Convert.ToString((version & 0xf0) >> 4) + "." + Convert.ToString(version & 0x0f);
                 toolStripStatusLabelVersion.ForeColor = Color.Blue;
                 thread_sequence_flag = true;
-                //thread_sequence.Start();
+                thread_sequence.Start();
             }
         }
         private void getVersionToolStripMenuItem_Click(object sender, EventArgs e)
@@ -197,13 +197,11 @@ namespace GroundStationDrone
             }
             else if (response.Substring(0, 3) == "2+1")
             {
-                speed_change = false;
             }
         }
         private void trackBarSpeed_Scroll(object sender, EventArgs e)
         {
             speed_track = (short)trackBarSpeed.Value; 
-            speed_change = true;
         }
 
         private void showIndicatorToolStripMenuItem_Click(object sender, EventArgs e)

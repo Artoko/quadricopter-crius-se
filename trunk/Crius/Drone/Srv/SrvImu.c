@@ -53,9 +53,9 @@ void SrvImuDispatcher (Event_t in_event)
 	lastread_ekf = now;
 	
 	// ********************* Mise à jour roulis tangage lacet *****************
-	//ComplementaryFilter( imu_reel.acc_angles,imu_reel.gyr_angles, interval_ekf);
-	imu_reel.angles.roulis   = (Int16S)(float)SrvKalmanFilterX( imu_reel.acc_angles.x, imu_reel.gyr_angles.y, interval_ekf ) ;
-	imu_reel.angles.tangage  = (Int16S)(float)SrvKalmanFilterY( imu_reel.acc_angles.y, imu_reel.gyr_angles.x, interval_ekf ) ;
+	ComplementaryFilter( imu_reel.acc_angles,imu_reel.gyr_angles);
+	//imu_reel.angles.roulis   = (Int16S)(float)SrvKalmanFilterX( imu_reel.acc_angles.x, imu_reel.gyr_angles.y, interval_ekf ) ;
+	//imu_reel.angles.tangage  = (Int16S)(float)SrvKalmanFilterY( imu_reel.acc_angles.y, imu_reel.gyr_angles.x, interval_ekf ) ;
 	imu_reel.angles.lacet	 = (Int16S)(float)SrvKalmanFilterZ( imu_reel.angles.nord, imu_reel.gyr_angles.z, interval_ekf );
 	
 	if(imu_reel.angles.lacet < 0.0)
@@ -106,6 +106,10 @@ Int32S  __attribute__ ((noinline)) mul(Int16S a, Int16S b)
 
 void ComplementaryFilter(S_Acc_Angles accData, S_Gyr_Angles gyrData)
 {
-	imu_reel.angles.tangage = gyrData.x * 0.97 + accData.y * 0.03;
-	imu_reel.angles.roulis = gyrData.y * 0.97 + accData.x * 0.03;
+	float gyr_poid = 0.90;
+	float acc_poid = 100-gyr_poid;
+	imu_reel.angles.tangage = gyrData.x * gyr_poid + /*accData.y */ acc_poid * imu_reel.sensors.acc.y * 0.99F;
+	imu_reel.angles.roulis = gyrData.y * gyr_poid + /*accData.x */ acc_poid * imu_reel.sensors.acc.x * 0.99F;
+	imu_reel.angles.tangage /= 100.0;
+	imu_reel.angles.roulis /= 100.0;
 }
