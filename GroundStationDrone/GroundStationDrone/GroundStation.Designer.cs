@@ -76,6 +76,7 @@
             // 
             // statusStripState
             // 
+            this.statusStripState.BackColor = System.Drawing.SystemColors.GrayText;
             this.statusStripState.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabelVersion,
             this.toolStripSeparator1,
@@ -88,9 +89,9 @@
             this.toolStripStatusLabelTemperature,
             this.toolStripSeparator5,
             this.toolStripStatusLabelPresssion});
-            this.statusStripState.Location = new System.Drawing.Point(0, 359);
+            this.statusStripState.Location = new System.Drawing.Point(0, 463);
             this.statusStripState.Name = "statusStripState";
-            this.statusStripState.Size = new System.Drawing.Size(895, 23);
+            this.statusStripState.Size = new System.Drawing.Size(941, 23);
             this.statusStripState.TabIndex = 0;
             this.statusStripState.Text = "statusStrip1";
             // 
@@ -166,7 +167,7 @@
             this.toolStripMenuItemView});
             this.menuStripParams.Location = new System.Drawing.Point(0, 0);
             this.menuStripParams.Name = "menuStripParams";
-            this.menuStripParams.Size = new System.Drawing.Size(895, 24);
+            this.menuStripParams.Size = new System.Drawing.Size(941, 24);
             this.menuStripParams.TabIndex = 4;
             this.menuStripParams.Text = "menuStrip2";
             // 
@@ -313,23 +314,23 @@
             // cockpitToolStripMenuItem
             // 
             this.cockpitToolStripMenuItem.Name = "cockpitToolStripMenuItem";
-            this.cockpitToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.cockpitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.cockpitToolStripMenuItem.Text = "Cockpit";
             this.cockpitToolStripMenuItem.Click += new System.EventHandler(this.cockpitToolStripMenuItem_Click);
             // 
             // graphToolStripMenuItem
             // 
             this.graphToolStripMenuItem.Name = "graphToolStripMenuItem";
-            this.graphToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.graphToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.graphToolStripMenuItem.Text = "Graph";
             // 
             // trackBarSpeed
             // 
-            this.trackBarSpeed.Location = new System.Drawing.Point(811, 135);
+            this.trackBarSpeed.Location = new System.Drawing.Point(33, 106);
             this.trackBarSpeed.Maximum = 800;
             this.trackBarSpeed.Name = "trackBarSpeed";
             this.trackBarSpeed.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.trackBarSpeed.Size = new System.Drawing.Size(45, 104);
+            this.trackBarSpeed.Size = new System.Drawing.Size(45, 150);
             this.trackBarSpeed.SmallChange = 5;
             this.trackBarSpeed.TabIndex = 5;
             this.trackBarSpeed.TickFrequency = 100;
@@ -338,72 +339,68 @@
             // 
             // panel1
             // 
+            this.panel1.BackColor = System.Drawing.SystemColors.ControlDark;
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel1.Location = new System.Drawing.Point(636, 252);
+            this.panel1.Location = new System.Drawing.Point(84, 340);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(247, 104);
+            this.panel1.Size = new System.Drawing.Size(618, 104);
             this.panel1.TabIndex = 6;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
             // turn_indicator
             // 
-            this.turn_indicator.Location = new System.Drawing.Point(324, 183);
+            this.turn_indicator.Location = new System.Drawing.Point(396, 184);
             this.turn_indicator.Name = "turn_indicator";
             this.turn_indicator.Size = new System.Drawing.Size(150, 150);
             this.turn_indicator.TabIndex = 12;
             this.turn_indicator.Text = "turnCoordinatorInstrumentControl1";
-            this.turn_indicator.Visible = false;
             // 
             // vario_indicator
             // 
-            this.vario_indicator.Location = new System.Drawing.Point(168, 183);
+            this.vario_indicator.Location = new System.Drawing.Point(240, 184);
             this.vario_indicator.Name = "vario_indicator";
             this.vario_indicator.Size = new System.Drawing.Size(150, 150);
             this.vario_indicator.TabIndex = 11;
             this.vario_indicator.Text = "verticalSpeedIndicatorInstrumentControl1";
-            this.vario_indicator.Visible = false;
             // 
             // altimeter_indicator
             // 
-            this.altimeter_indicator.Location = new System.Drawing.Point(480, 105);
+            this.altimeter_indicator.Location = new System.Drawing.Point(552, 106);
             this.altimeter_indicator.Name = "altimeter_indicator";
             this.altimeter_indicator.Size = new System.Drawing.Size(150, 150);
             this.altimeter_indicator.TabIndex = 10;
             this.altimeter_indicator.Text = "altimeterInstrumentControl1";
-            this.altimeter_indicator.Visible = false;
             // 
             // heading_indicator
             // 
-            this.heading_indicator.Location = new System.Drawing.Point(324, 27);
+            this.heading_indicator.Location = new System.Drawing.Point(396, 28);
             this.heading_indicator.Name = "heading_indicator";
             this.heading_indicator.Size = new System.Drawing.Size(150, 150);
             this.heading_indicator.TabIndex = 9;
             this.heading_indicator.Text = "headingIndicatorInstrumentControl1";
-            this.heading_indicator.Visible = false;
             // 
             // horizon_indicator
             // 
-            this.horizon_indicator.Location = new System.Drawing.Point(168, 27);
+            this.horizon_indicator.Location = new System.Drawing.Point(240, 28);
             this.horizon_indicator.Name = "horizon_indicator";
             this.horizon_indicator.Size = new System.Drawing.Size(150, 150);
             this.horizon_indicator.TabIndex = 8;
             this.horizon_indicator.Text = "attitudeIndicatorInstrumentControl1";
-            this.horizon_indicator.Visible = false;
             // 
             // air_speed_indicator
             // 
-            this.air_speed_indicator.Location = new System.Drawing.Point(12, 105);
+            this.air_speed_indicator.Location = new System.Drawing.Point(84, 106);
             this.air_speed_indicator.Name = "air_speed_indicator";
             this.air_speed_indicator.Size = new System.Drawing.Size(150, 150);
             this.air_speed_indicator.TabIndex = 7;
             this.air_speed_indicator.Text = "airSpeedIndicatorInstrumentControl1";
-            this.air_speed_indicator.Visible = false;
             // 
             // GroundStation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(895, 382);
+            this.BackColor = System.Drawing.SystemColors.GrayText;
+            this.ClientSize = new System.Drawing.Size(941, 486);
             this.Controls.Add(this.turn_indicator);
             this.Controls.Add(this.vario_indicator);
             this.Controls.Add(this.altimeter_indicator);
@@ -414,6 +411,7 @@
             this.Controls.Add(this.trackBarSpeed);
             this.Controls.Add(this.statusStripState);
             this.Controls.Add(this.menuStripParams);
+            this.ForeColor = System.Drawing.SystemColors.Desktop;
             this.Name = "GroundStation";
             this.Text = "GroundStationDrone";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GroundStation_FormClosing);
