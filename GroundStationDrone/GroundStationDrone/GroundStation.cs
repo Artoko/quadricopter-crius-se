@@ -23,6 +23,13 @@ namespace GroundStationDrone
         List<Point> points_roulis = new List<Point>();
         List<Point> points_tangage = new List<Point>();
         List<Point> points_lacet = new List<Point>();
+        List<Point> points_acc_x = new List<Point>();
+        List<Point> points_acc_y = new List<Point>();
+        List<Point> points_acc_z = new List<Point>();
+        List<Point> points_gyr_x = new List<Point>();
+        List<Point> points_gyr_y = new List<Point>();
+        List<Point> points_gyr_z = new List<Point>();
+
         List<string> frame_sent = new List<string>();
 
         short speed_track = 0;
@@ -108,7 +115,8 @@ namespace GroundStationDrone
                 toolStripStatusLabelVersion.Text = "Version : " + Convert.ToString((version & 0xf0) >> 4) + "." + Convert.ToString(version & 0x0f);
                 toolStripStatusLabelVersion.ForeColor = Color.Blue;
                 thread_sequence_flag = true;
-                thread_sequence.Start();
+                //thread_sequence.Start(); 
+                SetAll(speed_track, 0, 0, 0);
             }
         }
         private void getVersionToolStripMenuItem_Click(object sender, EventArgs e)
@@ -238,7 +246,7 @@ namespace GroundStationDrone
                 turn_indicator.SetTurnCoordinatorParameters(angle_roulis / 10, angle_roulis / 10);
                 heading_indicator.SetHeadingIndicatorParameters(angle_lacet);
 
-                toolStripStatusLabelAngles.Text = "Angles : " + Convert.ToString(angle_roulis) + " , " + Convert.ToString(angle_tangage) + " , " + Convert.ToString(angle_lacet);
+                toolStripStatusLabelAngles.Text = "Angles : " + Convert.ToString(angle_roulis) + "° , " + Convert.ToString(angle_tangage) + "° , " + Convert.ToString(angle_lacet)+"°";
             }
         }
         private void getAnglesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -451,9 +459,12 @@ namespace GroundStationDrone
                 short speed = (short)((frame[17] << 8) + frame[18]);
                 short temperature = (short)((frame[20] << 8) + frame[21]);
                 Int32 pressure = (Int32)((frame[23] << 24) + (frame[24] << 16) + (frame[25] << 8) + (frame[26]));
-                short x = (short)((frame[28] << 8) + frame[29]);
-                short y = (short)((frame[31] << 8) + frame[32]);
-                short z = (short)((frame[34] << 8) + frame[35]);
+                short acc_x = (short)((frame[28] << 8) + frame[29]);
+                short acc_y = (short)((frame[31] << 8) + frame[32]);
+                short acc_z = (short)((frame[34] << 8) + frame[35]);
+                short gyr_x = (short)((frame[37] << 8) + frame[38]);
+                short gyr_y = (short)((frame[40] << 8) + frame[41]);
+                short gyr_z = (short)((frame[43] << 8) + frame[44]);
 
 
                 horizon_indicator.SetAttitudeIndicatorParameters(angle_tangage, angle_roulis);
@@ -461,18 +472,26 @@ namespace GroundStationDrone
                 heading_indicator.SetHeadingIndicatorParameters(angle_lacet);
                 altimeter_indicator.SetAlimeterParameters(altitude);
                 air_speed_indicator.SetAirSpeedIndicatorParameters((int)speed);
-                vario_indicator.SetVerticalSpeedIndicatorParameters(((z - 255) * -6000) / 255);
+                vario_indicator.SetVerticalSpeedIndicatorParameters(((acc_z - 255) * -6000) / 255);
 
-                toolStripStatusLabelAngles.Text = "Angles : " + Convert.ToString(angle_roulis) + " , " + Convert.ToString(angle_tangage) + " , " + Convert.ToString(angle_lacet);
+                toolStripStatusLabelAngles.Text = "Angles : " + Convert.ToString(angle_roulis) + "° , " + Convert.ToString(angle_tangage) + "° , " + Convert.ToString(angle_lacet)+"°";
                 toolStripStatusLabelSpeed.Text = "Speed : " + Convert.ToString(speed);
-                toolStripStatusLabelAltitude.Text = "Altitude = " + Convert.ToString(altitude);
-                toolStripStatusLabelTemperature.Text = "Temperature : " + Convert.ToString(temperature) + " °C";
-                toolStripStatusLabelPresssion.Text = "Pression : " + Convert.ToString(pressure) + " Pa";
+                toolStripStatusLabelAltitude.Text = "Altitude = " + Convert.ToString(altitude) + "m";
+                toolStripStatusLabelTemperature.Text = "Temperature : " + Convert.ToString(temperature) + "°C";
+                toolStripStatusLabelPresssion.Text = "Pression : " + Convert.ToString(pressure) + "Pa";
                 time++;
                 
                 points_roulis.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((angle_roulis - 1) * panel1.Height) / 180) - 1));
                 points_tangage.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((angle_tangage - 1) * panel1.Height) / 180) - 1));
                 points_lacet.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height - (int)(((angle_lacet - 1) * panel1.Height) / 360) - 1));
+
+                points_acc_x.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((acc_x - 1) * panel1.Height) / (8 * 255)) - 1));
+                points_acc_y.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((acc_y - 1) * panel1.Height) / (8 * 255)) - 1));
+                points_acc_z.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((acc_z - 1) * panel1.Height) / (8 * 255)) - 1));
+                
+                points_gyr_x.Add(new Point((int)((time * panel1.Width / 250)),panel1.Height / 2 - (int)(((gyr_x - 1) * panel1.Height) / 255) - 1));
+                points_gyr_y.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((gyr_y - 1) * panel1.Height) / 255) - 1));
+                points_gyr_z.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((gyr_z - 1) * panel1.Height) / 255) - 1));
 
                 if (points_roulis.Count > 250)
                 {
@@ -505,13 +524,73 @@ namespace GroundStationDrone
                         {
                             points_lacet[i - 1] = new Point(0, points_lacet[i].Y);
                         }
+
+                        if (points_acc_x[i].X - points_acc_x[0].X >= 0)
+                        {
+                            points_acc_x[i - 1] = new Point(points_acc_x[i].X - points_acc_x[0].X, points_acc_x[i].Y);
+                        }
+                        else
+                        {
+                            points_acc_x[i - 1] = new Point(0, points_acc_x[i].Y);
+                        }
+
+                        if (points_acc_y[i].X - points_acc_y[0].X >= 0)
+                        {
+                            points_acc_y[i - 1] = new Point(points_acc_y[i].X - points_acc_y[0].X, points_acc_y[i].Y);
+                        }
+                        else
+                        {
+                            points_acc_y[i - 1] = new Point(0, points_acc_y[i].Y);
+                        }
+
+                        if (points_acc_z[i].X - points_acc_z[0].X >= 0)
+                        {
+                            points_acc_z[i - 1] = new Point(points_acc_z[i].X - points_acc_z[0].X, points_acc_z[i].Y);
+                        }
+                        else
+                        {
+                            points_acc_z[i - 1] = new Point(0, points_acc_z[i].Y);
+                        }
+
+                        if (points_gyr_x[i].X - points_gyr_x[0].X >= 0)
+                        {
+                            points_gyr_x[i - 1] = new Point(points_gyr_x[i].X - points_gyr_x[0].X, points_gyr_x[i].Y);
+                        }
+                        else
+                        {
+                            points_gyr_x[i - 1] = new Point(0, points_gyr_x[i].Y);
+                        }
+
+                        if (points_gyr_y[i].X - points_gyr_y[0].X >= 0)
+                        {
+                            points_gyr_y[i - 1] = new Point(points_gyr_y[i].X - points_gyr_y[0].X, points_gyr_y[i].Y);
+                        }
+                        else
+                        {
+                            points_gyr_y[i - 1] = new Point(0, points_gyr_y[i].Y);
+                        }
+
+                        if (points_gyr_z[i].X - points_gyr_z[0].X >= 0)
+                        {
+                            points_gyr_z[i - 1] = new Point(points_gyr_z[i].X - points_gyr_z[0].X, points_gyr_z[i].Y);
+                        }
+                        else
+                        {
+                            points_gyr_z[i - 1] = new Point(0, points_gyr_z[i].Y);
+                        }
                     }
                     points_roulis.RemoveRange(points_roulis.Count - 1, 1);
                     points_tangage.RemoveRange(points_tangage.Count - 1, 1);
                     points_lacet.RemoveRange(points_lacet.Count - 1, 1);
+                    points_acc_x.RemoveRange(points_acc_x.Count - 1, 1);
+                    points_acc_y.RemoveRange(points_acc_y.Count - 1, 1);
+                    points_acc_z.RemoveRange(points_acc_z.Count - 1, 1);
+                    points_gyr_x.RemoveRange(points_gyr_x.Count - 1, 1);
+                    points_gyr_y.RemoveRange(points_gyr_y.Count - 1, 1);
+                    points_gyr_z.RemoveRange(points_gyr_z.Count - 1, 1);
                 }
                 panel1.Refresh();
-                //SetAll(speed_track, 0, 0, 0);
+                SetAll(speed_track, 0, 0, 0);
             }
         }
 
@@ -535,6 +614,14 @@ namespace GroundStationDrone
                 g.DrawLines(new Pen(Color.Red), points_roulis.ToArray());
                 g.DrawLines(new Pen(Color.Green), points_tangage.ToArray());
                 g.DrawLines(new Pen(Color.Blue), points_lacet.ToArray());
+
+                /*g.DrawLines(new Pen(Color.Blue), points_acc_x.ToArray());
+                g.DrawLines(new Pen(Color.Blue), points_acc_y.ToArray());
+                g.DrawLines(new Pen(Color.Blue), points_acc_z.ToArray());*/
+
+                /*g.DrawLines(new Pen(Color.Blue), points_gyr_x.ToArray());
+                g.DrawLines(new Pen(Color.Blue), points_gyr_y.ToArray());
+                g.DrawLines(new Pen(Color.Blue), points_gyr_z.ToArray());*/
             }
             g.Dispose();
         }

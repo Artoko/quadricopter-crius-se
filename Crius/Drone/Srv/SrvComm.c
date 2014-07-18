@@ -498,6 +498,15 @@ static void SrvCommRepportData( void )
 				'+',
 				(Int8U)(imu_reel.sensors.acc.z >> 8U),
 				(Int8U)imu_reel.sensors.acc.z,
+				'+',
+				(Int8U)(imu_reel.sensors.gyr.x >> 8U),
+				(Int8U)imu_reel.sensors.gyr.x,
+				'+',
+				(Int8U)(imu_reel.sensors.gyr.y >> 8U),
+				(Int8U)imu_reel.sensors.gyr.y,
+				'+',
+				(Int8U)(imu_reel.sensors.gyr.z >> 8U),
+				(Int8U)imu_reel.sensors.gyr.z,
 				'*',
 			};
 	o_message[ 1U ] = sizeof(o_message);
