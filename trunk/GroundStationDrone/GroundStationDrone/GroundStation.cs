@@ -41,7 +41,7 @@ namespace GroundStationDrone
         public GroundStation()
         {
             InitializeComponent();
-            thread_sequence = new Thread(new ThreadStart(ThreadSequence));
+            //thread_sequence = new Thread(new ThreadStart(ThreadSequence));
         }
         private void GroundStation_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -488,10 +488,10 @@ namespace GroundStationDrone
                 points_acc_x.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((acc_x - 1) * panel1.Height) / (8 * 255)) - 1));
                 points_acc_y.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((acc_y - 1) * panel1.Height) / (8 * 255)) - 1));
                 points_acc_z.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((acc_z - 1) * panel1.Height) / (8 * 255)) - 1));
-                
-                points_gyr_x.Add(new Point((int)((time * panel1.Width / 250)),panel1.Height / 2 - (int)(((gyr_x - 1) * panel1.Height) / 255) - 1));
-                points_gyr_y.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((gyr_y - 1) * panel1.Height) / 255) - 1));
-                points_gyr_z.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((gyr_z - 1) * panel1.Height) / 255) - 1));
+
+                points_gyr_x.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((gyr_x - 1) * panel1.Height) / (100 * 255)) - 1));
+                points_gyr_y.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((gyr_y - 1) * panel1.Height) / (100 * 255)) - 1));
+                points_gyr_z.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((gyr_z - 1) * panel1.Height) / (100 * 255)) - 1));
 
                 if (points_roulis.Count > 250)
                 {
@@ -594,34 +594,84 @@ namespace GroundStationDrone
             }
         }
 
-        private void ThreadSequence()
+       /* private void ThreadSequence()
         {
             while (thread_sequence_flag)
             {
                 SetAll(speed_track, 0, 0, 0);
                 Thread.Sleep(50);
             }
-        }
+        }*/
 
         #region graph
 
-        
+        private void labelAttitude_Click(object sender, EventArgs e)
+        {
+            if (labelAttitude.Font.Style == FontStyle.Bold)
+            {
+                labelAttitude.Font = new Font(labelAttitude.Font, FontStyle.Regular);
+            }
+            else
+            {
+                labelAttitude.Font = new Font(labelAttitude.Font, FontStyle.Bold);
+                labelAcc.Font = new Font(labelAcc.Font, FontStyle.Regular);
+                labelGyro.Font = new Font(labelGyro.Font, FontStyle.Regular);
+            }
+        }
+
+        private void labelAcc_Click(object sender, EventArgs e)
+        {
+            if (labelAcc.Font.Style == FontStyle.Bold)
+            {
+                labelAcc.Font = new Font(labelAcc.Font, FontStyle.Regular);
+            }
+            else
+            {
+                labelAcc.Font = new Font(labelAcc.Font, FontStyle.Bold);
+                labelGyro.Font = new Font(labelGyro.Font, FontStyle.Regular);
+                labelAttitude.Font = new Font(labelAttitude.Font, FontStyle.Regular);
+            }
+        }
+
+        private void labelGyro_Click(object sender, EventArgs e)
+        {
+            if (labelGyro.Font.Style == FontStyle.Bold)
+            {
+                labelGyro.Font = new Font(labelGyro.Font, FontStyle.Regular);
+            }
+            else
+            {
+                labelGyro.Font = new Font(labelGyro.Font, FontStyle.Bold);
+                labelAcc.Font = new Font(labelAcc.Font, FontStyle.Regular);
+                labelAttitude.Font = new Font(labelAttitude.Font, FontStyle.Regular);
+            }
+        }
+
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
             g = e.Graphics;
             if (points_roulis.Count > 1)
             {
-                g.DrawLines(new Pen(Color.Red), points_roulis.ToArray());
-                g.DrawLines(new Pen(Color.Green), points_tangage.ToArray());
-                g.DrawLines(new Pen(Color.Blue), points_lacet.ToArray());
+                if (labelAttitude.Font.Style == FontStyle.Bold)
+                {
+                    g.DrawLines(new Pen(Color.Red), points_roulis.ToArray());
+                    g.DrawLines(new Pen(Color.Green), points_tangage.ToArray());
+                    g.DrawLines(new Pen(Color.Blue), points_lacet.ToArray());
+                }
 
-                /*g.DrawLines(new Pen(Color.Blue), points_acc_x.ToArray());
-                g.DrawLines(new Pen(Color.Blue), points_acc_y.ToArray());
-                g.DrawLines(new Pen(Color.Blue), points_acc_z.ToArray());*/
+                if (labelAcc.Font.Style == FontStyle.Bold)
+                {
+                    g.DrawLines(new Pen(Color.Red), points_acc_x.ToArray());
+                    g.DrawLines(new Pen(Color.Green), points_acc_y.ToArray());
+                    g.DrawLines(new Pen(Color.Blue), points_acc_z.ToArray());
+                }
 
-                /*g.DrawLines(new Pen(Color.Blue), points_gyr_x.ToArray());
-                g.DrawLines(new Pen(Color.Blue), points_gyr_y.ToArray());
-                g.DrawLines(new Pen(Color.Blue), points_gyr_z.ToArray());*/
+                if (labelGyro.Font.Style == FontStyle.Bold)
+                {
+                    g.DrawLines(new Pen(Color.Red), points_gyr_x.ToArray());
+                    g.DrawLines(new Pen(Color.Green), points_gyr_y.ToArray());
+                    g.DrawLines(new Pen(Color.Blue), points_gyr_z.ToArray());
+                }
             }
             g.Dispose();
         }
@@ -651,6 +701,8 @@ namespace GroundStationDrone
             }
         }
         #endregion
+
+        
 
 
         
