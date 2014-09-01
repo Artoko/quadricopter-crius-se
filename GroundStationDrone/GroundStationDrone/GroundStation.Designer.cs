@@ -63,6 +63,9 @@
             this.graphToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.trackBarSpeed = new System.Windows.Forms.TrackBar();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.labelAttitude = new System.Windows.Forms.Label();
+            this.labelAcc = new System.Windows.Forms.Label();
+            this.labelGyro = new System.Windows.Forms.Label();
             this.turn_indicator = new GroundStationDrone.TurnCoordinatorInstrumentControl();
             this.vario_indicator = new GroundStationDrone.VerticalSpeedIndicatorInstrumentControl();
             this.altimeter_indicator = new GroundStationDrone.AltimeterInstrumentControl();
@@ -91,7 +94,8 @@
             this.toolStripStatusLabelPresssion});
             this.statusStripState.Location = new System.Drawing.Point(0, 463);
             this.statusStripState.Name = "statusStripState";
-            this.statusStripState.Size = new System.Drawing.Size(941, 23);
+            this.statusStripState.Size = new System.Drawing.Size(708, 23);
+            this.statusStripState.SizingGrip = false;
             this.statusStripState.TabIndex = 0;
             this.statusStripState.Text = "statusStrip1";
             // 
@@ -167,7 +171,7 @@
             this.toolStripMenuItemView});
             this.menuStripParams.Location = new System.Drawing.Point(0, 0);
             this.menuStripParams.Name = "menuStripParams";
-            this.menuStripParams.Size = new System.Drawing.Size(941, 24);
+            this.menuStripParams.Size = new System.Drawing.Size(708, 24);
             this.menuStripParams.TabIndex = 4;
             this.menuStripParams.Text = "menuStrip2";
             // 
@@ -314,14 +318,14 @@
             // cockpitToolStripMenuItem
             // 
             this.cockpitToolStripMenuItem.Name = "cockpitToolStripMenuItem";
-            this.cockpitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.cockpitToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
             this.cockpitToolStripMenuItem.Text = "Cockpit";
             this.cockpitToolStripMenuItem.Click += new System.EventHandler(this.cockpitToolStripMenuItem_Click);
             // 
             // graphToolStripMenuItem
             // 
             this.graphToolStripMenuItem.Name = "graphToolStripMenuItem";
-            this.graphToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.graphToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
             this.graphToolStripMenuItem.Text = "Graph";
             // 
             // trackBarSpeed
@@ -346,6 +350,36 @@
             this.panel1.Size = new System.Drawing.Size(618, 104);
             this.panel1.TabIndex = 6;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
+            // 
+            // labelAttitude
+            // 
+            this.labelAttitude.AutoSize = true;
+            this.labelAttitude.Location = new System.Drawing.Point(30, 352);
+            this.labelAttitude.Name = "labelAttitude";
+            this.labelAttitude.Size = new System.Drawing.Size(43, 13);
+            this.labelAttitude.TabIndex = 13;
+            this.labelAttitude.Text = "Attitude";
+            this.labelAttitude.Click += new System.EventHandler(this.labelAttitude_Click);
+            // 
+            // labelAcc
+            // 
+            this.labelAcc.AutoSize = true;
+            this.labelAcc.Location = new System.Drawing.Point(30, 381);
+            this.labelAcc.Name = "labelAcc";
+            this.labelAcc.Size = new System.Drawing.Size(26, 13);
+            this.labelAcc.TabIndex = 14;
+            this.labelAcc.Text = "Acc";
+            this.labelAcc.Click += new System.EventHandler(this.labelAcc_Click);
+            // 
+            // labelGyro
+            // 
+            this.labelGyro.AutoSize = true;
+            this.labelGyro.Location = new System.Drawing.Point(30, 409);
+            this.labelGyro.Name = "labelGyro";
+            this.labelGyro.Size = new System.Drawing.Size(29, 13);
+            this.labelGyro.TabIndex = 15;
+            this.labelGyro.Text = "Gyro";
+            this.labelGyro.Click += new System.EventHandler(this.labelGyro_Click);
             // 
             // turn_indicator
             // 
@@ -400,7 +434,10 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GrayText;
-            this.ClientSize = new System.Drawing.Size(941, 486);
+            this.ClientSize = new System.Drawing.Size(708, 486);
+            this.Controls.Add(this.labelGyro);
+            this.Controls.Add(this.labelAcc);
+            this.Controls.Add(this.labelAttitude);
             this.Controls.Add(this.turn_indicator);
             this.Controls.Add(this.vario_indicator);
             this.Controls.Add(this.altimeter_indicator);
@@ -412,7 +449,11 @@
             this.Controls.Add(this.statusStripState);
             this.Controls.Add(this.menuStripParams);
             this.ForeColor = System.Drawing.SystemColors.Desktop;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.MaximizeBox = false;
             this.Name = "GroundStation";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "GroundStationDrone";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GroundStation_FormClosing);
             this.Load += new System.EventHandler(this.GroundStation_Load);
@@ -469,6 +510,9 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemView;
         private System.Windows.Forms.ToolStripMenuItem cockpitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem graphToolStripMenuItem;
+        private System.Windows.Forms.Label labelAttitude;
+        private System.Windows.Forms.Label labelAcc;
+        private System.Windows.Forms.Label labelGyro;
 
     }
 }
