@@ -193,6 +193,8 @@ void DrvUart1SendMessage(Char *i_message,Int8U i_message_len )
 ISR(USART_RX_vect)
 #elif defined (__AVR_ATmega1284P__)
 ISR(USART0_RX_vect)
+#elif defined (__AVR_ATmega324P__)
+ISR(USART0_RX_vect)
 #endif
 {
 	Int8U rcv_byte = UDR0 ;
@@ -217,6 +219,8 @@ ISR(USART0_RX_vect)
 ISR(USART_TX_vect)
 #elif defined (__AVR_ATmega1284P__)
 ISR(USART0_TX_vect)
+#elif defined (__AVR_ATmega324P__)
+ISR(USART0_TX_vect)
 #endif
 {
 	if( in_message_sent_0 < in_message_len_0)
@@ -239,6 +243,8 @@ ISR(USART0_TX_vect)
 #if defined (__AVR_ATmega328P__)
 ISR(USART_RX_vect)
 #elif defined (__AVR_ATmega1284P__)
+ISR(USART1_RX_vect)
+#elif defined (__AVR_ATmega324P__)
 ISR(USART1_RX_vect)
 #endif
 {

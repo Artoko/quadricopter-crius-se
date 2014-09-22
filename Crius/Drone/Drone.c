@@ -49,8 +49,9 @@ int main(void)
 	
 	// ********************* Led init *************************************************
 	CONFIGURE_LED_PIN();
-	//start Initialisation
 	LED_ON();
+	
+	DDRA	|=	(1 << PORTA4);
 	
 	// ********************* General variables init ***********************************
 	imu_reel.angles.roulis		= 0;
@@ -69,23 +70,24 @@ int main(void)
 	
 	// ********************* Drivers init *********************************************
 	DrvEventInit();
-	DrvTickInit();
-	DrvTwiInit( TWI_SPEED_400K );
-	DrvUartInit( UART_0, UART_SPEED_115200 );
 	DrvEepromInit();
+	DrvTickInit();
+	DrvUartInit( UART_0, UART_SPEED_115200 );
+	DrvTwiInit( TWI_SPEED_400K );
 	
 	// ********************* Interrupt Enable *****************************************
 	DrvInterruptSetAllInterrupts();
 	
 	// ********************* Services init ********************************************
-	SrvCommInit();
-	SrvTimerInit();
+	
 	SrvPIDInit();
-	SrvKalmanFilterInit();
-	SrvSensorsInit();
-	SrvImuInit();
 	SrvMotorInit(); 
-	SrvHeartbeatInit();
+	//SrvHeartbeatInit();
+	SrvTimerInit();
+	SrvKalmanFilterInit();
+	SrvImuInit();
+	SrvCommInit();
+	SrvSensorsInit();
 	
 	//Wait 1 sec for sensors init
 	DrvTimerDelayMs(1000);
@@ -105,20 +107,20 @@ int main(void)
 	
     while(TRUE)
     {			
-		
+		PORTA	^=	(1 << PORTA4);
 		current_main_event = DrvEventGetEvent();	
 		// ********************* Read sensors *****************************************
 		SrvSensorsDispatcher(current_main_event);	//2.4ms
 		// ********************* Compute sensors **************************************
 		SrvImuDispatcher(current_main_event);		//1.6ms
 		// ********************* PID compute ******************************************
-		SrvImuDispatcher(current_main_event);		//1.6ms
+		SrvPIDDispatcher(current_main_event);		//1.6ms
 		// ********************* Update motors ******* ********************************
 		SrvMotorDispatcher(current_main_event);		//0.2ms
 		// ********************* Receive transmit data ********************************
 		SrvCommDispatcher(current_main_event);
 		// ********************* Still alive  *****************************************
-		SrvHeartbeatDispatcher(current_main_event);
+		//SrvHeartbeatDispatcher(current_main_event);
 	}	
 }
 

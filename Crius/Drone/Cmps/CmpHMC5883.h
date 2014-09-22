@@ -26,6 +26,7 @@
 
 //Values MODE
 #define HMC5883_CONTINUOUS   0x00
+#define HMC5883_SINGLE	     0x01
 
 #define HMC5883_CONFIG_A     0x00
 #define HMC5883_CONFIG_B     0x01
@@ -49,5 +50,5 @@
 Boolean CmpHMC5883Init(void);
 //mag X Y Z
 Boolean CmpHMC5883GetHeading(S_Mag_Sensor *mag);
-
+Boolean CmpHMC5883Calibrate(void);
 #endif /*BMA180_H_*/
