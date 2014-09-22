@@ -23,37 +23,46 @@ namespace GroundStationDrone
         List<Point> points_roulis = new List<Point>();
         List<Point> points_tangage = new List<Point>();
         List<Point> points_lacet = new List<Point>();
+
         List<Point> points_acc_x = new List<Point>();
         List<Point> points_acc_y = new List<Point>();
         List<Point> points_acc_z = new List<Point>();
+
         List<Point> points_gyr_x = new List<Point>();
         List<Point> points_gyr_y = new List<Point>();
         List<Point> points_gyr_z = new List<Point>();
 
+        List<Point> points_mag_x = new List<Point>();
+        List<Point> points_mag_y = new List<Point>();
+        List<Point> points_mag_z = new List<Point>();
+
+        List<Point> points_mot_1 = new List<Point>();
+        List<Point> points_mot_2 = new List<Point>();
+        List<Point> points_mot_3 = new List<Point>();
+        List<Point> points_mot_4 = new List<Point>();
+
         List<string> frame_sent = new List<string>();
 
         short speed_track = 0;
-
-        static Thread thread_sequence;
-        public static bool thread_sequence_flag = false;
+        bool loop_set_all = true;
+        int index_pid = 0;
 
 
         public GroundStation()
         {
             InitializeComponent();
-            //thread_sequence = new Thread(new ThreadStart(ThreadSequence));
         }
         private void GroundStation_FormClosing(object sender, FormClosingEventArgs e)
         {
-            thread_sequence_flag = false;
             serial_com.Deconnect();
         }
         private void GroundStation_Load(object sender, EventArgs e)
         {
             if (toolStripStatusLabelVersion.Text == "Version : 0.0")
             {
-                if ((serial_com.Connect("COM7") == true)||
-                    (serial_com.Connect("COM5") == true)
+                if ((serial_com.Connect("COM22") == true)||
+                    (serial_com.Connect("COM5") == true) ||
+                    (serial_com.Connect("COM3") == true)
                     )
                 {
                     GetVersion();
@@ -100,6 +109,7 @@ namespace GroundStationDrone
         #region general
         private void GetVersion()
         {
+            serial_com.ClassUartReset();
             SendSerialMessage("1+1", IncommingMessageVersion);
         }
         private void IncommingMessageVersion(byte[] frame)
@@ -111,12 +121,21 @@ namespace GroundStationDrone
             }
             else if (response.Substring(0, 3) == "1+1")
             {
-                byte version = Encoding.ASCII.GetBytes(response.Replace(response.Substring(0, 4),"").ToCharArray())[0];
+                byte version = Encoding.ASCII.GetBytes(response.Replace(response.Substring(0, 4), "").ToCharArray())[0];
                 toolStripStatusLabelVersion.Text = "Version : " + Convert.ToString((version & 0xf0) >> 4) + "." + Convert.ToString(version & 0x0f);
                 toolStripStatusLabelVersion.ForeColor = Color.Blue;
-                thread_sequence_flag = true;
-                //thread_sequence.Start(); 
-                SetAll(speed_track, 0, 0, 0);
+                labelAttitude.Font = new Font(labelAttitude.Font, FontStyle.Bold);
+                labelAcc.Font = new Font(labelAcc.Font, FontStyle.Regular);
+                labelGyro.Font = new Font(labelGyro.Font, FontStyle.Regular);
+                labelMag.Font = new Font(labelMag.Font, FontStyle.Regular);
+                labelMot.Font = new Font(labelMot.Font, FontStyle.Regular);
+                loop_set_all = true;
+                //SetAll(speed_track, 0, 0, 0);
+                GetPID(0);
+            }
+            else
+            {
+                serial_com.ClassUartReset();
             }
         }
         private void getVersionToolStripMenuItem_Click(object sender, EventArgs e)
@@ -378,6 +397,31 @@ namespace GroundStationDrone
                 short pid_P = (short)((frame[6] << 8) + frame[7]);
                 short pid_I = (short)((frame[9] << 8) + frame[10]);
                 short pid_D = (short)((frame[12] << 8) + frame[13]);
+
+                if (pid_index == 0)
+                {
+                    numericUpDownProulis.Value = pid_P;
+                    numericUpDownIroulis.Value = pid_I;
+                    numericUpDownDroulis.Value = pid_D;
+                    GetPID(1);
+                }
+                else if (pid_index == 1)
+                {
+                    numericUpDownPtangage.Value = pid_P;
+                    numericUpDownItangage.Value = pid_I;
+                    numericUpDownDtangage.Value = pid_D;
+                    GetPID(2);
+                }
+                else if (pid_index == 2)
+                {
+                    numericUpDownPlacet.Value = pid_P;
+                    numericUpDownIlacet.Value = pid_I;
+                    numericUpDownDlacet.Value = pid_D;
+                    loop_set_all = true;
+                    SetAll(speed_track, 0, 0, 0);
+                }
+
+
             }
         }
         private void getPIDsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -390,7 +434,7 @@ namespace GroundStationDrone
         private void SetPID(short index, short pid_P, short pid_I, short pid_D)
         {
             SendSerialMessage("5+1+" +
-                Convert.ToChar(Convert.ToByte(index >> 8)) +
+                index +
                 "+" +
                 Convert.ToChar(Convert.ToByte(pid_P >> 8)) +
                 Convert.ToChar(Convert.ToByte((byte)pid_P)) +
@@ -416,7 +460,29 @@ namespace GroundStationDrone
                 short pid_P = (short)((frame[6] << 8) + frame[7]);
                 short pid_I = (short)((frame[9] << 8) + frame[10]);
                 short pid_D = (short)((frame[12] << 8) + frame[13]);
+
+                if (pid_index == 0)
+                {
+                    numericUpDownProulis.Value = pid_P;
+                    numericUpDownIroulis.Value = pid_I;
+                    numericUpDownDroulis.Value = pid_D;
+                }
+                else if (pid_index == 1)
+                {
+                    numericUpDownPtangage.Value = pid_P;
+                    numericUpDownItangage.Value = pid_I;
+                    numericUpDownDtangage.Value = pid_D;
+                }
+                else if (pid_index == 2)
+                {
+                    numericUpDownPlacet.Value = pid_P;
+                    numericUpDownIlacet.Value = pid_I;
+                    numericUpDownDlacet.Value = pid_D;
+                }
+
             }
+            loop_set_all = true;
+            SetAll(speed_track, 0, 0, 0);
         }
         private void setPIDsToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -452,27 +518,34 @@ namespace GroundStationDrone
             else if (response.Substring(0, 1) == "6")
             {
                 short angle_roulis = (short)((frame[2] << 8) + frame[3]);
-                short angle_tangage = (short)((frame[5] << 8) + frame[6]);
-                short angle_lacet = (short)((frame[8] << 8) + frame[9]);
-                short angle_nord = (short)((frame[11] << 8) + frame[12]);
-                short altitude = (short)((frame[14] << 8) + frame[15]);
-                short speed = (short)((frame[17] << 8) + frame[18]);
-                short temperature = (short)((frame[20] << 8) + frame[21]);
-                Int32 pressure = (Int32)((frame[23] << 24) + (frame[24] << 16) + (frame[25] << 8) + (frame[26]));
+                short angle_tangage = (short)((frame[4] << 8) + frame[5]);
+                short angle_lacet = (short)((frame[6] << 8) + frame[7]);
+                short angle_nord = (short)((frame[8] << 8) + frame[9]);
+                short altitude = (short)((frame[10] << 8) + frame[11]);
+                short speed = (short)((frame[12] << 8) + frame[13]);
+                short front_l = (short)((frame[14] << 8) + frame[15]);
+                short front_r = (short)((frame[16] << 8) + frame[17]);
+                short rear_l = (short)((frame[18] << 8) + frame[19]);
+                short rear_r = (short)((frame[20] << 8) + frame[21]);
+                short temperature = (short)((frame[22] << 8) + frame[23]);
+                Int32 pressure = (Int32)((frame[24] << 24) + (frame[25] << 16) + (frame[26] << 8) + (frame[27]));
                 short acc_x = (short)((frame[28] << 8) + frame[29]);
-                short acc_y = (short)((frame[31] << 8) + frame[32]);
-                short acc_z = (short)((frame[34] << 8) + frame[35]);
-                short gyr_x = (short)((frame[37] << 8) + frame[38]);
-                short gyr_y = (short)((frame[40] << 8) + frame[41]);
-                short gyr_z = (short)((frame[43] << 8) + frame[44]);
+                short acc_y = (short)((frame[30] << 8) + frame[31]);
+                short acc_z = (short)((frame[32] << 8) + frame[33]);
+                short gyr_x = (short)((frame[34] << 8) + frame[35]);
+                short gyr_y = (short)((frame[36] << 8) + frame[37]);
+                short gyr_z = (short)((frame[38] << 8) + frame[39]);
+                short mag_x = (short)((frame[40] << 8) + frame[41]);
+                short mag_y = (short)((frame[42] << 8) + frame[43]);
+                short mag_z = (short)((frame[44] << 8) + frame[45]);
 
 
                 horizon_indicator.SetAttitudeIndicatorParameters(angle_tangage, angle_roulis);
                 turn_indicator.SetTurnCoordinatorParameters(angle_roulis / 10, angle_roulis / 10);
                 heading_indicator.SetHeadingIndicatorParameters(angle_lacet);
-                altimeter_indicator.SetAlimeterParameters(altitude);
+                altimeter_indicator.SetAlimeterParameters((int)(altitude * 3.2808399));
                 air_speed_indicator.SetAirSpeedIndicatorParameters((int)speed);
-                vario_indicator.SetVerticalSpeedIndicatorParameters(((acc_z - 255) * -6000) / 255);
+                vario_indicator.SetVerticalSpeedIndicatorParameters(((acc_z - 16383) * 6000) / 16383);
 
                 toolStripStatusLabelAngles.Text = "Angles : " + Convert.ToString(angle_roulis) + "° , " + Convert.ToString(angle_tangage) + "° , " + Convert.ToString(angle_lacet)+"°";
                 toolStripStatusLabelSpeed.Text = "Speed : " + Convert.ToString(speed);
@@ -485,13 +558,23 @@ namespace GroundStationDrone
                 points_tangage.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((angle_tangage - 1) * panel1.Height) / 180) - 1));
                 points_lacet.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height - (int)(((angle_lacet - 1) * panel1.Height) / 360) - 1));
 
-                points_acc_x.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((acc_x - 1) * panel1.Height) / (8 * 255)) - 1));
-                points_acc_y.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((acc_y - 1) * panel1.Height) / (8 * 255)) - 1));
-                points_acc_z.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((acc_z - 1) * panel1.Height) / (8 * 255)) - 1));
+                points_acc_x.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((acc_x - 1) * panel1.Height) / (0xFFFF / 1)) - 1));
+                points_acc_y.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((acc_y - 1) * panel1.Height) / (0xFFFF / 1)) - 1));
+                points_acc_z.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((acc_z - 0xffff / 4 - 1) * panel1.Height) / (0xFFFF / 1)) - 1));
 
-                points_gyr_x.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((gyr_x - 1) * panel1.Height) / (100 * 255)) - 1));
-                points_gyr_y.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((gyr_y - 1) * panel1.Height) / (100 * 255)) - 1));
-                points_gyr_z.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((gyr_z - 1) * panel1.Height) / (100 * 255)) - 1));
+                points_gyr_x.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((gyr_x - 1) * panel1.Height) / (0xFFFF)) - 1));
+                points_gyr_y.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((gyr_y - 1) * panel1.Height) / (0xFFFF)) - 1));
+                points_gyr_z.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((gyr_z - 1) * panel1.Height) / (0xFFFF)) - 1));
+                
+                points_mag_x.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((mag_x - 1) * panel1.Height) / (0x3FF)) - 1));
+                points_mag_y.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((mag_y - 1) * panel1.Height) / (0x3FF)) - 1));
+                points_mag_z.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((mag_z - 1) * panel1.Height) / (0x3FF)) - 1));
+
+                points_mot_1.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height - (int)(((front_l - 1) * panel1.Height) / (1000)) - 1));
+                points_mot_2.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height - (int)(((front_r - 1) * panel1.Height) / (1000)) - 1));
+                points_mot_3.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height - (int)(((rear_l - 1) * panel1.Height) / (1000)) - 1));
+                points_mot_4.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height - (int)(((rear_r - 1) * panel1.Height) / (1000)) - 1));
+
 
                 if (points_roulis.Count > 250)
                 {
@@ -525,6 +608,7 @@ namespace GroundStationDrone
                             points_lacet[i - 1] = new Point(0, points_lacet[i].Y);
                         }
 
+                        //acc
                         if (points_acc_x[i].X - points_acc_x[0].X >= 0)
                         {
                             points_acc_x[i - 1] = new Point(points_acc_x[i].X - points_acc_x[0].X, points_acc_x[i].Y);
@@ -552,6 +636,7 @@ namespace GroundStationDrone
                             points_acc_z[i - 1] = new Point(0, points_acc_z[i].Y);
                         }
 
+                        //gyro
                         if (points_gyr_x[i].X - points_gyr_x[0].X >= 0)
                         {
                             points_gyr_x[i - 1] = new Point(points_gyr_x[i].X - points_gyr_x[0].X, points_gyr_x[i].Y);
@@ -578,6 +663,72 @@ namespace GroundStationDrone
                         {
                             points_gyr_z[i - 1] = new Point(0, points_gyr_z[i].Y);
                         }
+
+                        //mag
+                        if (points_mag_x[i].X - points_mag_x[0].X >= 0)
+                        {
+                            points_mag_x[i - 1] = new Point(points_mag_x[i].X - points_mag_x[0].X, points_mag_x[i].Y);
+                        }
+                        else
+                        {
+                            points_mag_x[i - 1] = new Point(0, points_mag_x[i].Y);
+                        }
+
+                        if (points_mag_y[i].X - points_mag_y[0].X >= 0)
+                        {
+                            points_mag_y[i - 1] = new Point(points_mag_y[i].X - points_mag_y[0].X, points_mag_y[i].Y);
+                        }
+                        else
+                        {
+                            points_mag_y[i - 1] = new Point(0, points_mag_y[i].Y);
+                        }
+
+                        if (points_mag_z[i].X - points_mag_z[0].X >= 0)
+                        {
+                            points_mag_z[i - 1] = new Point(points_mag_z[i].X - points_mag_z[0].X, points_mag_z[i].Y);
+                        }
+                        else
+                        {
+                            points_mag_z[i - 1] = new Point(0, points_mag_z[i].Y);
+                        }
+
+                        //moteur
+                        if (points_mot_1[i].X - points_mot_1[0].X >= 0)
+                        {
+                            points_mot_1[i - 1] = new Point(points_mot_1[i].X - points_mot_1[0].X, points_mot_1[i].Y);
+                        }
+                        else
+                        {
+                            points_mot_1[i - 1] = new Point(0, points_mot_1[i].Y);
+                        }
+
+                        if (points_mot_2[i].X - points_mot_2[0].X >= 0)
+                        {
+                            points_mot_2[i - 1] = new Point(points_mot_2[i].X - points_mot_2[0].X, points_mot_2[i].Y);
+                        }
+                        else
+                        {
+                            points_mot_2[i - 1] = new Point(0, points_mot_2[i].Y);
+                        }
+
+                        if (points_mot_3[i].X - points_mot_3[0].X >= 0)
+                        {
+                            points_mot_3[i - 1] = new Point(points_mot_3[i].X - points_mot_3[0].X, points_mot_3[i].Y);
+                        }
+                        else
+                        {
+                            points_mot_3[i - 1] = new Point(0, points_mot_3[i].Y);
+                        }
+
+                        if (points_mot_4[i].X - points_mot_4[0].X >= 0)
+                        {
+                            points_mot_4[i - 1] = new Point(points_mot_4[i].X - points_mot_4[0].X, points_mot_4[i].Y);
+                        }
+                        else
+                        {
+                            points_mot_4[i - 1] = new Point(0, points_mot_4[i].Y);
+                        }
+
                     }
                     points_roulis.RemoveRange(points_roulis.Count - 1, 1);
                     points_tangage.RemoveRange(points_tangage.Count - 1, 1);
@@ -588,20 +739,30 @@ namespace GroundStationDrone
                     points_gyr_x.RemoveRange(points_gyr_x.Count - 1, 1);
                     points_gyr_y.RemoveRange(points_gyr_y.Count - 1, 1);
                     points_gyr_z.RemoveRange(points_gyr_z.Count - 1, 1);
+                    points_mag_x.RemoveRange(points_mag_x.Count - 1, 1);
+                    points_mag_y.RemoveRange(points_mag_y.Count - 1, 1);
+                    points_mag_z.RemoveRange(points_mag_z.Count - 1, 1);
+                    points_mot_1.RemoveRange(points_mot_1.Count - 1, 1);
+                    points_mot_2.RemoveRange(points_mot_2.Count - 1, 1);
+                    points_mot_3.RemoveRange(points_mot_3.Count - 1, 1);
+                    points_mot_4.RemoveRange(points_mot_4.Count - 1, 1);
                 }
                 panel1.Refresh();
-                SetAll(speed_track, 0, 0, 0);
+                if (loop_set_all == true)
+                {
+                    SetAll(speed_track, 0, 0, 0);
+                }
+                else
+                {
+                    if(index_pid == 0)
+                        SetPID(0, (short)numericUpDownProulis.Value, (short)numericUpDownIroulis.Value, (short)numericUpDownDroulis.Value);
+                    if (index_pid == 1)
+                        SetPID(1, (short)numericUpDownPtangage.Value, (short)numericUpDownItangage.Value, (short)numericUpDownDtangage.Value);
+                    if (index_pid == 2)
+                        SetPID(2, (short)numericUpDownPlacet.Value, (short)numericUpDownIlacet.Value, (short)numericUpDownDlacet.Value);
+                }
             }
         }
-
-       /* private void ThreadSequence()
-        {
-            while (thread_sequence_flag)
-            {
-                SetAll(speed_track, 0, 0, 0);
-                Thread.Sleep(50);
-            }
-        }*/
 
         #region graph
 
@@ -616,6 +777,8 @@ namespace GroundStationDrone
                 labelAttitude.Font = new Font(labelAttitude.Font, FontStyle.Bold);
                 labelAcc.Font = new Font(labelAcc.Font, FontStyle.Regular);
                 labelGyro.Font = new Font(labelGyro.Font, FontStyle.Regular);
+                labelMag.Font = new Font(labelMag.Font, FontStyle.Regular);
+                labelMot.Font = new Font(labelMot.Font, FontStyle.Regular);
             }
         }
 
@@ -630,6 +793,8 @@ namespace GroundStationDrone
                 labelAcc.Font = new Font(labelAcc.Font, FontStyle.Bold);
                 labelGyro.Font = new Font(labelGyro.Font, FontStyle.Regular);
                 labelAttitude.Font = new Font(labelAttitude.Font, FontStyle.Regular);
+                labelMag.Font = new Font(labelMag.Font, FontStyle.Regular);
+                labelMot.Font = new Font(labelMot.Font, FontStyle.Regular);
             }
         }
 
@@ -644,6 +809,42 @@ namespace GroundStationDrone
                 labelGyro.Font = new Font(labelGyro.Font, FontStyle.Bold);
                 labelAcc.Font = new Font(labelAcc.Font, FontStyle.Regular);
                 labelAttitude.Font = new Font(labelAttitude.Font, FontStyle.Regular);
+                labelMag.Font = new Font(labelMag.Font, FontStyle.Regular);
+                labelMot.Font = new Font(labelMot.Font, FontStyle.Regular);
+            }
+        }
+
+        private void labelMag_Click(object sender, EventArgs e)
+        {
+            if (labelMag.Font.Style == FontStyle.Bold)
+            {
+                labelMag.Font = new Font(labelMag.Font, FontStyle.Regular);
+            }
+            else
+            {
+                labelMag.Font = new Font(labelMag.Font, FontStyle.Bold);
+                labelAcc.Font = new Font(labelAcc.Font, FontStyle.Regular);
+                labelGyro.Font = new Font(labelGyro.Font, FontStyle.Regular);
+                labelAttitude.Font = new Font(labelAttitude.Font, FontStyle.Regular);
+                labelMot.Font = new Font(labelMot.Font, FontStyle.Regular);
+            }
+        }
+
+
+        private void labelMot_Click(object sender, EventArgs e)
+        {
+
+            if (labelMot.Font.Style == FontStyle.Bold)
+            {
+                labelMot.Font = new Font(labelMot.Font, FontStyle.Regular);
+            }
+            else
+            {
+                labelMot.Font = new Font(labelMot.Font, FontStyle.Bold);
+                labelAcc.Font = new Font(labelAcc.Font, FontStyle.Regular);
+                labelAttitude.Font = new Font(labelAttitude.Font, FontStyle.Regular);
+                labelMag.Font = new Font(labelMag.Font, FontStyle.Regular);
+                labelGyro.Font = new Font(labelGyro.Font, FontStyle.Regular);
             }
         }
 
@@ -672,6 +873,21 @@ namespace GroundStationDrone
                     g.DrawLines(new Pen(Color.Green), points_gyr_y.ToArray());
                     g.DrawLines(new Pen(Color.Blue), points_gyr_z.ToArray());
                 }
+
+                if (labelMag.Font.Style == FontStyle.Bold)
+                {
+                    g.DrawLines(new Pen(Color.Red), points_mag_x.ToArray());
+                    g.DrawLines(new Pen(Color.Green), points_mag_y.ToArray());
+                    g.DrawLines(new Pen(Color.Blue), points_mag_z.ToArray());
+                }
+
+                if (labelMot.Font.Style == FontStyle.Bold)
+                {
+                    g.DrawLines(new Pen(Color.Red), points_mot_1.ToArray());
+                    g.DrawLines(new Pen(Color.Green), points_mot_2.ToArray());
+                    g.DrawLines(new Pen(Color.Blue), points_mot_3.ToArray());
+                    g.DrawLines(new Pen(Color.YellowGreen), points_mot_4.ToArray());
+                }
             }
             g.Dispose();
         }
@@ -681,26 +897,30 @@ namespace GroundStationDrone
         #region View
         private void cockpitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!horizon_indicator.Visible)
-            {
-                horizon_indicator.Visible = true;
-                turn_indicator.Visible = true;
-                heading_indicator.Visible = true;
-                altimeter_indicator.Visible = true;
-                air_speed_indicator.Visible = true;
-                vario_indicator.Visible = true;
-            }
-            else
-            {
-                horizon_indicator.Visible = false;
-                turn_indicator.Visible = false;
-                heading_indicator.Visible = false;
-                altimeter_indicator.Visible = false;
-                air_speed_indicator.Visible = false;
-                vario_indicator.Visible = false;
-            }
+            
         }
         #endregion
+
+        private void numericUpDownRoulis_ValueChanged(object sender, EventArgs e)
+        {
+            loop_set_all = false;
+            index_pid = 0;
+        }
+
+        private void numericUpDowntangage_ValueChanged(object sender, EventArgs e)
+        {
+            loop_set_all = false;
+            index_pid = 1;
+
+        }
+
+        private void numericUpDownLacet_ValueChanged(object sender, EventArgs e)
+        {
+            loop_set_all = false;
+            index_pid = 2;
+        }
+
+        
 
         
 

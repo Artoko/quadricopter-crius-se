@@ -117,6 +117,14 @@ namespace MySerial
             }
         }
 
+        public void ClassUartReset()
+        {
+            index = 0;
+            recpt_buff = new byte[100];
+            serialPort1.DiscardInBuffer();
+            serialPort1.DiscardOutBuffer();
+        }
+
         /*private void serialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             List<byte> bytes = Encoding.ASCII.GetBytes(serialPort1.ReadExisting().ToCharArray()).ToList();
@@ -158,6 +166,7 @@ namespace MySerial
                                         recpt_buff[i] = 0;
                                     }
                                     list_callback_messages(frame);
+                                    recpt_buff = new byte[100];
                                     index = 0;
                                 }
                             }
@@ -165,30 +174,6 @@ namespace MySerial
                             {
                                 recpt_buff[index++] = received_byte;
                             }
-
-                            /*if (index > 3)
-                            {
-                                if ((recpt_buff[index - 2] == '#') && (recpt_buff[index - 1] == '#'))
-                                {
-                                    if ((bytes != index))
-                                    {
-                                        recpt_buff[index++] = (byte)serialPort1.ReadByte();
-                                    }
-
-                                    byte[] frame = new byte[index - 3];
-
-                                    for (int i = 1; i < index - 2; i++)
-                                    {
-                                        frame[i - 1] = recpt_buff[i];
-                                        recpt_buff[i] = 0;
-                                    }
-                                    list_callback_messages(frame);
-
-                                    bytes -= index;
-                                    if (bytes < 0) bytes = 0;
-                                    index = 0;
-                                }
-                            }*/
                         }
 
                         bytes = 0;
