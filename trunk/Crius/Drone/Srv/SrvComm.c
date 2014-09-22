@@ -42,7 +42,7 @@ static void SrvCommRepportAngles( Int8U comm_type_angle, Int16S angles_roulis, I
 
 static void SrvCommRepportSensors( Int8U comm_type_sensor );
 
-static void SrvCommRepportPID( Int8U comm_type_pid );
+static void SrvCommRepportPID( Int8U comm_type_pid, Int8U index, Int16S pid_p, Int16S pid_i, Int16S pid_d );
 
 static void SrvCommWriteAllData( Int16U motor_speed, Int16S angles_roulis, Int16S angles_tangage, Int16S angles_lacet );
 
@@ -122,7 +122,11 @@ static void SrvCommExecute ( void )
 	else if( buffer[ 2U ] == COMM_PID )
 	{
 		buffer[ 4U ] = buffer[ 4U ] - 0x30;
-		SrvCommRepportPID( buffer[ 4U ] );
+		Int8U pid_index = buffer[ 6U ] - 0x30;
+		Int16S pid_P = (buffer[ 8U ] << 8U) | (buffer[ 9U ]);
+		Int16S pid_I = (buffer[ 11U ] << 8U) | (buffer[ 12U ]);
+		Int16S pid_D = (buffer[ 14U ] << 8U) | (buffer[ 15U ]);
+		SrvCommRepportPID( buffer[ 4U ], pid_index, pid_P, pid_I, pid_D);
 	}
 	else if( buffer[ 2U ] == COMM_WRITE_ALL )
 	{
@@ -358,22 +362,20 @@ static void SrvCommRepportSensors( Int8U comm_type_sensor )
 	}
 }
 
-static void SrvCommRepportPID( Int8U comm_type_pid )
+static void SrvCommRepportPID( Int8U comm_type_pid, Int8U index, Int16S pid_p, Int16S pid_i, Int16S pid_d )
 {		
 	//report pid
 	if( comm_type_pid == COMM_PID_WRITE)
 	{
 		//applique les PIDs souhaité
-		Int8U index = 0;
 		float P = 0;
 		float I = 0;
 		float D = 0;
-		index = (Int8U)ma_trame_comm.param[PARAM_2];
 		if( index < NB_PID )
 		{
-			P =  (float)( ma_trame_comm.param[PARAM_3] / 1000.0 );
-			I =  (float)( ma_trame_comm.param[PARAM_4] / 1000.0 );
-			D =  (float)( ma_trame_comm.param[PARAM_5] / 1000.0 );
+			P =  (float)( pid_p / 1000.0 );
+			I =  (float)( pid_i / 1000.0 );
+			D =  (float)( pid_d / 1000.0 );
 			DrvEepromWritePID( index, P, I, D );
 			SrvPIDSetValues( index, P, I, D );
 			//on renvoie les valeures PID
@@ -401,11 +403,9 @@ static void SrvCommRepportPID( Int8U comm_type_pid )
 	}
 	else if( comm_type_pid == COMM_PID_READ)
 	{	
-		Int8U index = 0;
 		float P = 0;
 		float I = 0;
 		float D = 0;
-		index = ma_trame_comm.param[PARAM_2];
 		
 		if( index < NB_PID )
 		{
@@ -466,47 +466,48 @@ static void SrvCommRepportData( void )
 	Char o_message[ ] = { '*', 0x00, '6', '+', 
 				(Int8U)(imu_reel.angles.roulis >> 8U),
 				(Int8U)imu_reel.angles.roulis,
-				'+',
 				(Int8U)(imu_reel.angles.tangage >> 8U),
 				(Int8U)imu_reel.angles.tangage,
-				'+',
 				(Int8U)(imu_reel.angles.lacet >> 8U),
 				(Int8U)imu_reel.angles.lacet,
-				'+',
 				(Int8U)(imu_reel.angles.nord >> 8U),
 				(Int8U)imu_reel.angles.nord,
-				'+',
 				(Int8U)(imu_reel.sensors.bar.altitude >> 8U),
 				(Int8U)imu_reel.sensors.bar.altitude,
-				'+',
 				(Int8U)(imu_reel.moteurs.throttle >> 8U),
 				(Int8U)imu_reel.moteurs.throttle,
-				'+',
+				(Int8U)(imu_reel.moteurs.frontMotor_L >> 8U),
+				(Int8U)imu_reel.moteurs.frontMotor_L,
+				(Int8U)(imu_reel.moteurs.frontMotor_R >> 8U),
+				(Int8U)imu_reel.moteurs.frontMotor_R,
+				(Int8U)(imu_reel.moteurs.rearMotor_L >> 8U),
+				(Int8U)imu_reel.moteurs.rearMotor_L,
+				(Int8U)(imu_reel.moteurs.rearMotor_R >> 8U),
+				(Int8U)imu_reel.moteurs.rearMotor_R,
 				(Int8U)(imu_reel.sensors.bar.temperature >> 8U),
 				(Int8U)imu_reel.sensors.bar.temperature,
-				'+',
 				(Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 24U),
 				(Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 16U),
 				(Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 8U),
 				(Int8U)((Int32U)imu_reel.sensors.bar.pressure),
-				'+',
 				(Int8U)(imu_reel.sensors.acc.x >> 8U),
 				(Int8U)imu_reel.sensors.acc.x,
-				'+',
 				(Int8U)(imu_reel.sensors.acc.y >> 8U),
 				(Int8U)imu_reel.sensors.acc.y,
-				'+',
 				(Int8U)(imu_reel.sensors.acc.z >> 8U),
 				(Int8U)imu_reel.sensors.acc.z,
-				'+',
 				(Int8U)(imu_reel.sensors.gyr.x >> 8U),
 				(Int8U)imu_reel.sensors.gyr.x,
-				'+',
 				(Int8U)(imu_reel.sensors.gyr.y >> 8U),
 				(Int8U)imu_reel.sensors.gyr.y,
-				'+',
 				(Int8U)(imu_reel.sensors.gyr.z >> 8U),
 				(Int8U)imu_reel.sensors.gyr.z,
+				(Int8U)(imu_reel.sensors.mag.x >> 8U),
+				(Int8U)imu_reel.sensors.mag.x,
+				(Int8U)(imu_reel.sensors.mag.y >> 8U),
+				(Int8U)imu_reel.sensors.mag.y,
+				(Int8U)(imu_reel.sensors.mag.z >> 8U),
+				(Int8U)imu_reel.sensors.mag.z,
 				'*',
 			};
 	o_message[ 1U ] = sizeof(o_message);

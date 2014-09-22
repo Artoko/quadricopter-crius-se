@@ -62,13 +62,14 @@ Boolean SrvSensorsInit( void )
 	return TRUE;
 }
 
+float interval_baro = 0.0F;
+float interval_gyro = 0.0F;
+	
+
 //dispatcher d'evenements
 void SrvSensorsDispatcher (Event_t in_event)
 {
 	Int32U now = 0U;
-	float interval_baro = 0.0F;
-	float interval_gyro = 0.0F;
-	
 	// ********************* Calcul du temps de cycle *************************
 	now = DrvTimerGetTimeUs();
 	interval_gyro = (float)(now - lastread_gyro) / 1000000.0F;
@@ -112,6 +113,7 @@ void SrvSensorsSensorsCalibration( void )
 
 	Boolean calibrate_acc = FALSE;
 	Boolean calibrate_gyr = FALSE;
+	Boolean calibrate_mag = FALSE;
 	do
 	{
 		#if defined( DAISY_7 )
@@ -124,7 +126,7 @@ void SrvSensorsSensorsCalibration( void )
 		{
 			calibrate_acc = TRUE;
 		}
-		//calib accelerometer
+		//calib gyroscope
 		if( CmpL3G4200DIsCalibrate() == FALSE)
 		{
 			CmpL3G4200DGetRotation(&rotation);
@@ -132,6 +134,7 @@ void SrvSensorsSensorsCalibration( void )
 		else
 		{
 			calibrate_gyr = TRUE;
+			CmpL3G4200DGetNoise(&imu_reel.sensors.gyr);
 		}
 		
 		#elif defined( CRIUS )
@@ -154,7 +157,13 @@ void SrvSensorsSensorsCalibration( void )
 			calibrate_gyr = TRUE;
 		}
 		#endif
-	} while ((!calibrate_acc) && (!calibrate_gyr));
+		
+		//calib magnetometer
+		calibrate_mag = CmpHMC5883Calibrate();
+		
+	} while ((!calibrate_acc) || (!calibrate_gyr) || (!calibrate_mag));
+	
+	
 	
 	DrvEepromConfigure();
 }
@@ -173,62 +182,115 @@ void SrvSensorsReadAccelerometerSensor( S_Acc_Angles *acc_angles, S_Acc_Sensor *
 	sensors->z *= 1;
 	#endif
 
+	#if ( ACC_LIS331DLH == 1 )
+	acc_read_ok = CmpLIS331DLHGetAcceleration( sensors );
+	sensors->x *= -1;
+	sensors->y *= -1;
+	sensors->z *= 1;
+	#endif
+	
 	//ACC
 	if(acc_read_ok != FALSE)
 	{
 		
 		//Roll & Pitch 
-		acc_angles->x  = (float)atan2((double)(sensors->x) , (double)sqrt((double)(pow((double)sensors->y,2)+pow((double)sensors->z,2))));
-        acc_angles->y = (float)atan2((double)(sensors->y) , (double)sqrt((double)(pow((double)sensors->x,2)+pow((double)sensors->z,2))));
+		//acc_angles->roulis = (float)atan2(sensors->y, sensors->z) ;
+		//acc_angles->tangage = (float)atan((double)(-sensors->x / sqrt(sensors->y * sensors->y + sensors->z * sensors->z))) ;
 		
-		acc_angles->x = ToDeg(acc_angles->x);
-		acc_angles->y = ToDeg(acc_angles->y);
-		acc_angles->z = sensors->z;
+		acc_angles->tangage  = (float)atan2((double)(sensors->x) , (double)sqrt((double)(pow((double)sensors->y,2)+pow((double)sensors->z,2))));
+        acc_angles->roulis = (float)atan2((double)(sensors->y) , (double)sqrt((double)(pow((double)sensors->x,2)+pow((double)sensors->z,2))));
+		
+		acc_angles->roulis = ToDeg(acc_angles->roulis);
+		acc_angles->tangage = ToDeg(acc_angles->tangage);
 	}
 }
 
 /************************************************************************/
 /*Lecture Gyroscope                                                     */
 /************************************************************************/
+float previous_gyroRate_x = 0;
+float previous_gyroRate_y = 0;
+float previous_gyroRate_z = 0;
 void SrvSensorsReadGyroscopeSensor( S_Gyr_Angles *gyr_angles, float interval, S_Gyr_Sensor *sensors )
 {
 	Boolean gyr_read_ok = FALSE;
-	
-	float gyroRate = 0;
-		
+
+	static float gyroRate = 0;
+
 	#if ( GYR_ITG3205 == 1 )
 	gyr_read_ok = CmpITG3205GetRotation( sensors );
 	sensors->x *= -1;
 	sensors->y *= 1;
 	sensors->z *= -1;
 	#endif
-	
-	
-	
+
+	#if ( GYR_L3G4200D == 1 )
+	gyr_read_ok = CmpL3G4200DGetRotation( sensors );
+	sensors->x *= -1;
+	sensors->y *= 1;
+	sensors->z *= -1;
+	#endif
+
+
 	//GYR
-	//sensitivity	=>	14.375
 	if(gyr_read_ok != FALSE)
 	{
-		#if ( GYR_L3G4200D == 1 )
-		gyroRate = sensors->x * 0.00875 ;
-		#elif ( GYR_ITG3205 == 1 )
-		gyroRate = sensors->x * 0.06956 ;// 14.375 ;
+		//roulis
+		//*************
+		#ifdef GYR_L3G4200D 
+		gyroRate = sensors->x * 0.06956 ;
 		#endif
-		gyr_angles->x += (float)((float)((gyroRate * interval)));
-		
-		#if ( GYR_L3G4200D == 1 )
-		gyroRate = sensors->y * 0.00875 ;
-		#elif ( GYR_ITG3205 == 1 )
-		gyroRate = sensors->y * 0.06956 ;// 14.375 ;
+		#ifdef GYR_ITG3205
+		gyroRate = sensors->x * 0.06956 ;
 		#endif
-		gyr_angles->y += (float)((float)((gyroRate * interval) ));
-		
-		#if ( GYR_L3G4200D == 1 )
-		gyroRate = sensors->z * 0.00875 ;
-		#elif ( GYR_ITG3205 == 1 )
-		gyroRate = sensors->z * 0.06956 ;// 14.375 ;
+		gyr_angles->roulis += ((float)(previous_gyroRate_x + gyroRate) * interval) / 2 ;
+		previous_gyroRate_x = gyroRate;
+		if(gyr_angles->roulis < 0.0)
+		{
+			gyr_angles->roulis += 360.0;
+		}
+		else if(gyr_angles->roulis > 360.0)
+		{
+			gyr_angles->roulis -= 360.0;
+		}
+	
+		//tangage
+		//*************
+		#ifdef GYR_L3G4200D 
+		gyroRate = sensors->y * 0.06956 ;
 		#endif
-		gyr_angles->z += (float)((float)((gyroRate * interval)));
+		#ifdef GYR_ITG3205
+		gyroRate = sensors->y * 0.06956 ;
+		#endif
+		gyr_angles->tangage += ((float)(previous_gyroRate_y + gyroRate) * interval) / 2;
+		previous_gyroRate_y = gyroRate;
+		if(gyr_angles->tangage < 0.0)
+		{
+			gyr_angles->tangage += 360.0;
+		}
+		else if(gyr_angles->tangage > 360.0)
+		{
+			gyr_angles->tangage -= 360.0;
+		}
+	
+		//lacet
+		//*************
+		#ifdef GYR_L3G4200D 
+		gyroRate = sensors->z * 0.06956 ;
+		#endif
+		#ifdef GYR_ITG3205
+		gyroRate = sensors->z * 0.06956 ;
+		#endif
+		gyr_angles->lacet += ((float)(previous_gyroRate_z + gyroRate) * interval) / 2;
+		previous_gyroRate_z = gyroRate;
+		if(gyr_angles->lacet < 0.0)
+		{
+			gyr_angles->lacet += 360.0;
+		}
+		else if(gyr_angles->lacet > 360.0)
+		{
+			gyr_angles->lacet -= 360.0;
+		}
 	}
 }
 
@@ -239,8 +301,9 @@ void SrvSensorsReadMagnetometerSensor( S_angles *angles, S_Mag_Sensor *sensors )
 {
 	Boolean mag_read_ok = FALSE;
 		
-	#if ( GYR_ITG3205 == 1 )
+	#if ( MAG_HMC5883 == 1 )
 	mag_read_ok = CmpHMC5883GetHeading( sensors );	
+
 	sensors->x *= -1;
 	sensors->y *= 1;
 	sensors->z *= -1;
@@ -260,10 +323,8 @@ void SrvSensorsReadMagnetometerSensor( S_angles *angles, S_Mag_Sensor *sensors )
 			
 			float Xh = sensors->x * cosPitch + sensors->z * sinPitch;
 			float Yh = sensors->x * sinRoll * sinPitch + sensors->y * cosRoll - sensors->z * sinRoll * cosPitch;
-			
-			
-			float heading = atan2(Yh, Xh);
-			//float heading = atan2(sensors->y, sensors->x);
+
+			float heading = -1*atan2(Yh, Xh);
 			heading += LOCAL_MAGNETIC_DECLINAISON;
 			if(heading < 0)
 			{

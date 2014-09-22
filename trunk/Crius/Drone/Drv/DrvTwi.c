@@ -234,11 +234,11 @@ Boolean DrvTwiWriteRegBuf(Int8U slave_address, Int8U slave_register, Int8U *buff
 /************************************************************************/
 static void DrvTwiWaitTransmission( void )
 {
-	Int16U count = 0x3FFU;
+	Int8U timeout_i2c = 0xFFU;
 	while ( ! (TWCR & (1<<TWINT) ) ) 
 	{
-		count--;
-		if ( count == 0) 
+		timeout_i2c--;
+		if ( timeout_i2c == 0) 
 		{
 			TWCR = 0;
 			break;

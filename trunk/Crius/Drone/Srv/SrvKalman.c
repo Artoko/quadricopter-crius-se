@@ -35,9 +35,9 @@ float dtY, yY, SY;
 float KY_0, KY_1;
 
 /* Kalman filter variables and constants */
-const float Q_angleZ = 0.1; // Process noise covariance for the magnetometer - Sw
+const float Q_angleZ = 0.0001; // Process noise covariance for the magnetometer - Sw
 const float Q_gyroZ = 0.003; // Process noise covariance for the gyro - Sw
-const float R_angleZ = 0.03; // Measurement noise covariance - Sv
+const float R_angleZ = 0.001; // Measurement noise covariance - Sv
 
 float angleZ = 0; // The angle output from the Kalman filter
 float biasZ = 0; // The gZro bias calculated bZ the Kalman filter

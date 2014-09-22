@@ -26,6 +26,7 @@
 ////////////////////////////////////////PRIVATE FONCTIONS/////////////////////////////////////////
 
 void ComplementaryFilter(S_Acc_Angles accData, S_Gyr_Angles gyrData);
+
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 
 //variables de timming
@@ -53,19 +54,12 @@ void SrvImuDispatcher (Event_t in_event)
 	lastread_ekf = now;
 	
 	// ********************* Mise à jour roulis tangage lacet *****************
-	//ComplementaryFilter( imu_reel.acc_angles,imu_reel.gyr_angles);
-	imu_reel.angles.roulis   = (Int16S)(float)SrvKalmanFilterX( imu_reel.acc_angles.x, imu_reel.gyr_angles.y, interval_ekf ) ;
-	imu_reel.angles.tangage  = (Int16S)(float)SrvKalmanFilterY( imu_reel.acc_angles.y, imu_reel.gyr_angles.x, interval_ekf ) ;
-	imu_reel.angles.lacet	 = (Int16S)(float)SrvKalmanFilterZ( imu_reel.angles.nord, imu_reel.gyr_angles.z, interval_ekf );
+	ComplementaryFilter( imu_reel.acc_angles,imu_reel.gyr_angles);
 	
-	if(imu_reel.angles.lacet < 0.0)
-	{
-		imu_reel.angles.lacet += 360.0;
-	}
-	else if(imu_reel.angles.lacet > 360.0)
-	{
-		imu_reel.angles.lacet -= 360.0;
-	}
+	//imu_reel.angles.roulis   = (Int16S)(float)SrvKalmanFilterX( imu_reel.acc_angles.roulis, imu_reel.gyr_angles.roulis, interval_ekf ) ;
+	//imu_reel.angles.tangage  = (Int16S)(float)SrvKalmanFilterY( imu_reel.acc_angles.tangage, imu_reel.gyr_angles.tangage, interval_ekf ) ;
+	//imu_reel.angles.lacet = (Int16S)(float)SrvKalmanFilterZ(  imu_reel.gyr_angles.lacet,imu_reel.angles.nord, interval_ekf );
+	imu_reel.angles.lacet = imu_reel.gyr_angles.lacet;
 }
 
 
@@ -106,10 +100,12 @@ Int32S  __attribute__ ((noinline)) mul(Int16S a, Int16S b)
 
 void ComplementaryFilter(S_Acc_Angles accData, S_Gyr_Angles gyrData)
 {
-	float gyr_poid = 0.90;
-	float acc_poid = 100-gyr_poid;
-	imu_reel.angles.tangage = gyrData.x * gyr_poid + /*accData.y */ acc_poid * imu_reel.sensors.acc.y * 0.99F;
-	imu_reel.angles.roulis = gyrData.y * gyr_poid + /*accData.x */ acc_poid * imu_reel.sensors.acc.x * 0.99F;
-	imu_reel.angles.tangage /= 100.0;
-	imu_reel.angles.roulis /= 100.0;
+	#define gyr_poid 0.98
+	#define acc_poid (100.0 - gyr_poid)
+	int forceMagnitudeApprox = abs(imu_reel.sensors.acc.x) + abs(imu_reel.sensors.acc.y) + abs(imu_reel.sensors.acc.z);
+	if (forceMagnitudeApprox > 8192 && forceMagnitudeApprox < 32768)
+	{
+		imu_reel.angles.tangage = (gyrData.tangage * gyr_poid + accData.tangage * acc_poid)/100;
+		imu_reel.angles.roulis = (gyrData.roulis * gyr_poid + accData.roulis * acc_poid)/100;
+	}
 }

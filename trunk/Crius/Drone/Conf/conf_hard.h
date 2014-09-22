@@ -25,8 +25,8 @@
 #define VERSION 0x10
 
 ////////////////////////////////////////PUBLIC SENSORS BOARD ///////////////////////////////////////
-//#define DAISY_7		
-#define CRIUS		
+#define DAISY_7		
+//#define CRIUS		
 
 #define QUADX
 //#define BI
@@ -46,10 +46,11 @@
 //-----------------------------------------------------------------------------------------------//
 
 /////////////////////////////////////PUBLIC LED MANAGMENT///////////////////////////////////////////
-#define LED_ON()			(PORTB	|=	(1 << PORTB5))
-#define LED_OFF()			(PORTB	&=~	(1 << PORTB5))
-#define LED_TOGGLE()		(PORTB	^=	(1 << PORTB5))
-#define CONFIGURE_LED_PIN() (DDRB	|=	(1 << PORTB5))
+#define LED_PIN				PORTB1
+#define LED_ON()			(PORTB	|=	(1 << LED_PIN))
+#define LED_OFF()			(PORTB	&=~	(1 << LED_PIN))
+#define LED_TOGGLE()		(PORTB	^=	(1 << LED_PIN))
+#define CONFIGURE_LED_PIN() (DDRB	|=	(1 << LED_PIN))
 
 ////////////////////////////////////////PUBLIC FREQUENCE OSC///////////////////////////////////////
 #define		CONF_FOSC_MHZ				16UL
@@ -75,8 +76,8 @@
 
 ////////////////////////////////////PUBLIC SERVOS PORTS///////////////////////////////////////////
 #if defined( DAISY_7 )
-	#define PORT_DIR_SERVO			DDRB
-	#define PORT_SERVO				PORTB
+	#define PORT_DIR_SERVO			DDRA
+	#define PORT_SERVO				PORTA
 #elif defined( CRIUS )
 	#define PORT_DIR_SERVO			DDRC
 	#define PORT_SERVO				PORTC
@@ -159,17 +160,16 @@ typedef struct SS_angles
 //-----------------------------------------------------------------------------------------------//
 typedef struct
 {
-	float x;
-	float y;
-	float z;
+	float roulis;
+	float tangage;
 }S_Acc_Angles;
 
 //-----------------------------------------------------------------------------------------------//
 typedef struct
 {
-	float x;
-	float y;
-	float z;
+	float roulis;
+	float tangage;
+	float lacet;
 }S_Gyr_Angles;
 
 //-----------------------------------------------------------------------------------------------//
@@ -186,6 +186,7 @@ typedef struct
 	Int16S x;
 	Int16S y;
 	Int16S z;
+	Int16S noise;
 }S_Gyr_Sensor;
 
 //-----------------------------------------------------------------------------------------------//

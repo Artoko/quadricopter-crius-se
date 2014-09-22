@@ -13,10 +13,11 @@
 #include "Drv/DrvEeprom.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-#define NB_SAMPLE_TO_CALIB_LIS331DLH	100
+#define NB_SAMPLE_TO_CALIB_LIS331DLH	10
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
+
 Int8U loop_calibration_liS331dlh = 0U;
-Int16S accel_calib_liS331dlh[ 3U ] = { 0, 0, 0 };
+Int32S accel_calib_liS331dlh[ 3U ] = { 0, 0, 0 };
 	
  ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
@@ -44,7 +45,11 @@ Boolean CmpLIS331DLHInit(void)
 																	LIS331DLH_CTRL_REG1_XEN 
 																	);
 		DrvTimerDelayUs(200);
-		
+		DrvTwiWriteReg(LIS331DLH_ADDRESS,LIS331DLH_CTRL_REG4,	LIS331DLH_CTRL_REG4_BDU |
+																 LIS331DLH_CTRL_REG4_BLE);
+					 
+					 
+					 
 		//Calibration du capteur
 		//si l'eeprom est configué
 		conf = DrvEepromIsConfigured();
@@ -80,8 +85,7 @@ Boolean CmpLIS331DLHIsCalibrate(void)
 Boolean CmpLIS331DLHGetAcceleration(S_Acc_Sensor *acc)
 {
 	Int8U buffer[ 6U ] = {0U, 0U, 0U, 0U, 0U, 0U};
-
-	if( DrvTwiReadRegBuf( LIS331DLH_ADDRESS, LIS331DLH_OUT_X_L, buffer, 6U ) != TRUE )
+	if( DrvTwiReadRegBuf( LIS331DLH_ADDRESS, LIS331DLH_OUT_X_L | 0x80, buffer, 6U ) != TRUE )
 	{
 		return FALSE;
 	}
