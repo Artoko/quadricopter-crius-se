@@ -66,6 +66,23 @@
             this.labelAttitude = new System.Windows.Forms.Label();
             this.labelAcc = new System.Windows.Forms.Label();
             this.labelGyro = new System.Windows.Forms.Label();
+            this.labelMag = new System.Windows.Forms.Label();
+            this.labelMot = new System.Windows.Forms.Label();
+            this.numericUpDownProulis = new System.Windows.Forms.NumericUpDown();
+            this.labelP = new System.Windows.Forms.Label();
+            this.labelI = new System.Windows.Forms.Label();
+            this.labelD = new System.Windows.Forms.Label();
+            this.numericUpDownIroulis = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownDroulis = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownDtangage = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownItangage = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownPtangage = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownDlacet = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownIlacet = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownPlacet = new System.Windows.Forms.NumericUpDown();
+            this.labelRoulis = new System.Windows.Forms.Label();
+            this.labelTangage = new System.Windows.Forms.Label();
+            this.labelLacet = new System.Windows.Forms.Label();
             this.turn_indicator = new GroundStationDrone.TurnCoordinatorInstrumentControl();
             this.vario_indicator = new GroundStationDrone.VerticalSpeedIndicatorInstrumentControl();
             this.altimeter_indicator = new GroundStationDrone.AltimeterInstrumentControl();
@@ -75,6 +92,15 @@
             this.statusStripState.SuspendLayout();
             this.menuStripParams.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSpeed)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownProulis)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownIroulis)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDroulis)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDtangage)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownItangage)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPtangage)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDlacet)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownIlacet)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPlacet)).BeginInit();
             this.SuspendLayout();
             // 
             // statusStripState
@@ -94,7 +120,7 @@
             this.toolStripStatusLabelPresssion});
             this.statusStripState.Location = new System.Drawing.Point(0, 463);
             this.statusStripState.Name = "statusStripState";
-            this.statusStripState.Size = new System.Drawing.Size(708, 23);
+            this.statusStripState.Size = new System.Drawing.Size(967, 23);
             this.statusStripState.SizingGrip = false;
             this.statusStripState.TabIndex = 0;
             this.statusStripState.Text = "statusStrip1";
@@ -171,7 +197,7 @@
             this.toolStripMenuItemView});
             this.menuStripParams.Location = new System.Drawing.Point(0, 0);
             this.menuStripParams.Name = "menuStripParams";
-            this.menuStripParams.Size = new System.Drawing.Size(708, 24);
+            this.menuStripParams.Size = new System.Drawing.Size(967, 24);
             this.menuStripParams.TabIndex = 4;
             this.menuStripParams.Text = "menuStrip2";
             // 
@@ -354,7 +380,8 @@
             // labelAttitude
             // 
             this.labelAttitude.AutoSize = true;
-            this.labelAttitude.Location = new System.Drawing.Point(30, 352);
+            this.labelAttitude.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.labelAttitude.Location = new System.Drawing.Point(12, 340);
             this.labelAttitude.Name = "labelAttitude";
             this.labelAttitude.Size = new System.Drawing.Size(43, 13);
             this.labelAttitude.TabIndex = 13;
@@ -364,7 +391,8 @@
             // labelAcc
             // 
             this.labelAcc.AutoSize = true;
-            this.labelAcc.Location = new System.Drawing.Point(30, 381);
+            this.labelAcc.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.labelAcc.Location = new System.Drawing.Point(12, 362);
             this.labelAcc.Name = "labelAcc";
             this.labelAcc.Size = new System.Drawing.Size(26, 13);
             this.labelAcc.TabIndex = 14;
@@ -374,12 +402,207 @@
             // labelGyro
             // 
             this.labelGyro.AutoSize = true;
-            this.labelGyro.Location = new System.Drawing.Point(30, 409);
+            this.labelGyro.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.labelGyro.Location = new System.Drawing.Point(12, 384);
             this.labelGyro.Name = "labelGyro";
             this.labelGyro.Size = new System.Drawing.Size(29, 13);
             this.labelGyro.TabIndex = 15;
             this.labelGyro.Text = "Gyro";
             this.labelGyro.Click += new System.EventHandler(this.labelGyro_Click);
+            // 
+            // labelMag
+            // 
+            this.labelMag.AutoSize = true;
+            this.labelMag.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.labelMag.Location = new System.Drawing.Point(12, 406);
+            this.labelMag.Name = "labelMag";
+            this.labelMag.Size = new System.Drawing.Size(28, 13);
+            this.labelMag.TabIndex = 16;
+            this.labelMag.Text = "Mag";
+            this.labelMag.Click += new System.EventHandler(this.labelMag_Click);
+            // 
+            // labelMot
+            // 
+            this.labelMot.AutoSize = true;
+            this.labelMot.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.labelMot.Location = new System.Drawing.Point(12, 428);
+            this.labelMot.Name = "labelMot";
+            this.labelMot.Size = new System.Drawing.Size(45, 13);
+            this.labelMot.TabIndex = 17;
+            this.labelMot.Text = "Moteurs";
+            this.labelMot.Click += new System.EventHandler(this.labelMot_Click);
+            // 
+            // numericUpDownProulis
+            // 
+            this.numericUpDownProulis.Location = new System.Drawing.Point(760, 106);
+            this.numericUpDownProulis.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownProulis.Name = "numericUpDownProulis";
+            this.numericUpDownProulis.Size = new System.Drawing.Size(57, 20);
+            this.numericUpDownProulis.TabIndex = 18;
+            this.numericUpDownProulis.ValueChanged += new System.EventHandler(this.numericUpDownRoulis_ValueChanged);
+            // 
+            // labelP
+            // 
+            this.labelP.AutoSize = true;
+            this.labelP.Location = new System.Drawing.Point(781, 81);
+            this.labelP.Name = "labelP";
+            this.labelP.Size = new System.Drawing.Size(14, 13);
+            this.labelP.TabIndex = 19;
+            this.labelP.Text = "P";
+            // 
+            // labelI
+            // 
+            this.labelI.AutoSize = true;
+            this.labelI.Location = new System.Drawing.Point(847, 81);
+            this.labelI.Name = "labelI";
+            this.labelI.Size = new System.Drawing.Size(10, 13);
+            this.labelI.TabIndex = 20;
+            this.labelI.Text = "I";
+            // 
+            // labelD
+            // 
+            this.labelD.AutoSize = true;
+            this.labelD.Location = new System.Drawing.Point(908, 81);
+            this.labelD.Name = "labelD";
+            this.labelD.Size = new System.Drawing.Size(15, 13);
+            this.labelD.TabIndex = 21;
+            this.labelD.Text = "D";
+            // 
+            // numericUpDownIroulis
+            // 
+            this.numericUpDownIroulis.Location = new System.Drawing.Point(824, 106);
+            this.numericUpDownIroulis.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownIroulis.Name = "numericUpDownIroulis";
+            this.numericUpDownIroulis.Size = new System.Drawing.Size(57, 20);
+            this.numericUpDownIroulis.TabIndex = 22;
+            this.numericUpDownIroulis.ValueChanged += new System.EventHandler(this.numericUpDownRoulis_ValueChanged);
+            // 
+            // numericUpDownDroulis
+            // 
+            this.numericUpDownDroulis.Location = new System.Drawing.Point(887, 106);
+            this.numericUpDownDroulis.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownDroulis.Name = "numericUpDownDroulis";
+            this.numericUpDownDroulis.Size = new System.Drawing.Size(57, 20);
+            this.numericUpDownDroulis.TabIndex = 23;
+            this.numericUpDownDroulis.ValueChanged += new System.EventHandler(this.numericUpDownRoulis_ValueChanged);
+            // 
+            // numericUpDownDtangage
+            // 
+            this.numericUpDownDtangage.Location = new System.Drawing.Point(887, 132);
+            this.numericUpDownDtangage.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownDtangage.Name = "numericUpDownDtangage";
+            this.numericUpDownDtangage.Size = new System.Drawing.Size(57, 20);
+            this.numericUpDownDtangage.TabIndex = 26;
+            this.numericUpDownDtangage.ValueChanged += new System.EventHandler(this.numericUpDowntangage_ValueChanged);
+            // 
+            // numericUpDownItangage
+            // 
+            this.numericUpDownItangage.Location = new System.Drawing.Point(824, 132);
+            this.numericUpDownItangage.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownItangage.Name = "numericUpDownItangage";
+            this.numericUpDownItangage.Size = new System.Drawing.Size(57, 20);
+            this.numericUpDownItangage.TabIndex = 25;
+            this.numericUpDownItangage.ValueChanged += new System.EventHandler(this.numericUpDowntangage_ValueChanged);
+            // 
+            // numericUpDownPtangage
+            // 
+            this.numericUpDownPtangage.Location = new System.Drawing.Point(760, 132);
+            this.numericUpDownPtangage.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownPtangage.Name = "numericUpDownPtangage";
+            this.numericUpDownPtangage.Size = new System.Drawing.Size(57, 20);
+            this.numericUpDownPtangage.TabIndex = 24;
+            this.numericUpDownPtangage.ValueChanged += new System.EventHandler(this.numericUpDowntangage_ValueChanged);
+            // 
+            // numericUpDownDlacet
+            // 
+            this.numericUpDownDlacet.Location = new System.Drawing.Point(887, 158);
+            this.numericUpDownDlacet.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownDlacet.Name = "numericUpDownDlacet";
+            this.numericUpDownDlacet.Size = new System.Drawing.Size(57, 20);
+            this.numericUpDownDlacet.TabIndex = 29;
+            this.numericUpDownDlacet.ValueChanged += new System.EventHandler(this.numericUpDownLacet_ValueChanged);
+            // 
+            // numericUpDownIlacet
+            // 
+            this.numericUpDownIlacet.Location = new System.Drawing.Point(824, 158);
+            this.numericUpDownIlacet.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownIlacet.Name = "numericUpDownIlacet";
+            this.numericUpDownIlacet.Size = new System.Drawing.Size(57, 20);
+            this.numericUpDownIlacet.TabIndex = 28;
+            this.numericUpDownIlacet.ValueChanged += new System.EventHandler(this.numericUpDownLacet_ValueChanged);
+            // 
+            // numericUpDownPlacet
+            // 
+            this.numericUpDownPlacet.Location = new System.Drawing.Point(760, 158);
+            this.numericUpDownPlacet.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownPlacet.Name = "numericUpDownPlacet";
+            this.numericUpDownPlacet.Size = new System.Drawing.Size(57, 20);
+            this.numericUpDownPlacet.TabIndex = 27;
+            this.numericUpDownPlacet.ValueChanged += new System.EventHandler(this.numericUpDownLacet_ValueChanged);
+            // 
+            // labelRoulis
+            // 
+            this.labelRoulis.AutoSize = true;
+            this.labelRoulis.ForeColor = System.Drawing.SystemColors.Desktop;
+            this.labelRoulis.Location = new System.Drawing.Point(722, 108);
+            this.labelRoulis.Name = "labelRoulis";
+            this.labelRoulis.Size = new System.Drawing.Size(36, 13);
+            this.labelRoulis.TabIndex = 30;
+            this.labelRoulis.Text = "Roulis";
+            // 
+            // labelTangage
+            // 
+            this.labelTangage.AutoSize = true;
+            this.labelTangage.Location = new System.Drawing.Point(708, 134);
+            this.labelTangage.Name = "labelTangage";
+            this.labelTangage.Size = new System.Drawing.Size(50, 13);
+            this.labelTangage.TabIndex = 31;
+            this.labelTangage.Text = "Tangage";
+            // 
+            // labelLacet
+            // 
+            this.labelLacet.AutoSize = true;
+            this.labelLacet.Location = new System.Drawing.Point(724, 160);
+            this.labelLacet.Name = "labelLacet";
+            this.labelLacet.Size = new System.Drawing.Size(34, 13);
+            this.labelLacet.TabIndex = 32;
+            this.labelLacet.Text = "Lacet";
             // 
             // turn_indicator
             // 
@@ -434,7 +657,24 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GrayText;
-            this.ClientSize = new System.Drawing.Size(708, 486);
+            this.ClientSize = new System.Drawing.Size(967, 486);
+            this.Controls.Add(this.labelLacet);
+            this.Controls.Add(this.labelTangage);
+            this.Controls.Add(this.labelRoulis);
+            this.Controls.Add(this.numericUpDownDlacet);
+            this.Controls.Add(this.numericUpDownIlacet);
+            this.Controls.Add(this.numericUpDownPlacet);
+            this.Controls.Add(this.numericUpDownDtangage);
+            this.Controls.Add(this.numericUpDownItangage);
+            this.Controls.Add(this.numericUpDownPtangage);
+            this.Controls.Add(this.numericUpDownDroulis);
+            this.Controls.Add(this.numericUpDownIroulis);
+            this.Controls.Add(this.labelD);
+            this.Controls.Add(this.labelI);
+            this.Controls.Add(this.labelP);
+            this.Controls.Add(this.numericUpDownProulis);
+            this.Controls.Add(this.labelMot);
+            this.Controls.Add(this.labelMag);
             this.Controls.Add(this.labelGyro);
             this.Controls.Add(this.labelAcc);
             this.Controls.Add(this.labelAttitude);
@@ -462,6 +702,15 @@
             this.menuStripParams.ResumeLayout(false);
             this.menuStripParams.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSpeed)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownProulis)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownIroulis)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDroulis)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDtangage)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownItangage)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPtangage)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDlacet)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownIlacet)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPlacet)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -513,6 +762,23 @@
         private System.Windows.Forms.Label labelAttitude;
         private System.Windows.Forms.Label labelAcc;
         private System.Windows.Forms.Label labelGyro;
+        private System.Windows.Forms.Label labelMag;
+        private System.Windows.Forms.Label labelMot;
+        private System.Windows.Forms.NumericUpDown numericUpDownProulis;
+        private System.Windows.Forms.Label labelP;
+        private System.Windows.Forms.Label labelI;
+        private System.Windows.Forms.Label labelD;
+        private System.Windows.Forms.NumericUpDown numericUpDownIroulis;
+        private System.Windows.Forms.NumericUpDown numericUpDownDroulis;
+        private System.Windows.Forms.NumericUpDown numericUpDownDtangage;
+        private System.Windows.Forms.NumericUpDown numericUpDownItangage;
+        private System.Windows.Forms.NumericUpDown numericUpDownPtangage;
+        private System.Windows.Forms.NumericUpDown numericUpDownDlacet;
+        private System.Windows.Forms.NumericUpDown numericUpDownIlacet;
+        private System.Windows.Forms.NumericUpDown numericUpDownPlacet;
+        private System.Windows.Forms.Label labelRoulis;
+        private System.Windows.Forms.Label labelTangage;
+        private System.Windows.Forms.Label labelLacet;
 
     }
 }
