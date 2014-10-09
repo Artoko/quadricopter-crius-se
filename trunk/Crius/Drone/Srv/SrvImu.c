@@ -54,12 +54,20 @@ void SrvImuDispatcher (Event_t in_event)
 	lastread_ekf = now;
 	
 	// ********************* Mise à jour roulis tangage lacet *****************
-	ComplementaryFilter( imu_reel.acc_angles,imu_reel.gyr_angles);
+	//ComplementaryFilter( imu_reel.acc_angles,imu_reel.gyr_angles);
 	
-	//imu_reel.angles.roulis   = (Int16S)(float)SrvKalmanFilterX( imu_reel.acc_angles.roulis, imu_reel.gyr_angles.roulis, interval_ekf ) ;
-	//imu_reel.angles.tangage  = (Int16S)(float)SrvKalmanFilterY( imu_reel.acc_angles.tangage, imu_reel.gyr_angles.tangage, interval_ekf ) ;
+	imu_reel.angles.roulis   = (Int16S)(float)SrvKalmanFilterX( imu_reel.acc_angles.roulis, imu_reel.gyr_angles.roulis, interval_ekf ) ;
+	imu_reel.angles.tangage  = (Int16S)(float)SrvKalmanFilterY( imu_reel.acc_angles.tangage, imu_reel.gyr_angles.tangage, interval_ekf ) ;
 	//imu_reel.angles.lacet = (Int16S)(float)SrvKalmanFilterZ(  imu_reel.gyr_angles.lacet,imu_reel.angles.nord, interval_ekf );
 	imu_reel.angles.lacet = imu_reel.gyr_angles.lacet;
+	if(imu_reel.angles.lacet < 0.0)
+	{
+		imu_reel.angles.lacet += 360.0;
+	}
+	else if(imu_reel.angles.lacet > 360.0)
+	{
+		imu_reel.angles.lacet -= 360.0;
+	}
 }
 
 
@@ -100,12 +108,12 @@ Int32S  __attribute__ ((noinline)) mul(Int16S a, Int16S b)
 
 void ComplementaryFilter(S_Acc_Angles accData, S_Gyr_Angles gyrData)
 {
-	#define gyr_poid 0.98
+	#define gyr_poid 0.99
 	#define acc_poid (100.0 - gyr_poid)
-	int forceMagnitudeApprox = abs(imu_reel.sensors.acc.x) + abs(imu_reel.sensors.acc.y) + abs(imu_reel.sensors.acc.z);
+	Int16U forceMagnitudeApprox = abs(imu_reel.sensors.acc.x) + abs(imu_reel.sensors.acc.y) + abs(imu_reel.sensors.acc.z);
 	if (forceMagnitudeApprox > 8192 && forceMagnitudeApprox < 32768)
 	{
-		imu_reel.angles.tangage = (gyrData.tangage * gyr_poid + accData.tangage * acc_poid)/100;
-		imu_reel.angles.roulis = (gyrData.roulis * gyr_poid + accData.roulis * acc_poid)/100;
+		imu_reel.angles.tangage = (Int16S)((float)(gyrData.tangage * gyr_poid + accData.tangage * acc_poid)/100);
+		imu_reel.angles.roulis = (Int16S)((float)(gyrData.roulis * gyr_poid + accData.roulis * acc_poid)/100);
 	}
 }

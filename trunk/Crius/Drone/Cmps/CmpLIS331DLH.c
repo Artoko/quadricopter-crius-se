@@ -46,7 +46,8 @@ Boolean CmpLIS331DLHInit(void)
 																	);
 		DrvTimerDelayUs(200);
 		DrvTwiWriteReg(LIS331DLH_ADDRESS,LIS331DLH_CTRL_REG4,	LIS331DLH_CTRL_REG4_BDU |
-																 LIS331DLH_CTRL_REG4_BLE);
+																LIS331DLH_CTRL_REG4_FS_1G_2G |
+																LIS331DLH_CTRL_REG4_BLE);
 					 
 					 
 					 
@@ -63,7 +64,12 @@ Boolean CmpLIS331DLHInit(void)
 		else
 		{
 			loop_calibration_liS331dlh = 0;
-			DrvEepromReadAcc(accel_calib_liS331dlh);
+			
+			Int16S l_accel_calib_liS331dlh[ 3U ] = {(Int16S)accel_calib_liS331dlh[0U],
+													(Int16S)accel_calib_liS331dlh[1U],
+													(Int16S)accel_calib_liS331dlh[2U]
+												 };
+			DrvEepromReadAcc(l_accel_calib_liS331dlh);
 		}	
 		o_success = TRUE;
 	}
@@ -74,7 +80,11 @@ Boolean CmpLIS331DLHIsCalibrate(void)
 {
 	if(loop_calibration_liS331dlh == 0)
 	{
-		DrvEepromWriteAcc(accel_calib_liS331dlh);
+		Int16S l_accel_calib_liS331dlh[ 3U ] = {(Int16S)accel_calib_liS331dlh[0U],
+												(Int16S)accel_calib_liS331dlh[1U],
+												(Int16S)accel_calib_liS331dlh[2U]
+											};
+		DrvEepromWriteAcc(l_accel_calib_liS331dlh);
 		return TRUE;
 	}
 	return FALSE;

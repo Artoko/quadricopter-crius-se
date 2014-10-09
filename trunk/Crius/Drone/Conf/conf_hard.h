@@ -46,12 +46,23 @@
 //-----------------------------------------------------------------------------------------------//
 
 /////////////////////////////////////PUBLIC LED MANAGMENT///////////////////////////////////////////
-#define LED_PIN				PORTB1
-#define LED_ON()			(PORTB	|=	(1 << LED_PIN))
-#define LED_OFF()			(PORTB	&=~	(1 << LED_PIN))
-#define LED_TOGGLE()		(PORTB	^=	(1 << LED_PIN))
-#define CONFIGURE_LED_PIN() (DDRB	|=	(1 << LED_PIN))
+#define LED_VERTE_PIN				PORTB1
+#define LED_VERTE_ON()				(PORTB	|=	(1 << LED_VERTE_PIN))
+#define LED_VERTE_OFF()				(PORTB	&=~	(1 << LED_VERTE_PIN))
+#define LED_VERTE_TOGGLE()			(PORTB	^=	(1 << LED_VERTE_PIN))
+#define CONFIGURE_VERTE_LED_PIN()	(DDRB	|=	(1 << LED_VERTE_PIN))
 
+#define LED_ORANGE_PIN				PORTB2
+#define LED_ORANGE_ON()				(PORTB	|=	(1 << LED_ORANGE_PIN))
+#define LED_ORANGE_OFF()				(PORTB	&=~	(1 << LED_ORANGE_PIN))
+#define LED_ORANGE_TOGGLE()			(PORTB	^=	(1 << LED_ORANGE_PIN))
+#define CONFIGURE_ORANGE_LED_PIN()	(DDRB	|=	(1 << LED_ORANGE_PIN))
+
+#define LED_ROUGE_PIN				PORTB3
+#define LED_ROUGE_ON()				(PORTB	|=	(1 << LED_ROUGE_PIN))
+#define LED_ROUGE_OFF()				(PORTB	&=~	(1 << LED_ROUGE_PIN))
+#define LED_ROUGE_TOGGLE()			(PORTB	^=	(1 << LED_ROUGE_PIN))
+#define CONFIGURE_ROUGE_LED_PIN()	(DDRB	|=	(1 << LED_ROUGE_PIN))
 ////////////////////////////////////////PUBLIC FREQUENCE OSC///////////////////////////////////////
 #define		CONF_FOSC_MHZ				16UL
 #define		CONF_FOSC_HZ				CONF_FOSC_MHZ * 1000000UL
@@ -111,6 +122,14 @@
 #define		COMM_MOTORS								2U
 	#define		COMM_MOTOR_WRITE						1U
 	#define		COMM_MOTOR_READ							2U
+	#define		COMM_MOTOR_STARTUP_F_R_READ				3U
+	#define		COMM_MOTOR_STARTUP_F_R_WRITE			4U
+	#define		COMM_MOTOR_STARTUP_R_R_READ				5U
+	#define		COMM_MOTOR_STARTUP_R_R_WRITE			6U
+	#define		COMM_MOTOR_STARTUP_F_L_READ				7U
+	#define		COMM_MOTOR_STARTUP_F_L_WRITE			8U
+	#define		COMM_MOTOR_STARTUP_R_L_READ				9U
+	#define		COMM_MOTOR_STARTUP_R_L_WRITE			10U
 #define		COMM_ANGLES								3U
 	#define		COMM_ANGLE_WRITE						1U
 	#define		COMM_ANGLE_READ							2U
@@ -129,14 +148,21 @@
 #define		ANGLE_MAX			90.0
 #define		ANGLE_MIN			-90.0
 
+////////////////////////////////////////////MOTORS MIN MAX////////////////////////////////////////////
+#define MOTOR_OFF_COMMAND 0
+#define MOTOR_MAX_COMMAND 1000
 //-----------------------------------------------------------------------------------------------//
 typedef struct SS_moteur
 {
 	Int16U throttle;
-	Int16U frontMotor_R;
-	Int16U frontMotor_L;
-	Int16U rearMotor_R;
-	Int16U rearMotor_L;
+	Int16U front_right;
+	Int16U front_left;
+	Int16U rear_right;
+	Int16U rear_left;
+	Int16U front_right_startup;
+	Int16U front_left_startup;
+	Int16U rear_right_startup;
+	Int16U rear_left_startup;
 }S_moteur;
 
 //-----------------------------------------------------------------------------------------------//

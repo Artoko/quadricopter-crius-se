@@ -34,9 +34,6 @@
 
 ////////////////////////////////////////PRIVATE VARIABLES///////////////////////////////////////
 
-//variables de timming
-Int32U lastread_gyro = 0U;
-Int32U lastread_baro = 0U;
 
 //Init des valeurs d'allumage moteurs
 Boolean SrvSensorsInit( void )
@@ -62,32 +59,22 @@ Boolean SrvSensorsInit( void )
 	return TRUE;
 }
 
-float interval_baro = 0.0F;
 float interval_gyro = 0.0F;
 	
 
 //dispatcher d'evenements
 void SrvSensorsDispatcher (Event_t in_event)
 {
-	Int32U now = 0U;
-	// ********************* Calcul du temps de cycle *************************
-	now = DrvTimerGetTimeUs();
-	interval_gyro = (float)(now - lastread_gyro) / 1000000.0F;
-	lastread_gyro = now;
-	
 	// ********************* Mesure des capteurs ******************************			
 	//read gyro
-	SrvSensorsReadGyroscopeSensor( &imu_reel.gyr_angles, interval_gyro, &imu_reel.sensors.gyr );
+	SrvSensorsReadGyroscopeSensor( &imu_reel.gyr_angles, &imu_reel.sensors.gyr );
 	//read acc
 	SrvSensorsReadAccelerometerSensor( &imu_reel.acc_angles, &imu_reel.sensors.acc );
 	//read mag
-	SrvSensorsReadMagnetometerSensor( &imu_reel.angles, &imu_reel.sensors.mag );
-
+	//SrvSensorsReadMagnetometerSensor( &imu_reel.angles, &imu_reel.sensors.mag );
+	//read baro
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_50MS ) == TRUE)
 	{
-		now = DrvTimerGetTimeUs();
-		interval_baro = (float)(now - lastread_baro) / 1000000.0F;
-		lastread_baro = now;
 		// *********************Mise à jour du barometre **************************
 		CmpBMP085StateMachine();
 		imu_reel.sensors.bar.temperature = (Int16S)CmpBMP085GetTemperature();
@@ -98,7 +85,6 @@ void SrvSensorsDispatcher (Event_t in_event)
 		{
 			imu_reel.sensors.bar.weather = CmpBMP085GetWeather(imu_reel.sensors.bar.pressure, imu_reel.sensors.bar.altitude);
 		}
-		imu_reel.pid_error.altitude	= SrvPIDCompute( 3U , imu_desire.altitude, imu_reel.sensors.bar.altitude	, interval_baro);
 	}
 }
 
@@ -134,7 +120,6 @@ void SrvSensorsSensorsCalibration( void )
 		else
 		{
 			calibrate_gyr = TRUE;
-			CmpL3G4200DGetNoise(&imu_reel.sensors.gyr);
 		}
 		
 		#elif defined( CRIUS )
@@ -194,12 +179,9 @@ void SrvSensorsReadAccelerometerSensor( S_Acc_Angles *acc_angles, S_Acc_Sensor *
 	{
 		
 		//Roll & Pitch 
-		//acc_angles->roulis = (float)atan2(sensors->y, sensors->z) ;
-		//acc_angles->tangage = (float)atan((double)(-sensors->x / sqrt(sensors->y * sensors->y + sensors->z * sensors->z))) ;
-		
+		acc_angles->roulis = (float)atan2((double)sensors->y, (double)sensors->z) ;
 		acc_angles->tangage  = (float)atan2((double)(sensors->x) , (double)sqrt((double)(pow((double)sensors->y,2)+pow((double)sensors->z,2))));
-        acc_angles->roulis = (float)atan2((double)(sensors->y) , (double)sqrt((double)(pow((double)sensors->x,2)+pow((double)sensors->z,2))));
-		
+        
 		acc_angles->roulis = ToDeg(acc_angles->roulis);
 		acc_angles->tangage = ToDeg(acc_angles->tangage);
 	}
@@ -211,11 +193,19 @@ void SrvSensorsReadAccelerometerSensor( S_Acc_Angles *acc_angles, S_Acc_Sensor *
 float previous_gyroRate_x = 0;
 float previous_gyroRate_y = 0;
 float previous_gyroRate_z = 0;
-void SrvSensorsReadGyroscopeSensor( S_Gyr_Angles *gyr_angles, float interval, S_Gyr_Sensor *sensors )
+void SrvSensorsReadGyroscopeSensor( S_Gyr_Angles *gyr_angles, S_Gyr_Sensor *sensors )
 {
 	Boolean gyr_read_ok = FALSE;
-
-	static float gyroRate = 0;
+	float gyroRate = 0;
+	
+	//variables de timming
+	static Int32U lastread_gyro = 0U;
+	Int32U now = 0U;
+	// ********************* Calcul du temps de cycle *************************
+	now = DrvTimerGetTimeUs();
+	interval_gyro = (float)(now - lastread_gyro) / 1000000.0F;
+	lastread_gyro = now;
+	
 
 	#if ( GYR_ITG3205 == 1 )
 	gyr_read_ok = CmpITG3205GetRotation( sensors );
@@ -238,59 +228,35 @@ void SrvSensorsReadGyroscopeSensor( S_Gyr_Angles *gyr_angles, float interval, S_
 		//roulis
 		//*************
 		#ifdef GYR_L3G4200D 
-		gyroRate = sensors->x * 0.06956 ;
+		gyroRate = sensors->x * 0.07 ;
 		#endif
 		#ifdef GYR_ITG3205
 		gyroRate = sensors->x * 0.06956 ;
 		#endif
-		gyr_angles->roulis += ((float)(previous_gyroRate_x + gyroRate) * interval) / 2 ;
+		gyr_angles->roulis += ((float)(previous_gyroRate_x + gyroRate) * interval_gyro) / 2 ;
 		previous_gyroRate_x = gyroRate;
-		if(gyr_angles->roulis < 0.0)
-		{
-			gyr_angles->roulis += 360.0;
-		}
-		else if(gyr_angles->roulis > 360.0)
-		{
-			gyr_angles->roulis -= 360.0;
-		}
 	
 		//tangage
 		//*************
 		#ifdef GYR_L3G4200D 
-		gyroRate = sensors->y * 0.06956 ;
+		gyroRate = sensors->y * 0.07 ;
 		#endif
 		#ifdef GYR_ITG3205
 		gyroRate = sensors->y * 0.06956 ;
 		#endif
-		gyr_angles->tangage += ((float)(previous_gyroRate_y + gyroRate) * interval) / 2;
+		gyr_angles->tangage += ((float)(previous_gyroRate_y + gyroRate) * interval_gyro) / 2;
 		previous_gyroRate_y = gyroRate;
-		if(gyr_angles->tangage < 0.0)
-		{
-			gyr_angles->tangage += 360.0;
-		}
-		else if(gyr_angles->tangage > 360.0)
-		{
-			gyr_angles->tangage -= 360.0;
-		}
 	
 		//lacet
 		//*************
 		#ifdef GYR_L3G4200D 
-		gyroRate = sensors->z * 0.06956 ;
+		gyroRate = sensors->z * 0.07 ;
 		#endif
 		#ifdef GYR_ITG3205
 		gyroRate = sensors->z * 0.06956 ;
 		#endif
-		gyr_angles->lacet += ((float)(previous_gyroRate_z + gyroRate) * interval) / 2;
+		gyr_angles->lacet += ((float)(previous_gyroRate_z + gyroRate) * interval_gyro) / 2;
 		previous_gyroRate_z = gyroRate;
-		if(gyr_angles->lacet < 0.0)
-		{
-			gyr_angles->lacet += 360.0;
-		}
-		else if(gyr_angles->lacet > 360.0)
-		{
-			gyr_angles->lacet -= 360.0;
-		}
 	}
 }
 

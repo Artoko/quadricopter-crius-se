@@ -73,13 +73,13 @@ void HeartbeatIsrCallbackTimer( void)
 {
 	if(heartbeat_state == HEARTBEAT_STATE_OFF)
 	{
-		LED_ON();
+		LED_VERTE_ON();
 		heartbeat_state = HEARTBEAT_STATE_ON;
 		SrvTimerDelayTimer( CONF_TIMER_HEARTBEAT, heartbeat_delay );
 	}
 	else
 	{
-		LED_OFF();
+		LED_VERTE_OFF();
 		heartbeat_state = HEARTBEAT_STATE_OFF;
 		SrvTimerDelayTimer( CONF_TIMER_HEARTBEAT, HEARTBEAT_LIMIT - heartbeat_delay );
 	}

@@ -60,9 +60,9 @@ namespace GroundStationDrone
         {
             if (toolStripStatusLabelVersion.Text == "Version : 0.0")
             {
-                if ((serial_com.Connect("COM22") == true)||
+                if ((serial_com.Connect("COM3") == true)||
                     (serial_com.Connect("COM5") == true) ||
-                    (serial_com.Connect("COM3") == true)
+                    (serial_com.Connect("COM22") == true)
                     )
                 {
                     GetVersion();
