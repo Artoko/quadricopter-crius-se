@@ -103,7 +103,16 @@ static void SrvCommExecute ( void )
 	else if( buffer[ 2U ] == COMM_MOTORS )
 	{
 		buffer[ 4U ] = buffer[ 4U ] - 0x30;
-		motor_speed = (buffer[ 6U ] << 8U) | (buffer[ 7U ]); 
+		//si on demande le COMM_MOTOR_STARTUP_R_L_WRITE => 10
+		if( buffer[ 1U ] == 0x0AU )
+		{
+			buffer[ 4U ] = (buffer[ 5U ] - 0x30) + 10U;
+			motor_speed = (buffer[ 7U ] << 8U) | (buffer[ 8U ]); 
+		}
+		else
+		{
+			motor_speed = (buffer[ 6U ] << 8U) | (buffer[ 7U ]); 
+		}
 		SrvCommRepportMotors(buffer[ 4U ] , motor_speed);
 	}
 	else if( buffer[ 2U ] == COMM_ANGLES )
@@ -201,8 +210,8 @@ static void SrvCommRepportMotors( Int8U comm_type_motor, Int16U motor_speed )
 		//write puissance
 		//controle validité data
 		if(
-			( motor_speed >= 0U ) &&
-			( motor_speed <= 1000U )
+			( motor_speed >= MOTOR_OFF_COMMAND ) &&
+			( motor_speed <= MOTOR_MAX_COMMAND )
 		)
 		{
 			//applique la vitesse au moteurs
@@ -220,17 +229,17 @@ static void SrvCommRepportMotors( Int8U comm_type_motor, Int16U motor_speed )
 	{
 		//read motors
 		Char o_message[ ] = { '*', 0x00, '2', '+', '2', '+',
-							 (Int8U)(imu_reel.moteurs.frontMotor_R >> 8U),
-							 (Int8U)imu_reel.moteurs.frontMotor_R,
+							 (Int8U)(imu_reel.moteurs.front_right >> 8U),
+							 (Int8U)imu_reel.moteurs.front_right,
 							 '+',
-							 (Int8U)(imu_reel.moteurs.frontMotor_L >> 8U),
-							 (Int8U)imu_reel.moteurs.frontMotor_L,
+							 (Int8U)(imu_reel.moteurs.front_left >> 8U),
+							 (Int8U)imu_reel.moteurs.front_left,
 							 '+',
-							 (Int8U)(imu_reel.moteurs.rearMotor_R >> 8U),
-							 (Int8U)imu_reel.moteurs.rearMotor_R,
+							 (Int8U)(imu_reel.moteurs.rear_right >> 8U),
+							 (Int8U)imu_reel.moteurs.rear_right,
 							 '+',
-							 (Int8U)(imu_reel.moteurs.rearMotor_L >> 8U),
-							 (Int8U)imu_reel.moteurs.rearMotor_L,
+							 (Int8U)(imu_reel.moteurs.rear_left >> 8U),
+							 (Int8U)imu_reel.moteurs.rear_left,
 							 '+',
 							 (Int8U)(imu_reel.moteurs.throttle >> 8U),
 							 (Int8U)imu_reel.moteurs.throttle,
@@ -238,6 +247,135 @@ static void SrvCommRepportMotors( Int8U comm_type_motor, Int16U motor_speed )
 						 };
 		o_message[ 1U ] = sizeof(o_message);
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
+	}
+	else if( comm_type_motor == COMM_MOTOR_STARTUP_F_R_READ)	
+	{
+		Int16U startup = 0U;
+		//retourne la valeure startup du moteur
+		DrvEepromReadStartupMotorFrontRight( &startup);
+		Char o_message[ ] = { '*', 0x00, '2', '+', '3', '+',
+			(Int8U)(startup >> 8U),
+			(Int8U)startup,
+			'*'
+		};
+		o_message[ 1U ] = sizeof(o_message);
+		DrvUart0SendMessage( o_message , sizeof(o_message) );
+	}
+	else if( comm_type_motor == COMM_MOTOR_STARTUP_F_R_WRITE)
+	{
+		//write puissance
+		//controle validité data
+		if(
+		( motor_speed >= MOTOR_OFF_COMMAND ) &&
+		( motor_speed <= MOTOR_MAX_COMMAND )
+		)
+		{
+			DrvEepromWriteStartupMotorFrontRight( motor_speed );
+			Char o_message[ ] = { '*', 0x00, '2', '+', '4', '*'};
+			o_message[ 1U ] = sizeof(o_message);
+			DrvUart0SendMessage( o_message , sizeof(o_message) );
+		}
+		else
+		{
+			SrvCommRepportError();
+		}
+	}
+	else if( comm_type_motor == COMM_MOTOR_STARTUP_R_R_READ)
+	{
+		Int16U startup = 0U;
+		//retourne la valeure startup du moteur
+		DrvEepromReadStartupMotorRearRight( &startup );
+		Char o_message[ ] = { '*', 0x00, '2', '+', '5', '+',
+			(Int8U)(startup >> 8U),
+			(Int8U)startup,
+			'*'
+		};
+		o_message[ 1U ] = sizeof(o_message);
+		DrvUart0SendMessage( o_message , sizeof(o_message) );
+	}
+	else if( comm_type_motor == COMM_MOTOR_STARTUP_R_R_WRITE)
+	{
+		//write puissance
+		//controle validité data
+		if(
+		( motor_speed >= MOTOR_OFF_COMMAND ) &&
+		( motor_speed <= MOTOR_MAX_COMMAND )
+		)
+		{
+			DrvEepromWriteStartupMotorRearRight( motor_speed );
+			Char o_message[ ] = { '*', 0x00, '2', '+', '6', '*'};
+			o_message[ 1U ] = sizeof(o_message);
+			DrvUart0SendMessage( o_message , sizeof(o_message) );
+		}
+		else
+		{
+			SrvCommRepportError();
+		}
+	}
+	//*****************************
+	else if( comm_type_motor == COMM_MOTOR_STARTUP_F_L_READ)
+	{
+		Int16U startup = 0U;
+		//retourne la valeure startup du moteur
+		DrvEepromReadStartupMotorFrontLeft( &startup);
+		Char o_message[ ] = { '*', 0x00, '2', '+', '7', '+',
+			(Int8U)(startup >> 8U),
+			(Int8U)startup,
+			'*'
+		};
+		o_message[ 1U ] = sizeof(o_message);
+		DrvUart0SendMessage( o_message , sizeof(o_message) );
+	}
+	else if( comm_type_motor == COMM_MOTOR_STARTUP_F_L_WRITE)
+	{
+		//write puissance
+		//controle validité data
+		if(
+		( motor_speed >= MOTOR_OFF_COMMAND ) &&
+		( motor_speed <= MOTOR_MAX_COMMAND )
+		)
+		{
+			DrvEepromWriteStartupMotorFrontLeft( motor_speed );
+			Char o_message[ ] = { '*', 0x00, '2', '+', '8', '*'};
+			o_message[ 1U ] = sizeof(o_message);
+			DrvUart0SendMessage( o_message , sizeof(o_message) );
+		}
+		else
+		{
+			SrvCommRepportError();
+		}
+	}
+	else if( comm_type_motor == COMM_MOTOR_STARTUP_R_L_READ)
+	{
+		Int16U startup = 0U;
+		//retourne la valeure startup du moteur
+		DrvEepromReadStartupMotorRearLeft( &startup );
+		Char o_message[ ] = { '*', 0x00, '2', '+', '9', '+',
+			(Int8U)(startup >> 8U),
+			(Int8U)startup,
+			'*'
+		};
+		o_message[ 1U ] = sizeof(o_message);
+		DrvUart0SendMessage( o_message , sizeof(o_message) );
+	}
+	else if( comm_type_motor == COMM_MOTOR_STARTUP_R_L_WRITE)
+	{
+		//write puissance
+		//controle validité data
+		if(
+		( motor_speed >= MOTOR_OFF_COMMAND ) &&
+		( motor_speed <= MOTOR_MAX_COMMAND )
+		)
+		{
+			DrvEepromWriteStartupMotorRearLeft( motor_speed );
+			Char o_message[ ] = { '*', 0x00, '2', '+', '1', '0', '*'};
+			o_message[ 1U ] = sizeof(o_message);
+			DrvUart0SendMessage( o_message , sizeof(o_message) );
+		}
+		else
+		{
+			SrvCommRepportError();
+		}
 	}
 	else
 	{
@@ -476,14 +614,14 @@ static void SrvCommRepportData( void )
 				(Int8U)imu_reel.sensors.bar.altitude,
 				(Int8U)(imu_reel.moteurs.throttle >> 8U),
 				(Int8U)imu_reel.moteurs.throttle,
-				(Int8U)(imu_reel.moteurs.frontMotor_L >> 8U),
-				(Int8U)imu_reel.moteurs.frontMotor_L,
-				(Int8U)(imu_reel.moteurs.frontMotor_R >> 8U),
-				(Int8U)imu_reel.moteurs.frontMotor_R,
-				(Int8U)(imu_reel.moteurs.rearMotor_L >> 8U),
-				(Int8U)imu_reel.moteurs.rearMotor_L,
-				(Int8U)(imu_reel.moteurs.rearMotor_R >> 8U),
-				(Int8U)imu_reel.moteurs.rearMotor_R,
+				(Int8U)(imu_reel.moteurs.front_left >> 8U),
+				(Int8U)imu_reel.moteurs.front_left,
+				(Int8U)(imu_reel.moteurs.front_right >> 8U),
+				(Int8U)imu_reel.moteurs.front_right,
+				(Int8U)(imu_reel.moteurs.rear_left >> 8U),
+				(Int8U)imu_reel.moteurs.rear_left,
+				(Int8U)(imu_reel.moteurs.rear_right >> 8U),
+				(Int8U)imu_reel.moteurs.rear_right,
 				(Int8U)(imu_reel.sensors.bar.temperature >> 8U),
 				(Int8U)imu_reel.sensors.bar.temperature,
 				(Int8U)(((Int32U)imu_reel.sensors.bar.pressure) >> 24U),

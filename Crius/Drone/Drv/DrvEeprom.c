@@ -25,6 +25,10 @@
 #define ADDR_EEPROM_PID_ALT_I		( Int8U *)54U
 #define ADDR_EEPROM_PID_ALT_D		( Int8U *)58U
 #define ADDR_EEPROM_ALTITUDE		( Int8U *)62U
+#define ADDR_EEPROM_MOTOR_F_L		( Int8U *)64U
+#define ADDR_EEPROM_MOTOR_F_R		( Int8U *)66U
+#define ADDR_EEPROM_MOTOR_R_L		( Int8U *)68U
+#define ADDR_EEPROM_MOTOR_R_R		( Int8U *)70U
 
 
 #define VAL_EEPROM_CHECK_OK			0U
@@ -89,7 +93,7 @@ void DrvEepromConfigure ( void )
 //retourne l'etat de config de l'eeprom
 Boolean DrvEepromIsConfigured ( void )
 {
-	return eeprom_is_configured;
+	return FALSE;//eeprom_is_configured;
 }
 
 //retourne le numero de version
@@ -190,18 +194,65 @@ void DrvEepromWritePID (Int8U index,float P, float I, float D)
 
 
 //retourne les config du altitude
-void DrvEepromReadAltitude( Int16S *altitude)
+void DrvEepromReadAltitude( Int16S *altitude )
 {
 	*altitude = DrvEepromReadShort(ADDR_EEPROM_ALTITUDE);
 }
 
 //enregistre les config du altitude
-void DrvEepromWriteAltitude ( Int16U altitude)
+void DrvEepromWriteAltitude ( Int16S altitude )
 {
 	DrvEepromWriteShort(ADDR_EEPROM_ALTITUDE, altitude);
 }
 
+//retourne la valeure startup du moteur
+void DrvEepromReadStartupMotorFrontRight( Int16U *startup)
+{
+	*startup = DrvEepromReadShort(ADDR_EEPROM_MOTOR_F_R);
+}
 
+//retourne la valure startup du moteur
+void DrvEepromWriteStartupMotorFrontRight ( Int16U startup)
+{
+	DrvEepromWriteShort(ADDR_EEPROM_MOTOR_F_R, startup);
+}
+
+//retourne la valeure startup du moteur
+void DrvEepromReadStartupMotorFrontLeft( Int16U *startup)
+{
+	*startup = DrvEepromReadShort(ADDR_EEPROM_MOTOR_F_L);
+}
+
+//retourne la valure startup du moteur
+void DrvEepromWriteStartupMotorFrontLeft ( Int16U startup)
+{
+	DrvEepromWriteShort(ADDR_EEPROM_MOTOR_F_L, startup);
+}
+
+//retourne la valeure startup du moteur
+void DrvEepromReadStartupMotorRearRight( Int16U *startup)
+{
+	#define ADDR_EEPROM_MOTOR_R_L		( Int8U *)68U
+	*startup = DrvEepromReadShort(ADDR_EEPROM_MOTOR_R_R);
+}
+
+//retourne la valure startup du moteur
+void DrvEepromWriteStartupMotorRearRight ( Int16U startup)
+{
+	DrvEepromWriteShort(ADDR_EEPROM_MOTOR_R_R, startup);
+}
+
+//retourne la valeure startup du moteur
+void DrvEepromReadStartupMotorRearLeft( Int16U *startup)
+{
+	*startup = DrvEepromReadShort(ADDR_EEPROM_MOTOR_R_L);
+}
+
+//retourne la valure startup du moteur
+void DrvEepromWriteStartupMotorRearLeft ( Int16U startup)
+{
+	DrvEepromWriteShort(ADDR_EEPROM_MOTOR_R_L, startup);
+}
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 //Fonction de lecture eeprom
 static Int8U DrvEepromReadByte ( const Int8U * addr )

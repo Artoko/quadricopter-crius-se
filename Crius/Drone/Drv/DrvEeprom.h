@@ -56,7 +56,30 @@ void DrvEepromWritePID (Int8U index,float P, float I, float D);
 void DrvEepromReadAltitude( Int16S *altitude);
 
 //enregistre les config du altitude
-void DrvEepromWriteAltitude ( Int16U altitude);
+void DrvEepromWriteAltitude ( Int16S altitude);
 
+//retourne la valeure startup du moteur
+void DrvEepromReadStartupMotorFrontRight( Int16U *startup);
+
+//retourne la valure startup du moteur
+void DrvEepromWriteStartupMotorFrontRight ( Int16U startup);
+
+//retourne la valeure startup du moteur
+void DrvEepromReadStartupMotorFrontLeft( Int16U *startup);
+
+//retourne la valure startup du moteur
+void DrvEepromWriteStartupMotorFrontLeft ( Int16U startup);
+
+//retourne la valeure startup du moteur
+void DrvEepromReadStartupMotorRearRight( Int16U *startup);
+
+//retourne la valure startup du moteur
+void DrvEepromWriteStartupMotorRearRight ( Int16U startup);
+
+//retourne la valeure startup du moteur
+void DrvEepromReadStartupMotorRearLeft( Int16U *startup);
+
+//retourne la valure startup du moteur
+void DrvEepromWriteStartupMotorRearLeft ( Int16U startup);
 
 #endif /* DRV_EEPROM_H_ */

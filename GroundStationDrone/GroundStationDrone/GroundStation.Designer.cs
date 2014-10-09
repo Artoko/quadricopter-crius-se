@@ -369,11 +369,14 @@
             // 
             // panel1
             // 
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panel1.BackColor = System.Drawing.SystemColors.ControlDark;
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel1.Location = new System.Drawing.Point(84, 340);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(618, 104);
+            this.panel1.Size = new System.Drawing.Size(860, 104);
             this.panel1.TabIndex = 6;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
@@ -689,7 +692,6 @@
             this.Controls.Add(this.statusStripState);
             this.Controls.Add(this.menuStripParams);
             this.ForeColor = System.Drawing.SystemColors.Desktop;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.MaximizeBox = false;
             this.Name = "GroundStation";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;

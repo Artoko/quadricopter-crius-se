@@ -240,6 +240,7 @@ static void DrvTwiWaitTransmission( void )
 		timeout_i2c--;
 		if ( timeout_i2c == 0) 
 		{
+			LED_ROUGE_ON();
 			TWCR = 0;
 			break;
 		}

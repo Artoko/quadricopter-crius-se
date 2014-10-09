@@ -47,10 +47,14 @@
 #define LIS331DLH_OUT_Z_H					0x2D
 
 
-#define LIS331DLH_WHO_I_AM						0x32
-#define LIS331DLH_ACC_1G_2G						0xFFFF / 4
-#define LIS331DLH_ACC_1G_4G						0xFFFF / 8
-#define LIS331DLH_ACC_1G_8G						0xFFFF / 16
+#define LIS331DLH_CTRL_REG4_FS_1G_2G		0x00
+#define LIS331DLH_CTRL_REG4_FS_1G_4G		0x01
+#define LIS331DLH_CTRL_REG4_FS_1G_8G		0x11
+
+#define LIS331DLH_WHO_I_AM					0x32
+#define LIS331DLH_ACC_1G_2G					0xFFFF / 4
+#define LIS331DLH_ACC_1G_4G					0xFFFF / 8
+#define LIS331DLH_ACC_1G_8G					0xFFFF / 16
 
 
 ////////////////////////////////////////PUBLIC STRUCTURES/////////////////////////////////////////

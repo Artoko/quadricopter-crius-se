@@ -40,13 +40,16 @@ Boolean CmpL3G4200DInit(void)
 	DrvTwiReadReg(L3G4200D_ADDRESS, L3G4200D_WHO_AM_I, &datum );
 	if(L3G4200D_WHO_I_AM == datum)
 	{
-		DrvTwiWriteReg(L3G4200D_ADDRESS, L3G4200D_CTRL_REG1, L3G4200D_CTRL_REG1_DEFAULT);
+		DrvTwiWriteReg(L3G4200D_ADDRESS, L3G4200D_CTRL_REG1, L3G4200D_CTRL_REG1_PD	|
+															 L3G4200D_CTRL_REG1_ZEN	|
+															 L3G4200D_CTRL_REG1_YEN |
+															 L3G4200D_CTRL_REG1_XEN	);
 		DrvTimerDelayUs(200);
 		DrvTwiWriteReg(L3G4200D_ADDRESS, L3G4200D_CTRL_REG2, L3G4200D_CTRL_REG2_NO_HI_PASS);
 		DrvTimerDelayUs(200);
 		DrvTwiWriteReg(L3G4200D_ADDRESS, L3G4200D_CTRL_REG3, L3G4200D_CTRL_REG3_NO_INTERRUPT);
 		DrvTimerDelayUs(200);
-		DrvTwiWriteReg(L3G4200D_ADDRESS, L3G4200D_CTRL_REG4, L3G4200D_CTRL_REG4_DEFAULT);
+		DrvTwiWriteReg(L3G4200D_ADDRESS, L3G4200D_CTRL_REG4, L3G4200D_CTRL_REG4_FS_2000DPS | L3G4200D_CTRL_REG4_BDU_ENABLE);
 		DrvTimerDelayUs(200);
 		DrvTwiWriteReg(L3G4200D_ADDRESS, L3G4200D_CTRL_REG5, L3G4200D_CTRL_REG5_DISABLE_LPF2);
 		DrvTimerDelayUs(200);
@@ -82,26 +85,7 @@ Boolean CmpL3G4200DIsCalibrate(void)
 	return FALSE;
 }
 
-//Rotation X Y Z
-void CmpL3G4200DGetNoise(S_Gyr_Sensor *rot)
-{	
-	double noise=0;	
-	S_Gyr_Sensor rotation;
-	for(int n=0 ; n <NB_SAMPLE_TO_CALIB_L3G4200 ; n++)
-	{
-		CmpL3G4200DGetRotation(&rotation);
-		if((int)rotation.z - gyro_calib_l3g4200[2U] > noise)
-		{
-			noise=(int)rotation.z - gyro_calib_l3g4200[2U];
-		}
-		else if((int)rotation.z - gyro_calib_l3g4200[2U] < -noise)
-		{
-			noise=-(int)rotation.z - gyro_calib_l3g4200[2U];
-		}
-	}
-		
-	rot->noise = noise;
-}
+
 
 //Rotation X Y Z
 Boolean CmpL3G4200DGetRotation(S_Gyr_Sensor *rot)
@@ -147,14 +131,14 @@ Boolean CmpL3G4200DGetRotation(S_Gyr_Sensor *rot)
 			rot->z  -= gyro_calib_l3g4200[2U];
 			
 			//smooth gyro value
-			/*rot->x = (Int16S) ( ( (Int32S)((Int32S)gyro_smooth_value_l3g4200[0] * (GYRO_SMOOTHING_X - 1) ) + rot->x + 1 ) / GYRO_SMOOTHING_X);
+			rot->x = (Int16S) ( ( (Int32S)((Int32S)gyro_smooth_value_l3g4200[0] * (GYRO_SMOOTHING_X - 1) ) + rot->x + 1 ) / GYRO_SMOOTHING_X);
 			gyro_smooth_value_l3g4200[0] = rot->x;
 			
 			rot->y = (Int16S) ( ( (Int32S)((Int32S)gyro_smooth_value_l3g4200[1] * (GYRO_SMOOTHING_Y - 1) ) + rot->y + 1 ) / GYRO_SMOOTHING_Y);
 			gyro_smooth_value_l3g4200[1] = rot->y;
 			
 			rot->z = (Int16S) ( ( (Int32S)((Int32S)gyro_smooth_value_l3g4200[2] * (GYRO_SMOOTHING_Z - 1) ) + rot->z + 1 ) / GYRO_SMOOTHING_Z);
-			gyro_smooth_value_l3g4200[2] = rot->z;*/
+			gyro_smooth_value_l3g4200[2] = rot->z;
 		}
 		
 		return TRUE;
