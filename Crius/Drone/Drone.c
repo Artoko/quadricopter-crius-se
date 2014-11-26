@@ -11,8 +11,11 @@
 #include "Drv/DrvTick.h"
 #include "Drv/DrvTwi.h"
 #include "Drv/DrvUart.h"
+#include "Drv/DrvLed.h"
+#include "Drv/DrvButton.h"
 #include "Drv/DrvEvent.h"
 #include "Drv/DrvEeprom.h"
+#include "Drv/DrvTimer.h"
 #include "Drv/DrvInterrupt.h"
 
 #include "Srv/SrvKalman.h"
@@ -21,13 +24,14 @@
 #include "Srv/SrvStartEngine.h"
 #include "Srv/SrvPID.h"
 #include "Srv/SrvMotor.h"
-#include "Srv/SrvTimer.h"
-#include "Srv/SrvHeartbeat.h"
 #include "Srv/SrvSensors.h"
 
 #include "Cmps/CmpBMP085.h"
 
 
+////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
+//Fonction appelle lors d'une action sur le bouton
+void ActionButton (  EButtonState state  );
 
 ////////////////////////////////////////PRIVATE VARIABLES////////////////////////////////////////
 //event main
@@ -46,12 +50,7 @@ int main(void)
 	TCCR0B = 0U;
 	TCCR1B = 0U;
 	TCCR2B = 0U;
-	
-	// ********************* Led init *************************************************
-	CONFIGURE_LED_PIN();
-	LED_ON();
-	
-	DDRA	|=	(1 << PORTA4);
+		
 	
 	// ********************* General variables init ***********************************
 	imu_reel.angles.roulis		= 0;
@@ -69,45 +68,52 @@ int main(void)
 	imu_desire.maintient_altitude	= FALSE;
 	
 	// ********************* Drivers init *********************************************
+	DrvTimerInit();
+	DrvButtonInit();
+	DrvLedInit();
 	DrvEventInit();
 	DrvEepromInit();
 	DrvTickInit();
 	DrvUartInit( UART_0, UART_SPEED_115200 );
 	DrvTwiInit( TWI_SPEED_400K );
 	
+	// ********************* Led init *************************************************
+	DrvLedAddLed(E_LED_OK, EIO_PIN_B_1);
+	DrvLedAddLed(E_LED_WARNING, EIO_PIN_B_2);
+	DrvLedAddLed(E_LED_ERROR, EIO_PIN_B_3);
+	
+	DrvLedSetState(E_LED_OK, E_LED_ON);
+	DrvLedSetState(E_LED_WARNING, E_LED_OFF);
+	DrvLedSetState(E_LED_ERROR, E_LED_OFF);
+	
+	// ********************* Button ***************************************************
+	DrvButtonAddButton(E_BUTTON_SETUP, EIO_PIN_B_0, ActionButton);
+	
 	// ********************* Interrupt Enable *****************************************
 	DrvInterruptSetAllInterrupts();
 	
 	// ********************* Services init ********************************************
-	
 	SrvPIDInit();
 	SrvMotorInit(); 
-	//SrvHeartbeatInit();
-	SrvTimerInit();
 	SrvKalmanFilterInit();
 	SrvImuInit();
 	SrvCommInit();
 	SrvSensorsInit();
 	
 	//Wait 1 sec for sensors init
-	DrvTimerDelayMs(1000);
+	DrvTickDelayMs(1000);
 		
 	// ********************* Calibration sensors **************************************
+	DrvLedSetState(E_LED_WARNING, E_LED_ON);
 	SrvSensorsSensorsCalibration();
-	
-	//Wait 2 sec for sensors
-	DrvTimerDelayMs(1000);
-	
-	//stop Initialisation
-	LED_OFF();
+	DrvLedSetState(E_LED_WARNING, E_LED_OFF);
 	
 	// ********************* Reset time ***********************************************
-	SrvTimerTickReset();
-	
+	DrvLedSetBlinkMode(E_LED_OK,2,18);
+	DrvTimerTickReset();
 	
     while(TRUE)
-    {			
-		PORTA	^=	(1 << PORTA4);
+    {		
 		current_main_event = DrvEventGetEvent();	
 		// ********************* Read sensors *****************************************
 		SrvSensorsDispatcher(current_main_event);	//2.4ms
@@ -119,12 +125,15 @@ int main(void)
 		SrvMotorDispatcher(current_main_event);		//0.2ms
 		// ********************* Receive transmit data ********************************
 		SrvCommDispatcher(current_main_event);
-		// ********************* Still alive  *****************************************
-		//SrvHeartbeatDispatcher(current_main_event);
 	}	
 }
 
 
+//Fonction appelle lors d'une action sur le bouton
+void ActionButton ( EButtonState state )
+{
+	DrvLedSetToggle(E_LED_ERROR);
+}
 
 
 
