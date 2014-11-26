@@ -160,14 +160,14 @@ void SrvSensorsReadAccelerometerSensor( S_Acc_Angles *acc_angles, S_Acc_Sensor *
 {
 	Boolean acc_read_ok = FALSE;
 	
-	#if ( ACC_BMA180 == 1 )
+	#ifdef ACC_BMA180
 	acc_read_ok = CmpBMA180GetAcceleration( sensors );
 	sensors->x *= -1;
 	sensors->y *= -1;
 	sensors->z *= 1;
 	#endif
 
-	#if ( ACC_LIS331DLH == 1 )
+	#ifdef ACC_LIS331DLH 
 	acc_read_ok = CmpLIS331DLHGetAcceleration( sensors );
 	sensors->x *= -1;
 	sensors->y *= -1;
@@ -190,74 +190,66 @@ void SrvSensorsReadAccelerometerSensor( S_Acc_Angles *acc_angles, S_Acc_Sensor *
 /************************************************************************/
 /*Lecture Gyroscope                                                     */
 /************************************************************************/
-float previous_gyroRate_x = 0;
-float previous_gyroRate_y = 0;
-float previous_gyroRate_z = 0;
 void SrvSensorsReadGyroscopeSensor( S_Gyr_Angles *gyr_angles, S_Gyr_Sensor *sensors )
 {
+	#define NB_SAMPLES 10.0F
 	Boolean gyr_read_ok = FALSE;
-	float gyroRate = 0;
+	float gyroRate_x = 0;
+	float gyroRate_y = 0;
+	float gyroRate_z = 0;
 	
 	//variables de timming
-	static Int32U lastread_gyro = 0U;
+	Int32U lastread_gyro = 0U;
 	Int32U now = 0U;
-	// ********************* Calcul du temps de cycle *************************
-	now = DrvTimerGetTimeUs();
-	interval_gyro = (float)(now - lastread_gyro) / 1000000.0F;
-	lastread_gyro = now;
+	
+	for( int sample_gyro = 0U ; sample_gyro < NB_SAMPLES ; sample_gyro++ )
+	{		
+		// ********************* Calcul du temps de cycle *************************
+		now = DrvTickGetTimeUs();
+		interval_gyro = (float)(now - lastread_gyro) / 1000000.0F;
+		lastread_gyro = now;
 	
 
-	#if ( GYR_ITG3205 == 1 )
-	gyr_read_ok = CmpITG3205GetRotation( sensors );
-	sensors->x *= -1;
-	sensors->y *= 1;
-	sensors->z *= -1;
-	#endif
-
-	#if ( GYR_L3G4200D == 1 )
-	gyr_read_ok = CmpL3G4200DGetRotation( sensors );
-	sensors->x *= -1;
-	sensors->y *= 1;
-	sensors->z *= -1;
-	#endif
-
-
-	//GYR
-	if(gyr_read_ok != FALSE)
-	{
-		//roulis
-		//*************
-		#ifdef GYR_L3G4200D 
-		gyroRate = sensors->x * 0.07 ;
-		#endif
 		#ifdef GYR_ITG3205
-		gyroRate = sensors->x * 0.06956 ;
+		gyr_read_ok = CmpITG3205GetRotation( sensors );
+		sensors->x *= -1;
+		sensors->y *= 1;
+		sensors->z *= -1;
 		#endif
-		gyr_angles->roulis += ((float)(previous_gyroRate_x + gyroRate) * interval_gyro) / 2 ;
-		previous_gyroRate_x = gyroRate;
-	
-		//tangage
-		//*************
-		#ifdef GYR_L3G4200D 
-		gyroRate = sensors->y * 0.07 ;
+
+		#ifdef GYR_L3G4200D
+		gyr_read_ok = CmpL3G4200DGetRotation( sensors );
+		sensors->x *= -1;
+		sensors->y *= 1;
+		sensors->z *= -1;
 		#endif
-		#ifdef GYR_ITG3205
-		gyroRate = sensors->y * 0.06956 ;
-		#endif
-		gyr_angles->tangage += ((float)(previous_gyroRate_y + gyroRate) * interval_gyro) / 2;
-		previous_gyroRate_y = gyroRate;
-	
-		//lacet
-		//*************
-		#ifdef GYR_L3G4200D 
-		gyroRate = sensors->z * 0.07 ;
-		#endif
-		#ifdef GYR_ITG3205
-		gyroRate = sensors->z * 0.06956 ;
-		#endif
-		gyr_angles->lacet += ((float)(previous_gyroRate_z + gyroRate) * interval_gyro) / 2;
-		previous_gyroRate_z = gyroRate;
+		
+
+		//GYR
+		if(gyr_read_ok != FALSE)
+		{
+			//scaled
+			//*************
+			#ifdef GYR_L3G4200D 
+			gyroRate_x = sensors->x * 0.07 ;
+			gyroRate_y = sensors->y * 0.07 ;
+			gyroRate_z = sensors->z * 0.07 ;
+			#endif
+			#ifdef GYR_ITG3205
+			gyroRate_x = sensors->x * 0.06956 ;
+			gyroRate_y = sensors->y * 0.06956 ;
+			gyroRate_z = sensors->z * 0.06956 ;
+			#endif
+			
+			gyr_angles->roulis	+= (float)( gyroRate_x * interval_gyro);
+			gyr_angles->tangage += (float)( gyroRate_y * interval_gyro);
+			gyr_angles->lacet	+= (float)( gyroRate_z * interval_gyro);
+		}
 	}
+	gyr_angles->roulis		/= NB_SAMPLES;
+	gyr_angles->tangage		/= NB_SAMPLES;
+	gyr_angles->lacet		/= NB_SAMPLES;
+	
 }
 
 /************************************************************************/
@@ -267,7 +259,7 @@ void SrvSensorsReadMagnetometerSensor( S_angles *angles, S_Mag_Sensor *sensors )
 {
 	Boolean mag_read_ok = FALSE;
 		
-	#if ( MAG_HMC5883 == 1 )
+	#ifdef MAG_HMC5883
 	mag_read_ok = CmpHMC5883GetHeading( sensors );	
 
 	sensors->x *= -1;

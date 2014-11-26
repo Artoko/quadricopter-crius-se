@@ -31,38 +31,42 @@
 #define QUADX
 //#define BI
 
-#if defined( DAISY_7 )
-	#define ACC_LIS331DLH	1
-	#define GYR_L3G4200D	1
-	#define MAG_HMC5883		1
-	#define BAR_BMP085		1
-#elif defined( CRIUS )
-	#define ACC_BMA180		1
-	#define GYR_ITG3205		1
-	#define MAG_HMC5883		1
-	#define BAR_BMP085		1
+#ifdef DAISY_7 
+	#define ACC_LIS331DLH	
+	#define GYR_L3G4200D	
+	#define MAG_HMC5883		
+	#define BAR_BMP085		
+#else
+#ifdef CRIUS 
+	#define ACC_BMA180		
+	#define GYR_ITG3205		
+	#define MAG_HMC5883		
+	#define BAR_BMP085		
+#endif
 #endif
 
 //-----------------------------------------------------------------------------------------------//
 
 /////////////////////////////////////PUBLIC LED MANAGMENT///////////////////////////////////////////
-#define LED_VERTE_PIN				PORTB1
-#define LED_VERTE_ON()				(PORTB	|=	(1 << LED_VERTE_PIN))
-#define LED_VERTE_OFF()				(PORTB	&=~	(1 << LED_VERTE_PIN))
-#define LED_VERTE_TOGGLE()			(PORTB	^=	(1 << LED_VERTE_PIN))
-#define CONFIGURE_VERTE_LED_PIN()	(DDRB	|=	(1 << LED_VERTE_PIN))
+typedef enum
+{
+	E_LED_OK,
+	E_LED_WARNING,
+	E_LED_ERROR,
+	//----------------- Alaways at end -----------------------
+	E_NB_LED,
+	E_LED_NONE
+}ELed;
 
-#define LED_ORANGE_PIN				PORTB2
-#define LED_ORANGE_ON()				(PORTB	|=	(1 << LED_ORANGE_PIN))
-#define LED_ORANGE_OFF()				(PORTB	&=~	(1 << LED_ORANGE_PIN))
-#define LED_ORANGE_TOGGLE()			(PORTB	^=	(1 << LED_ORANGE_PIN))
-#define CONFIGURE_ORANGE_LED_PIN()	(DDRB	|=	(1 << LED_ORANGE_PIN))
+/////////////////////////////////////PUBLIC BOUTON MANAGMENT///////////////////////////////////////////
+typedef enum
+{
+	E_BUTTON_SETUP,
+	//----------------- Alaways at end -----------------------
+	E_NB_BUTTON,
+	E_BUTTON_NONE
+}EButton;
 
-#define LED_ROUGE_PIN				PORTB3
-#define LED_ROUGE_ON()				(PORTB	|=	(1 << LED_ROUGE_PIN))
-#define LED_ROUGE_OFF()				(PORTB	&=~	(1 << LED_ROUGE_PIN))
-#define LED_ROUGE_TOGGLE()			(PORTB	^=	(1 << LED_ROUGE_PIN))
-#define CONFIGURE_ROUGE_LED_PIN()	(DDRB	|=	(1 << LED_ROUGE_PIN))
 ////////////////////////////////////////PUBLIC FREQUENCE OSC///////////////////////////////////////
 #define		CONF_FOSC_MHZ				16UL
 #define		CONF_FOSC_HZ				CONF_FOSC_MHZ * 1000000UL
@@ -70,9 +74,15 @@
 
 
 ////////////////////////////////////////////PUBLIC TIMER///////////////////////////////////////////
-#define		CONF_TIMER_HEARTBEAT			0U
-#define		CONF_TIMER_BMP085				1U
-#define		CONF_TIMER_NB					2U
+typedef enum
+{
+	E_TIMER_BUTTON,
+	E_TIMER_LED,
+	//----------------- Alaways at end -----------------------
+	E_NB_TIMER,
+	E_TIMER_NONE
+}ETimer;
+
 
 ////////////////////////////////////////////PUBLIC EVENT///////////////////////////////////////////
 #define		CONF_EVENT_TIMER_5MS		( 1U << 0U )
@@ -84,6 +94,7 @@
 #define		CONF_EVENT_TIMER_500MS		( 1U << 6U )
 #define		CONF_EVENT_TIMER_1S			( 1U << 7U )
 #define		CONF_EVENT_MSG_RCV			( 1U << 8U )
+#define		CONF_EVENT_BUTTON			( 1U << 9U )
 
 ////////////////////////////////////PUBLIC SERVOS PORTS///////////////////////////////////////////
 #if defined( DAISY_7 )

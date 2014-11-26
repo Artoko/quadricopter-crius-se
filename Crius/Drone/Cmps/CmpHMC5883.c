@@ -35,7 +35,7 @@ Boolean CmpHMC5883Init(void)
 	Boolean o_success = FALSE;
 	calibration_hmc5883_done = FALSE;
 	DrvTwiWriteReg(HMC5883_ADDRESS,HMC5883_MODE,HMC5883_CONTINUOUS);
-	DrvTimerDelayMs(5);
+	DrvTickDelayMs(5);
 	o_success = TRUE;
 	return o_success;
 }
@@ -46,13 +46,13 @@ Boolean CmpHMC5883Calibrate(void)
 	{
 		S_Mag_Sensor magnetometer;
 		DrvTwiWriteReg(HMC5883_ADDRESS, 0x00, 0x11);
-		DrvTimerDelayMs(100); // Wait for sensor to get ready
+		DrvTickDelayMs(100); // Wait for sensor to get ready
 		CmpHMC5883GetHeading(&magnetometer); // Read positive bias values
 
 		int16_t magPosOff[3] = { magnetometer.x, magnetometer.y, magnetometer.z };
 
 		DrvTwiWriteReg(HMC5883_ADDRESS, 0x00, 0x12);
-		DrvTimerDelayMs(100); // Wait for sensor to get ready
+		DrvTickDelayMs(100); // Wait for sensor to get ready
 		CmpHMC5883GetHeading(&magnetometer); // Read negative bias values
 
 		int16_t magNegOff[3] = { magnetometer.x, magnetometer.y, magnetometer.z };

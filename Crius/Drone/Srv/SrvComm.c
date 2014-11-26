@@ -182,7 +182,7 @@ static void SrvCommRepportGeneral( Int8U comm_type_general )
 		o_message[ 1U ] = sizeof(o_message);
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 		//wait for reset
-		DrvTimerDelayMs(10);
+		DrvTickDelayMs(10);
 		RESET_SOFT();
 	}
 	else if( comm_type_general == COMM_GENERAL_FULL_RESET)
@@ -193,7 +193,7 @@ static void SrvCommRepportGeneral( Int8U comm_type_general )
 		o_message[ 1U ] = sizeof(o_message);
 		DrvUart0SendMessage( o_message , sizeof(o_message) );
 		//wait for reset
-		DrvTimerDelayMs(10);
+		DrvTickDelayMs(10);
 		RESET_SOFT();
 	}
 	else

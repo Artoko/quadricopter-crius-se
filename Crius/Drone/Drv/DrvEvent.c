@@ -63,7 +63,3 @@ inline Boolean DrvEventAddEvent(Event_t in_event)
 	
 	return TRUE;
 }
-
-
-
-

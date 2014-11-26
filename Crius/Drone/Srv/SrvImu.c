@@ -49,7 +49,7 @@ void SrvImuDispatcher (Event_t in_event)
 	float interval_ekf = 0.0F;
 	
 	// ********************* Calcul du temps de cycle *************************
-	now = DrvTimerGetTimeUs();
+	now = DrvTickGetTimeUs();
 	interval_ekf = (float)(now - lastread_ekf) / 1000000.0F;
 	lastread_ekf = now;
 	

@@ -35,7 +35,7 @@
       <ToolOptions>
         <InterfaceName>JTAG</InterfaceName>
         <InterfaceProperties>
-          <JtagDbgClock>749210</JtagDbgClock>
+          <JtagDbgClock>200000</JtagDbgClock>
           <JtagProgClock>1000000</JtagProgClock>
           <IspClock>250000</IspClock>
           <JtagInChain>false</JtagInChain>
@@ -247,6 +247,12 @@
     <Compile Include="Conf\conf_hard.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Drv\DrvButton.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drv\DrvButton.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Drv\DrvEeprom.c">
       <SubType>compile</SubType>
     </Compile>
@@ -262,6 +268,18 @@
     <Compile Include="Drv\DrvInterrupt.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Drv\DrvIo.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drv\DrvIo.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drv\DrvLed.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drv\DrvLed.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Drv\DrvServo.c">
       <SubType>compile</SubType>
     </Compile>
@@ -272,6 +290,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Drv\DrvTick.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drv\DrvTimer.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drv\DrvTimer.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Drv\DrvTwi.c">
@@ -293,12 +317,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Srv\SrvComm.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Srv\SrvHeartbeat.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Srv\SrvHeartbeat.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Srv\SrvImu.c">
@@ -329,12 +347,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Srv\SrvSensors.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Srv\SrvTimer.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Srv\SrvTimer.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Tools\tools_typedefs.h">

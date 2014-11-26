@@ -19,13 +19,13 @@ void DrvTickInit(void);
 void DrvTickReset(void);
 
 //get the tick counter
-Int32U DrvTimerGetTimeUs(void);
+Int32U DrvTickGetTimeUs(void);
 
 //wait for delay
-void DrvTimerDelayUs( Int16U delay_us );
-void DrvTimerDelayMs( Int16U delay_ms );
+void DrvTickDelayUs( Int16U delay_us );
+void DrvTickDelayMs( Int16U delay_ms );
 
 //get time interval
-Int32U DrvTimerGetInterval( Int32U *last_interval );
+Int32U DrvTickGetInterval( Int32U *last_interval );
 
 #endif /* DRVTICK_H_ */

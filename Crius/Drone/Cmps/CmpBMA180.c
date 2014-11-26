@@ -32,34 +32,34 @@ Boolean CmpBMA180Init(void)
 	DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_CHIP_ID, &datum );
 	if(BMA180_CHIP_ID == datum)
 	{
-		DrvTimerDelayUs(200);
+		DrvTickDelayUs(200);
 		//Write on EEPROM enable
 		DrvTwiWriteReg(BMA180_ADDRESS,BMA180_REG_CTRL_REG0, 1U<<4U );
-		DrvTimerDelayUs(200);
+		DrvTickDelayUs(200);
 		
 		//Bandwidth filters: 10Hz
 		DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_BW_TCS, &datum );
-		DrvTimerDelayUs(200);
+		DrvTickDelayUs(200);
 		datum = datum & 0x0F;        
 		datum = datum | (0x00 << 4); 
 		DrvTwiWriteReg(BMA180_ADDRESS, BMA180_REG_BW_TCS, datum);
-		DrvTimerDelayUs(200);
+		DrvTickDelayUs(200);
 		
 		//Mode: Low-Noise
 		DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_TC0_Z, &datum );
-		DrvTimerDelayUs(200);
+		DrvTickDelayUs(200);
 		datum = datum & 0xFC;
 		datum = datum | 0x00; 
 		DrvTwiWriteReg(BMA180_ADDRESS, BMA180_REG_TC0_Z, datum);
-		DrvTimerDelayUs(200);
+		DrvTickDelayUs(200);
 		
 		//Range: +-8G
 		DrvTwiReadReg(BMA180_ADDRESS, BMA180_REG_OFFSET_LSB1, &datum );
-		DrvTimerDelayUs(200);
+		DrvTickDelayUs(200);
 		datum = datum & 0xF1;
 		datum = datum | (0x05 << 1); 
 		DrvTwiWriteReg(BMA180_ADDRESS, BMA180_REG_OFFSET_LSB1, datum);
-		DrvTimerDelayUs(200);
+		DrvTickDelayUs(200);
 		
 		//Calibration du capteur
 		//si l'eeprom est configué
