@@ -247,6 +247,9 @@
     <Compile Include="Conf\conf_hard.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Drone.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Drv\DrvButton.c">
       <SubType>compile</SubType>
     </Compile>
@@ -308,9 +311,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Drv\DrvUart.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Srv\Drone.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Srv\SrvComm.c">
