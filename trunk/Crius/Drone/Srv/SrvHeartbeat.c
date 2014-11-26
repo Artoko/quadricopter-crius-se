@@ -5,7 +5,7 @@
 *  Author: berryer
 */
 
-#include "SrvTimer.h"
+#include "Drv/DrvTimer.h"
 #include "SrvHeartbeat.h"
 
 
@@ -38,7 +38,7 @@ void SrvHeartbeatInit( void )
 	heartbeat_state = HEARTBEAT_STATE_OFF;
 	
 	//init de la callback
-	SrvTimerAddTimer(CONF_TIMER_HEARTBEAT, HEARTBEAT_LIMIT, E_TIMER_MODE_PERIODIC, HeartbeatIsrCallbackTimer);
+	DrvTimerAddTimer(CONF_TIMER_HEARTBEAT, HEARTBEAT_LIMIT, E_TIMER_MODE_PERIODIC, HeartbeatIsrCallbackTimer);
 }
 
 //dispatcher d'evenements
@@ -75,12 +75,12 @@ void HeartbeatIsrCallbackTimer( void)
 	{
 		LED_VERTE_ON();
 		heartbeat_state = HEARTBEAT_STATE_ON;
-		SrvTimerDelayTimer( CONF_TIMER_HEARTBEAT, heartbeat_delay );
+		DrvTimerDelayTimer( CONF_TIMER_HEARTBEAT, heartbeat_delay );
 	}
 	else
 	{
 		LED_VERTE_OFF();
 		heartbeat_state = HEARTBEAT_STATE_OFF;
-		SrvTimerDelayTimer( CONF_TIMER_HEARTBEAT, HEARTBEAT_LIMIT - heartbeat_delay );
+		DrvTimerDelayTimer( CONF_TIMER_HEARTBEAT, HEARTBEAT_LIMIT - heartbeat_delay );
 	}
 }

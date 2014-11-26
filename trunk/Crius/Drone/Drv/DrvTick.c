@@ -33,7 +33,7 @@ void DrvTickInit(void)
 }
 
 //get the tick counter
-Int32U DrvTimerGetTimeUs(void)
+Int32U DrvTickGetTimeUs(void)
 {
 	Int8U tcnt = 0;
 	ATOMIC
@@ -43,37 +43,37 @@ Int32U DrvTimerGetTimeUs(void)
 	return (Int32U)((drv_timer_tick_counter * TIMER0_OVF) + (tcnt * TIMER0_TICK));
 }
 
-void DrvTimerDelayMs( Int16U delay_ms )
+void DrvTickDelayMs( Int16U delay_ms )
 {
 	Int32U time_test = 0UL;
-	drv_timer_start_delay = DrvTimerGetTimeUs() ;
+	drv_timer_start_delay = DrvTickGetTimeUs() ;
 	time_test = (Int32U)((Int32U)drv_timer_start_delay + (Int32U)((Int32U)delay_ms * 1000UL));
 	do 
 	{
-		if(DrvTimerGetTimeUs() > time_test)
+		if(DrvTickGetTimeUs() > time_test)
 		{
 			break;
 		}
 	} while (TRUE);
 }
 
-void DrvTimerDelayUs( Int16U delay_us )
+void DrvTickDelayUs( Int16U delay_us )
 {
 	Int32U time_test = 0UL;
-	drv_timer_start_delay = DrvTimerGetTimeUs() ;
+	drv_timer_start_delay = DrvTickGetTimeUs() ;
 	time_test = (Int32U)(drv_timer_start_delay + (Int32U)delay_us);
 	do 
 	{
-		if(DrvTimerGetTimeUs() > time_test)
+		if(DrvTickGetTimeUs() > time_test)
 		{
 			break;
 		}
 	} while (TRUE);
 }
 
-Int32U DrvTimerGetInterval( Int32U *last_interval )
+Int32U DrvTickGetInterval( Int32U *last_interval )
 {
-	Int32U now = DrvTimerGetTimeUs();
+	Int32U now = DrvTickGetTimeUs();
 	Int32U interval = now - last_interval[ 0U ];
 	last_interval[ 0U ] = now;
 	return interval;

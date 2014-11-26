@@ -64,7 +64,7 @@ void SrvPIDDispatcher (Event_t in_event)
 	float interval_pid = 0.0F;
 	
 	// ********************* Calcul du temps de cycle *************************
-	now = DrvTimerGetTimeUs();
+	now = DrvTickGetTimeUs();
 	interval_pid = (float)(now - lastread_pid) / 1000000.0F;
 	lastread_pid = now;
 	

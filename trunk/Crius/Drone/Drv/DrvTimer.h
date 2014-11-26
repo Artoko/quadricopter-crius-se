@@ -1,12 +1,12 @@
 /*
- * SrvTimer.h
+ * DrvTimer.h
  *
  * Created: 06/07/2012 16:35:15
  *  Author: berryer
  */ 
 
-#ifndef SRVTIMER_H_
-#define SRVTIMER_H_
+#ifndef DrvTIMER_H_
+#define DrvTIMER_H_
 
 #include "Conf/conf_hard.h"
 #include "Tools/tools_typedefs.h"
@@ -29,24 +29,24 @@ typedef enum
 
 
 /////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
-// Init du Srv Timer 
-void SrvTimerInit( void ) ;
+// Init du Drv Timer 
+void DrvTimerInit( void ) ;
 
 //fct qui parametre le timer
-void SrvTimerAddTimer( Int8U index_timer, Int16U delay_ms, ETimerMode mode, ptrfct_Isr_Callback_Timer ptrfct ) ;
+void DrvTimerAddTimer( Int8U index_timer, Int16U delay_ms, ETimerMode mode, ptrfct_Isr_Callback_Timer ptrfct ) ;
 
 //fct qui met en pause le timer
-void SrvTimerPauseTimer( Int8U index_timer ) ;
+void DrvTimerPauseTimer( Int8U index_timer ) ;
 
 //fct qui remet a zero les parametres du timer
-void SrvTimerStopTimer( Int8U index_timer ) ;
+void DrvTimerStopTimer( Int8U index_timer ) ;
 
 //fct qui reseter le timer
-void SrvTimerResetTimer( Int8U index_timer ) ;
+void DrvTimerResetTimer( Int8U index_timer ) ;
 
 //fct qui fixe un delay au timer
-void SrvTimerDelayTimer( Int8U index_timer , Int16U delay) ;
+void DrvTimerDelayTimer( Int8U index_timer , Int16U delay) ;
 
 //on reset tt les timers
-void SrvTimerTickReset(void) ;
-#endif /* SRVTIMER_H_ */
+void DrvTimerTickReset(void) ;
+#endif /* DrvTIMER_H_ */

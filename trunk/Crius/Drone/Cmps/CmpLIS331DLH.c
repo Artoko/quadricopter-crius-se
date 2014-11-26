@@ -34,7 +34,7 @@ Boolean CmpLIS331DLHInit(void)
 	DrvTwiReadReg(LIS331DLH_ADDRESS, LIS331DLH_WHO_AM_I, &datum );
 	if(LIS331DLH_WHO_I_AM == datum)
 	{
-		DrvTimerDelayUs(200);
+		DrvTickDelayUs(200);
 		//400Hz
 		//Normal Mode
 		//Enable XYZ
@@ -44,7 +44,7 @@ Boolean CmpLIS331DLHInit(void)
 																	LIS331DLH_CTRL_REG1_YEN |
 																	LIS331DLH_CTRL_REG1_XEN 
 																	);
-		DrvTimerDelayUs(200);
+		DrvTickDelayUs(200);
 		DrvTwiWriteReg(LIS331DLH_ADDRESS,LIS331DLH_CTRL_REG4,	LIS331DLH_CTRL_REG4_BDU |
 																LIS331DLH_CTRL_REG4_FS_1G_2G |
 																LIS331DLH_CTRL_REG4_BLE);

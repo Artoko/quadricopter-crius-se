@@ -44,15 +44,15 @@ Boolean CmpL3G4200DInit(void)
 															 L3G4200D_CTRL_REG1_ZEN	|
 															 L3G4200D_CTRL_REG1_YEN |
 															 L3G4200D_CTRL_REG1_XEN	);
-		DrvTimerDelayUs(200);
+		DrvTickDelayUs(200);
 		DrvTwiWriteReg(L3G4200D_ADDRESS, L3G4200D_CTRL_REG2, L3G4200D_CTRL_REG2_NO_HI_PASS);
-		DrvTimerDelayUs(200);
+		DrvTickDelayUs(200);
 		DrvTwiWriteReg(L3G4200D_ADDRESS, L3G4200D_CTRL_REG3, L3G4200D_CTRL_REG3_NO_INTERRUPT);
-		DrvTimerDelayUs(200);
+		DrvTickDelayUs(200);
 		DrvTwiWriteReg(L3G4200D_ADDRESS, L3G4200D_CTRL_REG4, L3G4200D_CTRL_REG4_FS_2000DPS | L3G4200D_CTRL_REG4_BDU_ENABLE);
-		DrvTimerDelayUs(200);
+		DrvTickDelayUs(200);
 		DrvTwiWriteReg(L3G4200D_ADDRESS, L3G4200D_CTRL_REG5, L3G4200D_CTRL_REG5_DISABLE_LPF2);
-		DrvTimerDelayUs(200);
+		DrvTickDelayUs(200);
 		
 		//Calibration du capteur
 		//si l'eeprom est configué

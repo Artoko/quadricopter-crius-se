@@ -7,6 +7,7 @@
 #include "Conf/conf_hard.h"
 #include "util\twi.h"
 #include "DrvTwi.h"
+#include "DrvLed.h"
 
 ////////////////////////////////////////PRIVATE STRUCTURES/////////////////////////////////////////
 
@@ -240,7 +241,7 @@ static void DrvTwiWaitTransmission( void )
 		timeout_i2c--;
 		if ( timeout_i2c == 0) 
 		{
-			LED_ROUGE_ON();
+			DrvLedSetState(E_LED_ERROR, E_LED_ON);
 			TWCR = 0;
 			break;
 		}
