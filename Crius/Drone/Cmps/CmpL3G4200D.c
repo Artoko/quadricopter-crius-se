@@ -131,14 +131,14 @@ Boolean CmpL3G4200DGetRotation(S_Gyr_Sensor *rot)
 			rot->z  -= gyro_calib_l3g4200[2U];
 			
 			//smooth gyro value
-			rot->x = (Int16S) ( ( (Int32S)((Int32S)gyro_smooth_value_l3g4200[0] * (GYRO_SMOOTHING_X - 1) ) + rot->x + 1 ) / GYRO_SMOOTHING_X);
+			/*rot->x = (Int16S) ( ( (Int32S)((Int32S)gyro_smooth_value_l3g4200[0] * (GYRO_SMOOTHING_X - 1) ) + rot->x + 1 ) / GYRO_SMOOTHING_X);
 			gyro_smooth_value_l3g4200[0] = rot->x;
 			
 			rot->y = (Int16S) ( ( (Int32S)((Int32S)gyro_smooth_value_l3g4200[1] * (GYRO_SMOOTHING_Y - 1) ) + rot->y + 1 ) / GYRO_SMOOTHING_Y);
 			gyro_smooth_value_l3g4200[1] = rot->y;
 			
 			rot->z = (Int16S) ( ( (Int32S)((Int32S)gyro_smooth_value_l3g4200[2] * (GYRO_SMOOTHING_Z - 1) ) + rot->z + 1 ) / GYRO_SMOOTHING_Z);
-			gyro_smooth_value_l3g4200[2] = rot->z;
+			gyro_smooth_value_l3g4200[2] = rot->z;*/
 		}
 		
 		return TRUE;

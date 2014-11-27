@@ -84,9 +84,13 @@ Boolean CmpHMC5883GetHeading(S_Mag_Sensor *mag)
 		
 		if( calibration_hmc5883_done == TRUE )
 		{
-			mag->x *= mag_calib_hmc5883_gain[0];
-			mag->y *= mag_calib_hmc5883_gain[1];
-			mag->z *= mag_calib_hmc5883_gain[2];
+			mag->x *= HMC5883_1_3GA_SCALE;
+			mag->y *= HMC5883_1_3GA_SCALE;
+			mag->z *= HMC5883_1_3GA_SCALE;
+			
+			//mag->x *= mag_calib_hmc5883_gain[0];
+			//mag->y *= mag_calib_hmc5883_gain[1];
+			//mag->z *= mag_calib_hmc5883_gain[2];
 
 			mag->x -= mag_calib_hmc5883_offset[0];
 			mag->y -= mag_calib_hmc5883_offset[1];

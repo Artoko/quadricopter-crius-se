@@ -80,6 +80,7 @@ void DrvUartInit( Int8U index_uart, Int32U baud_rate )
 Boolean DrvUart0ReadBuffer( Int8U *trame ,Int8U *lenght )
 {
 	Boolean o_success = FALSE;
+	static Int8U error_frame = 0U;
 	//commence par une '*'
 	if(buff_uart_0[ 0U ] == '*') 
 	{
@@ -99,6 +100,18 @@ Boolean DrvUart0ReadBuffer( Int8U *trame ,Int8U *lenght )
 				ctr_buff_uart_0 = 0U;
 				o_success = TRUE;
 			}
+		}
+		else
+		{
+			//si ca fait 2 fois qu'on arrive pas a decoder alors on arrete
+			/*if(error_frame++ == 1)
+			{
+				error_frame = 0;
+				ctr_buff_uart_0 = 0U;
+				buff_uart_0[ 0U ] = 0U;
+				buff_uart_0[ buff_uart_0[ 1U ] - 1U ] = 0U;
+				lenght[ 0U ] = 0U;
+			}*/
 		}
 	}
 	else
@@ -143,7 +156,6 @@ void DrvUart0SendMessage( Char *i_message, Int8U i_message_len )
 //on recupere le message
 void DrvUart0SendDirectMessage( Char *i_message, Int8U i_message_len )
 {
-	
 	//UCSR0B &= ~(1<<TXCIE0);	//disable TX interrupt
 	//on enregistre le message
 	for ( Int8U loop_send = 0U ; loop_send < i_message_len ; loop_send++)

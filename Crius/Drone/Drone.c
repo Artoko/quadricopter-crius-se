@@ -36,6 +36,8 @@ void ActionButton (  EButtonState state  );
 ////////////////////////////////////////PRIVATE VARIABLES////////////////////////////////////////
 //event main
 volatile Event_t current_main_event = 0;
+//variables de timming
+Int32U last_loop_time = 0U;
 
 S_imu_desiree imu_desire;
 S_imu imu_reel;
@@ -114,6 +116,10 @@ int main(void)
 	
     while(TRUE)
     {		
+		// ********************* Calcul du temps de cycle *****************************
+		imu_reel.loop_time = DrvTickGetTimeUs() - last_loop_time;
+		last_loop_time = DrvTickGetTimeUs();
+		
 		current_main_event = DrvEventGetEvent();	
 		// ********************* Read sensors *****************************************
 		SrvSensorsDispatcher(current_main_event);	//2.4ms

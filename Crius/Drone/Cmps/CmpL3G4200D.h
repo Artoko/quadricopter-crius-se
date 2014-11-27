@@ -64,7 +64,7 @@
 
 #define L3G4200D_CTRL_REG2_NO_HI_PASS		0x00
 #define L3G4200D_CTRL_REG3_NO_INTERRUPT		0x00
-#define L3G4200D_CTRL_REG5_DISABLE_LPF2		0x00
+#define L3G4200D_CTRL_REG5_DISABLE_LPF2		0x80
 #define L3G4200D_CTRL_REG5_ENABLE_LPF2		0x02
 
 ////////////////////////////////////////PUBLIC STRUCTURES////////////////////////////////////////
