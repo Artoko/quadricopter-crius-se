@@ -89,6 +89,7 @@
             this.heading_indicator = new GroundStationDrone.HeadingIndicatorInstrumentControl();
             this.horizon_indicator = new GroundStationDrone.AttitudeIndicatorInstrumentControl();
             this.air_speed_indicator = new GroundStationDrone.AirSpeedIndicatorInstrumentControl();
+            this.labelLoop = new System.Windows.Forms.Label();
             this.statusStripState.SuspendLayout();
             this.menuStripParams.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSpeed)).BeginInit();
@@ -118,7 +119,7 @@
             this.toolStripStatusLabelTemperature,
             this.toolStripSeparator5,
             this.toolStripStatusLabelPresssion});
-            this.statusStripState.Location = new System.Drawing.Point(0, 463);
+            this.statusStripState.Location = new System.Drawing.Point(0, 491);
             this.statusStripState.Name = "statusStripState";
             this.statusStripState.Size = new System.Drawing.Size(967, 23);
             this.statusStripState.SizingGrip = false;
@@ -376,7 +377,7 @@
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel1.Location = new System.Drawing.Point(84, 340);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(860, 104);
+            this.panel1.Size = new System.Drawing.Size(860, 132);
             this.panel1.TabIndex = 6;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
@@ -655,12 +656,24 @@
             this.air_speed_indicator.TabIndex = 7;
             this.air_speed_indicator.Text = "airSpeedIndicatorInstrumentControl1";
             // 
+            // labelLoop
+            // 
+            this.labelLoop.AutoSize = true;
+            this.labelLoop.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.labelLoop.Location = new System.Drawing.Point(12, 450);
+            this.labelLoop.Name = "labelLoop";
+            this.labelLoop.Size = new System.Drawing.Size(53, 13);
+            this.labelLoop.TabIndex = 33;
+            this.labelLoop.Text = "Loop time";
+            this.labelLoop.Click += new System.EventHandler(this.labelLoop_Click);
+            // 
             // GroundStation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GrayText;
-            this.ClientSize = new System.Drawing.Size(967, 486);
+            this.ClientSize = new System.Drawing.Size(967, 514);
+            this.Controls.Add(this.labelLoop);
             this.Controls.Add(this.labelLacet);
             this.Controls.Add(this.labelTangage);
             this.Controls.Add(this.labelRoulis);
@@ -781,6 +794,7 @@
         private System.Windows.Forms.Label labelRoulis;
         private System.Windows.Forms.Label labelTangage;
         private System.Windows.Forms.Label labelLacet;
+        private System.Windows.Forms.Label labelLoop;
 
     }
 }

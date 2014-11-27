@@ -261,6 +261,7 @@ typedef struct SS_imu
 	S_angles		angles;
 	S_moteur		moteurs;
 	S_pid			pid_error;
+	Int32U			loop_time;
 }S_imu;
 
 //-----------------------------------------------------------------------------------------------//

@@ -41,6 +41,9 @@ namespace GroundStationDrone
         List<Point> points_mot_3 = new List<Point>();
         List<Point> points_mot_4 = new List<Point>();
 
+        List<Point> points_loop = new List<Point>();
+        
+
         List<string> frame_sent = new List<string>();
 
         short speed_track = 0;
@@ -538,6 +541,7 @@ namespace GroundStationDrone
                 short mag_x = (short)((frame[40] << 8) + frame[41]);
                 short mag_y = (short)((frame[42] << 8) + frame[43]);
                 short mag_z = (short)((frame[44] << 8) + frame[45]);
+                Int32 loop_time = (Int32)((frame[46] << 24) + (frame[47] << 16) + (frame[48] << 8) + (frame[49]));
 
 
                 horizon_indicator.SetAttitudeIndicatorParameters(angle_tangage, angle_roulis);
@@ -574,6 +578,9 @@ namespace GroundStationDrone
                 points_mot_2.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height - (int)(((front_r - 1) * panel1.Height) / (1000)) - 1));
                 points_mot_3.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height - (int)(((rear_l - 1) * panel1.Height) / (1000)) - 1));
                 points_mot_4.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height - (int)(((rear_r - 1) * panel1.Height) / (1000)) - 1));
+
+                //points_loop
+                points_loop.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height - (int)(((loop_time - 1) * panel1.Height) / (10000)) - 1));
 
 
                 if (points_roulis.Count > 250)
@@ -729,6 +736,17 @@ namespace GroundStationDrone
                             points_mot_4[i - 1] = new Point(0, points_mot_4[i].Y);
                         }
 
+                        //points_loop
+                        if (points_loop[i].X - points_loop[0].X >= 0)
+                        {
+                            points_loop[i - 1] = new Point(points_loop[i].X - points_loop[0].X, points_loop[i].Y);
+                        }
+                        else
+                        {
+                            points_loop[i - 1] = new Point(0, points_loop[i].Y);
+                        }
+                        
+
                     }
                     points_roulis.RemoveRange(points_roulis.Count - 1, 1);
                     points_tangage.RemoveRange(points_tangage.Count - 1, 1);
@@ -746,6 +764,7 @@ namespace GroundStationDrone
                     points_mot_2.RemoveRange(points_mot_2.Count - 1, 1);
                     points_mot_3.RemoveRange(points_mot_3.Count - 1, 1);
                     points_mot_4.RemoveRange(points_mot_4.Count - 1, 1);
+                    points_loop.RemoveRange(points_loop.Count - 1, 1);
                 }
                 panel1.Refresh();
                 if (loop_set_all == true)
@@ -779,6 +798,7 @@ namespace GroundStationDrone
                 labelGyro.Font = new Font(labelGyro.Font, FontStyle.Regular);
                 labelMag.Font = new Font(labelMag.Font, FontStyle.Regular);
                 labelMot.Font = new Font(labelMot.Font, FontStyle.Regular);
+                labelLoop.Font = new Font(labelLoop.Font, FontStyle.Regular);
             }
         }
 
@@ -795,6 +815,7 @@ namespace GroundStationDrone
                 labelAttitude.Font = new Font(labelAttitude.Font, FontStyle.Regular);
                 labelMag.Font = new Font(labelMag.Font, FontStyle.Regular);
                 labelMot.Font = new Font(labelMot.Font, FontStyle.Regular);
+                labelLoop.Font = new Font(labelLoop.Font, FontStyle.Regular);
             }
         }
 
@@ -811,6 +832,7 @@ namespace GroundStationDrone
                 labelAttitude.Font = new Font(labelAttitude.Font, FontStyle.Regular);
                 labelMag.Font = new Font(labelMag.Font, FontStyle.Regular);
                 labelMot.Font = new Font(labelMot.Font, FontStyle.Regular);
+                labelLoop.Font = new Font(labelLoop.Font, FontStyle.Regular);
             }
         }
 
@@ -827,9 +849,26 @@ namespace GroundStationDrone
                 labelGyro.Font = new Font(labelGyro.Font, FontStyle.Regular);
                 labelAttitude.Font = new Font(labelAttitude.Font, FontStyle.Regular);
                 labelMot.Font = new Font(labelMot.Font, FontStyle.Regular);
+                labelLoop.Font = new Font(labelLoop.Font, FontStyle.Regular);
             }
         }
-
+        
+        private void labelLoop_Click(object sender, EventArgs e)
+        {
+            if (labelLoop.Font.Style == FontStyle.Bold)
+            {
+                labelMag.Font = new Font(labelLoop.Font, FontStyle.Regular);
+            }
+            else
+            {
+                labelLoop.Font = new Font(labelLoop.Font, FontStyle.Bold);
+                labelAcc.Font = new Font(labelAcc.Font, FontStyle.Regular);
+                labelGyro.Font = new Font(labelGyro.Font, FontStyle.Regular);
+                labelAttitude.Font = new Font(labelAttitude.Font, FontStyle.Regular);
+                labelMot.Font = new Font(labelMot.Font, FontStyle.Regular);
+                labelMag.Font = new Font(labelMag.Font, FontStyle.Regular);
+            }
+        }
 
         private void labelMot_Click(object sender, EventArgs e)
         {
@@ -845,6 +884,7 @@ namespace GroundStationDrone
                 labelAttitude.Font = new Font(labelAttitude.Font, FontStyle.Regular);
                 labelMag.Font = new Font(labelMag.Font, FontStyle.Regular);
                 labelGyro.Font = new Font(labelGyro.Font, FontStyle.Regular);
+                labelLoop.Font = new Font(labelLoop.Font, FontStyle.Regular);
             }
         }
 
@@ -888,6 +928,12 @@ namespace GroundStationDrone
                     g.DrawLines(new Pen(Color.Blue), points_mot_3.ToArray());
                     g.DrawLines(new Pen(Color.YellowGreen), points_mot_4.ToArray());
                 }
+
+                if (labelLoop.Font.Style == FontStyle.Bold)
+                {
+                    g.DrawLines(new Pen(Color.Red), points_loop.ToArray());
+                }
+
             }
             g.Dispose();
         }
@@ -919,6 +965,8 @@ namespace GroundStationDrone
             loop_set_all = false;
             index_pid = 2;
         }
+
+
 
         
 
