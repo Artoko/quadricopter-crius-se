@@ -40,7 +40,8 @@ Boolean CmpL3G4200DInit(void)
 	DrvTwiReadReg(L3G4200D_ADDRESS, L3G4200D_WHO_AM_I, &datum );
 	if(L3G4200D_WHO_I_AM == datum)
 	{
-		DrvTwiWriteReg(L3G4200D_ADDRESS, L3G4200D_CTRL_REG1, L3G4200D_CTRL_REG1_PD	|
+		DrvTwiWriteReg(L3G4200D_ADDRESS, L3G4200D_CTRL_REG1, L3G4200D_CTRL_REG1_DR_400HZ	|
+															 L3G4200D_CTRL_REG1_PD	|
 															 L3G4200D_CTRL_REG1_ZEN	|
 															 L3G4200D_CTRL_REG1_YEN |
 															 L3G4200D_CTRL_REG1_XEN	);
@@ -143,4 +144,15 @@ Boolean CmpL3G4200DGetRotation(S_Gyr_Sensor *rot)
 		
 		return TRUE;
 	}
+}
+
+
+
+//Get temperature
+Int8S CmpL3G4200DGetTemperature(void)
+{
+	Int8S temp = 0U;
+	DrvTwiReadReg(L3G4200D_ADDRESS, L3G4200D_TEMP_OUT_REG, (Int8U *)&temp);
+	return (Int8S)(temp | 0x10);
+	
 }

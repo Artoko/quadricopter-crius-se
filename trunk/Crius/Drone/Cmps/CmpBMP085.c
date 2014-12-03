@@ -71,7 +71,7 @@ Int16U CmpBMP085GetAltitude(float pressure)
 Int8U CmpBMP085GetWeather( float pressure , Int16U altitude )
 {	
 	// calcul de la presion attendu a notre altitudeconst
-	static float currentAltitude = 340.00F; // current altitude in METERS
+	float currentAltitude = (float)altitude; // current altitude in METERS
 	static float ePressure = 0;
 	ePressure = SEA_PRESSURE * pow((1-currentAltitude/44330.0F), 5.255F);
 	// on compare par rapport a la pression mesurée

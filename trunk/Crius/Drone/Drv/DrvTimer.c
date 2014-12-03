@@ -33,7 +33,7 @@ typedef struct SSTimer
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 //configuration initial des leds
-STimer MesTimers[ E_NB_TIMER ];
+volatile STimer MesTimers[ E_NB_TIMER ];
 
 volatile Int16U tick_counter_100us = 0U;
 

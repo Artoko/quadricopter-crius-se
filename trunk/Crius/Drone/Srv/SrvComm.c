@@ -85,6 +85,7 @@ void SrvCommDispatcher (Event_t in_event)
 		//dispatche trame
 		SrvCommExecute();
 	}
+	
 }
 /************************************************************************/
 /*execute message entrant                                               */
@@ -210,10 +211,7 @@ static void SrvCommRepportMotors( Int8U comm_type_motor, Int16U motor_speed )
 	{
 		//write puissance
 		//controle validité data
-		if(
-			( motor_speed >= MOTOR_OFF_COMMAND ) &&
-			( motor_speed <= MOTOR_MAX_COMMAND )
-		)
+		if( motor_speed <= MOTOR_MAX_COMMAND )
 		{
 			//applique la vitesse au moteurs
 			SrvMotorApplyAbsoluteSpeed(motor_speed);
@@ -266,10 +264,7 @@ static void SrvCommRepportMotors( Int8U comm_type_motor, Int16U motor_speed )
 	{
 		//write puissance
 		//controle validité data
-		if(
-		( motor_speed >= MOTOR_OFF_COMMAND ) &&
-		( motor_speed <= MOTOR_MAX_COMMAND )
-		)
+		if( motor_speed <= MOTOR_MAX_COMMAND )
 		{
 			DrvEepromWriteStartupMotorFrontRight( motor_speed );
 			Char o_message[ ] = { '*', 0x00, '2', '+', '4', '*'};
@@ -298,10 +293,7 @@ static void SrvCommRepportMotors( Int8U comm_type_motor, Int16U motor_speed )
 	{
 		//write puissance
 		//controle validité data
-		if(
-		( motor_speed >= MOTOR_OFF_COMMAND ) &&
-		( motor_speed <= MOTOR_MAX_COMMAND )
-		)
+		if( motor_speed <= MOTOR_MAX_COMMAND )
 		{
 			DrvEepromWriteStartupMotorRearRight( motor_speed );
 			Char o_message[ ] = { '*', 0x00, '2', '+', '6', '*'};
@@ -331,10 +323,7 @@ static void SrvCommRepportMotors( Int8U comm_type_motor, Int16U motor_speed )
 	{
 		//write puissance
 		//controle validité data
-		if(
-		( motor_speed >= MOTOR_OFF_COMMAND ) &&
-		( motor_speed <= MOTOR_MAX_COMMAND )
-		)
+		if( motor_speed <= MOTOR_MAX_COMMAND )
 		{
 			DrvEepromWriteStartupMotorFrontLeft( motor_speed );
 			Char o_message[ ] = { '*', 0x00, '2', '+', '8', '*'};
@@ -363,10 +352,7 @@ static void SrvCommRepportMotors( Int8U comm_type_motor, Int16U motor_speed )
 	{
 		//write puissance
 		//controle validité data
-		if(
-		( motor_speed >= MOTOR_OFF_COMMAND ) &&
-		( motor_speed <= MOTOR_MAX_COMMAND )
-		)
+		if( motor_speed <= MOTOR_MAX_COMMAND )
 		{
 			DrvEepromWriteStartupMotorRearLeft( motor_speed );
 			Char o_message[ ] = { '*', 0x00, '2', '+', '1', '0', '*'};
@@ -579,10 +565,7 @@ static void SrvCommRepportPID( Int8U comm_type_pid, Int8U index, Int16S pid_p, I
 
 static void SrvCommWriteAllData( Int16U motor_speed, Int16S angles_roulis, Int16S angles_tangage, Int16S angles_lacet )
 {
-	if(
-		( motor_speed >= 0U ) &&
-		( motor_speed <= 1000U )
-	)
+	if( motor_speed <= MOTOR_MAX_COMMAND )
 	{
 		//applique la vitesse au moteurs
 		SrvMotorApplyAbsoluteSpeed(motor_speed);

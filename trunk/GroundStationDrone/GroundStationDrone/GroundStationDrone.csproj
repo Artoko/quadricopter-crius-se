@@ -65,7 +65,8 @@
     <Compile Include="Avionics\VerticalSpeedIndicatorInstrumentControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ClassDrone.cs" />
+    <Compile Include="ClassCommDrone.cs" />
+    <Compile Include="ClassMotors.cs" />
     <Compile Include="ClassSerial.cs" />
     <Compile Include="GroundStation.cs">
       <SubType>Form</SubType>
@@ -100,9 +101,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ZedGraph.dll" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AirSpeedIndicator_Background.bmp" />

@@ -11,7 +11,7 @@
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 //index du servo controllé lors de l'IT
-volatile Int8S pin_servo = -1;
+volatile Int8U pin_servo = 0xFFU;
 //tableau des servos actifs
 volatile servo_t MesServos[ MAX_SERVOS ];
 Int16U ServoPosTics = 0U;

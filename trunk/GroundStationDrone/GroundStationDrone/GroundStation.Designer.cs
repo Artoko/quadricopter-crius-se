@@ -90,6 +90,9 @@
             this.horizon_indicator = new GroundStationDrone.AttitudeIndicatorInstrumentControl();
             this.air_speed_indicator = new GroundStationDrone.AirSpeedIndicatorInstrumentControl();
             this.labelLoop = new System.Windows.Forms.Label();
+            this.labelMax = new System.Windows.Forms.Label();
+            this.labelMin = new System.Windows.Forms.Label();
+            this.labelMid = new System.Windows.Forms.Label();
             this.statusStripState.SuspendLayout();
             this.menuStripParams.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSpeed)).BeginInit();
@@ -377,7 +380,7 @@
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel1.Location = new System.Drawing.Point(84, 340);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(860, 132);
+            this.panel1.Size = new System.Drawing.Size(826, 132);
             this.panel1.TabIndex = 6;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
@@ -667,12 +670,45 @@
             this.labelLoop.Text = "Loop time";
             this.labelLoop.Click += new System.EventHandler(this.labelLoop_Click);
             // 
+            // labelMax
+            // 
+            this.labelMax.AutoSize = true;
+            this.labelMax.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.labelMax.Location = new System.Drawing.Point(918, 340);
+            this.labelMax.Name = "labelMax";
+            this.labelMax.Size = new System.Drawing.Size(27, 13);
+            this.labelMax.TabIndex = 34;
+            this.labelMax.Text = "Max";
+            // 
+            // labelMin
+            // 
+            this.labelMin.AutoSize = true;
+            this.labelMin.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.labelMin.Location = new System.Drawing.Point(919, 458);
+            this.labelMin.Name = "labelMin";
+            this.labelMin.Size = new System.Drawing.Size(24, 13);
+            this.labelMin.TabIndex = 35;
+            this.labelMin.Text = "Min";
+            // 
+            // labelMid
+            // 
+            this.labelMid.AutoSize = true;
+            this.labelMid.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.labelMid.Location = new System.Drawing.Point(919, 399);
+            this.labelMid.Name = "labelMid";
+            this.labelMid.Size = new System.Drawing.Size(24, 13);
+            this.labelMid.TabIndex = 36;
+            this.labelMid.Text = "Mid";
+            // 
             // GroundStation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GrayText;
             this.ClientSize = new System.Drawing.Size(967, 514);
+            this.Controls.Add(this.labelMid);
+            this.Controls.Add(this.labelMin);
+            this.Controls.Add(this.labelMax);
             this.Controls.Add(this.labelLoop);
             this.Controls.Add(this.labelLacet);
             this.Controls.Add(this.labelTangage);
@@ -795,6 +831,9 @@
         private System.Windows.Forms.Label labelTangage;
         private System.Windows.Forms.Label labelLacet;
         private System.Windows.Forms.Label labelLoop;
+        private System.Windows.Forms.Label labelMax;
+        private System.Windows.Forms.Label labelMin;
+        private System.Windows.Forms.Label labelMid;
 
     }
 }

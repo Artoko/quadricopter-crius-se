@@ -119,12 +119,12 @@ Boolean DrvLedSetState ( Int8U id_led, ELedState state )
 	
 	if( id_led < E_NB_LED )
 	{
-		if( MesLeds[ id_led ].state == E_LED_ON )
+		if( state == E_LED_ON )
 		{
 			MesLeds[ id_led ].state = E_LED_ON;
 			DrvIoSetPinState(MesLeds[ id_led ].pin,TRUE);
 		}
-		else if( MesLeds[ id_led ].state == E_LED_OFF )
+		else if( state == E_LED_OFF )
 		{
 			MesLeds[ id_led ].state = E_LED_OFF;
 			DrvIoSetPinState(MesLeds[ id_led ].pin,FALSE);

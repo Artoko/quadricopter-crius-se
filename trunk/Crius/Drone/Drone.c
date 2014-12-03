@@ -97,10 +97,10 @@ int main(void)
 	// ********************* Services init ********************************************
 	SrvPIDInit();
 	SrvMotorInit(); 
-	SrvKalmanFilterInit();
+	//SrvKalmanFilterInit();
+	SrvSensorsInit();
 	SrvImuInit();
 	SrvCommInit();
-	SrvSensorsInit();
 	
 	//Wait 1 sec for sensors init
 	DrvTickDelayMs(1000);
@@ -113,12 +113,16 @@ int main(void)
 	// ********************* Reset time ***********************************************
 	DrvLedSetBlinkMode(E_LED_OK,2,18);
 	DrvTimerTickReset();
+	last_loop_time = DrvTickGetTimeUs();
 	
+	// ********************* Led ok blink mode ***********************************************
+	DrvLedSetBlinkMode(E_LED_OK,2,18);
     while(TRUE)
     {		
 		// ********************* Calcul du temps de cycle *****************************
-		imu_reel.loop_time = DrvTickGetTimeUs() - last_loop_time;
-		last_loop_time = DrvTickGetTimeUs();
+		Int32U now = DrvTickGetTimeUs();
+		imu_reel.loop_time = now - last_loop_time;
+		last_loop_time = now;
 		
 		current_main_event = DrvEventGetEvent();	
 		// ********************* Read sensors *****************************************
@@ -138,6 +142,7 @@ int main(void)
 //Fonction appelle lors d'une action sur le bouton
 void ActionButton ( EButtonState state )
 {
+	if(state == E_BUTTON_STATE_PUSHED)
 	DrvLedSetToggle(E_LED_ERROR);
 }
 
