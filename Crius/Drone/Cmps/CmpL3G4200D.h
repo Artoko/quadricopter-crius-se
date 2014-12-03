@@ -41,6 +41,7 @@
 #define L3G4200D_CTRL_REG4_FS_2000DPS		0x30
 
 #define L3G4200D_CTRL_REG5              0x24
+#define L3G4200D_TEMP_OUT_REG           0x26
 #define L3G4200D_STATUS_REG             0x27
 #define L3G4200D_OUT_X_L                0x28
 #define L3G4200D_OUT_X_H                0x29
@@ -77,6 +78,10 @@ Boolean CmpL3G4200DInit(void);
 //Rotation X Y Z
 Boolean CmpL3G4200DGetRotation(S_Gyr_Sensor *rot);
 
+//Calibration
 Boolean CmpL3G4200DIsCalibrate(void);
+
+//Get temperature
+Int8S CmpL3G4200DGetTemperature(void);
 
 #endif /*CMPL3G4200D_H_*/

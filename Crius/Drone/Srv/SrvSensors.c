@@ -60,7 +60,7 @@ Boolean SrvSensorsInit( void )
 }
 
 float interval_gyro = 0.0F;
-float lastread_gyro = 0U;
+Int32U lastread_gyro = 0U;
 	
 
 //dispatcher d'evenements
@@ -72,13 +72,15 @@ void SrvSensorsDispatcher (Event_t in_event)
 	//read acc
 	SrvSensorsReadAccelerometerSensor( &imu_reel.acc_angles, &imu_reel.sensors.acc );
 	//read mag
-	SrvSensorsReadMagnetometerSensor( &imu_reel.angles, &imu_reel.sensors.mag );
+	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_100MS ) == TRUE)
+	{
+		SrvSensorsReadMagnetometerSensor( &imu_reel.angles, &imu_reel.sensors.mag );
+	}
 	//read baro
 	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_50MS ) == TRUE)
 	{
 		// *********************Mise à jour du barometre **************************
 		CmpBMP085StateMachine();
-		imu_reel.sensors.bar.temperature = (Int16S)CmpBMP085GetTemperature();
 		imu_reel.sensors.bar.pressure = CmpBMP085GetPressure();
 		imu_reel.sensors.bar.altitude = (Int16S)CmpBMP085GetAltitude(imu_reel.sensors.bar.pressure);
 		
@@ -86,6 +88,13 @@ void SrvSensorsDispatcher (Event_t in_event)
 		{
 			imu_reel.sensors.bar.weather = CmpBMP085GetWeather(imu_reel.sensors.bar.pressure, imu_reel.sensors.bar.altitude);
 		}
+	}
+	//read baro
+	if( DrvEventTestEvent( in_event, CONF_EVENT_TIMER_1S ) == TRUE)
+	{
+		imu_reel.sensors.bar.temperature = (Int16S)CmpBMP085GetTemperature();
+		imu_reel.sensors.bar.temperature += (Int16S)CmpL3G4200DGetTemperature() ;
+		imu_reel.sensors.bar.temperature /= 2;
 	}
 }
 
@@ -193,19 +202,22 @@ void SrvSensorsReadAccelerometerSensor( S_Acc_Angles *acc_angles, S_Acc_Sensor *
 /************************************************************************/
 void SrvSensorsReadGyroscopeSensor( S_Gyr_Angles *gyr_angles, S_Gyr_Sensor *sensors )
 {
-	#define NB_SAMPLES 3U
+	#define NB_SAMPLES 2U
 	Boolean gyr_read_ok = FALSE;
 	float gyroRate_x = 0;
 	float gyroRate_y = 0;
 	float gyroRate_z = 0;
 	
-	//variables de timming
 	
+#if NB_SAMPLES > 1U
 	for( Int8U sample_gyro = 0U ; sample_gyro < NB_SAMPLES ; sample_gyro++ )
-	{		
+#endif	
+	{	
+
 		// ********************* Calcul du temps de cycle *************************
-		interval_gyro = (float)(DrvTickGetTimeUs() - lastread_gyro) / 1000000.0F;
-		lastread_gyro = DrvTickGetTimeUs();
+		Int32U now_gyro = DrvTickGetTimeUs();
+		interval_gyro = (float)(now_gyro - lastread_gyro) / 1000000.0F;
+		lastread_gyro = now_gyro;
 	
 
 		#ifdef GYR_ITG3205
@@ -244,10 +256,20 @@ void SrvSensorsReadGyroscopeSensor( S_Gyr_Angles *gyr_angles, S_Gyr_Sensor *sens
 			gyr_angles->lacet	+= (float)( gyroRate_z * interval_gyro);
 		}
 	}
+#if NB_SAMPLES > 1U
 	gyr_angles->roulis		/= (float)NB_SAMPLES;
 	gyr_angles->tangage		/= (float)NB_SAMPLES;
 	gyr_angles->lacet		/= (float)NB_SAMPLES;
+#endif
 	
+	if(gyr_angles->lacet < 0.0F)
+	{
+		gyr_angles->lacet += 360.0F;
+	}
+	if(gyr_angles->lacet > 360.0F)
+	{
+		gyr_angles->lacet -= 360.0F;
+	}
 }
 
 /************************************************************************/
@@ -291,6 +313,7 @@ void SrvSensorsReadMagnetometerSensor( S_angles *angles, S_Mag_Sensor *sensors )
 				heading -= 2 * M_PI;
 			}
 			angles->nord = (Int16S)ToDeg(heading);
+			
 		}
 	}
 }

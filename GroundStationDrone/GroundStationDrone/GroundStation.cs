@@ -19,10 +19,36 @@ namespace GroundStationDrone
 
         public static ClassSerial serial_com = new ClassSerial();
         ClassSerial.callback_message_receive my_callback;
+        ClassCommDrone comm_drone = new ClassCommDrone();
+
+        short angle_roulis = 0;
+        short angle_tangage = 0;
+        short angle_lacet = 0;
+        short angle_nord = 0;
+        short altitude = 0;
+        short speed = 0;
+        short front_l = 0;
+        short front_r = 0;
+        short rear_l = 0;
+        short rear_r = 0;
+        short temperature = 0;
+        Int32 pressure = 0;
+        short acc_x = 0;
+        short acc_y = 0;
+        short acc_z = 0;
+        short gyr_x = 0;
+        short gyr_y = 0;
+        short gyr_z = 0;
+        short mag_x = 0;
+        short mag_y = 0;
+        short mag_z = 0;
+        Int32 loop_time = 0;
+
         Graphics g = null;
         List<Point> points_roulis = new List<Point>();
         List<Point> points_tangage = new List<Point>();
         List<Point> points_lacet = new List<Point>();
+        List<Point> points_nord = new List<Point>();
 
         List<Point> points_acc_x = new List<Point>();
         List<Point> points_acc_y = new List<Point>();
@@ -68,6 +94,7 @@ namespace GroundStationDrone
                     (serial_com.Connect("COM22") == true)
                     )
                 {
+                    serial_com.ClassUartReset();
                     GetVersion();
                 }
             }
@@ -112,17 +139,16 @@ namespace GroundStationDrone
         #region general
         private void GetVersion()
         {
-            serial_com.ClassUartReset();
-            SendSerialMessage("1+1", IncommingMessageVersion);
+            SendSerialMessage(comm_drone.GetVersion(), IncommingMessageVersion);
         }
         private void IncommingMessageVersion(byte[] frame)
         {
             string response = ConvertFrame(frame);
-            if (response.Length < 3)
+            if (response.Length < comm_drone.GetVersion().Length)
             {
                 ErrorMessage(frame);
             }
-            else if (response.Substring(0, 3) == "1+1")
+            else if (response.Substring(0, comm_drone.GetVersion().Length) == comm_drone.GetVersion())
             {
                 byte version = Encoding.ASCII.GetBytes(response.Replace(response.Substring(0, 4), "").ToCharArray())[0];
                 toolStripStatusLabelVersion.Text = "Version : " + Convert.ToString((version & 0xf0) >> 4) + "." + Convert.ToString(version & 0x0f);
@@ -132,8 +158,8 @@ namespace GroundStationDrone
                 labelGyro.Font = new Font(labelGyro.Font, FontStyle.Regular);
                 labelMag.Font = new Font(labelMag.Font, FontStyle.Regular);
                 labelMot.Font = new Font(labelMot.Font, FontStyle.Regular);
+                labelLoop.Font = new Font(labelLoop.Font, FontStyle.Regular);
                 loop_set_all = true;
-                //SetAll(speed_track, 0, 0, 0);
                 GetPID(0);
             }
             else
@@ -143,22 +169,24 @@ namespace GroundStationDrone
         }
         private void getVersionToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            serial_com.ClassUartReset();
             GetVersion();
         }
         
         private void SetReset()
         {
-            SendSerialMessage("1+2", IncommingMessageReset);
+            SendSerialMessage(comm_drone.SetReset(), IncommingMessageReset);
         }
         private void IncommingMessageReset(byte[] frame)
         {
             string response = ConvertFrame(frame);
-            if (response.Length < 3)
+            if (response.Length < comm_drone.SetReset().Length)
             {
                 ErrorMessage(frame);
             }
-            else if (response == "1+2")
+            else if (response == comm_drone.SetReset())
             {
+                serial_com.ClassUartReset();
                 GetVersion();
             }
         }
@@ -166,21 +194,21 @@ namespace GroundStationDrone
         {
             SetReset();
         }
-
-        
+   
         private void SetFullReset()
         {
-            SendSerialMessage("1+3", IncommingMessageFullReset);
+            SendSerialMessage(comm_drone.SetFullReset(), IncommingMessageFullReset);
         }
         private void IncommingMessageFullReset(byte[] frame)
         {
             string response = ConvertFrame(frame);
-            if (response.Length < 3)
+            if (response.Length < comm_drone.SetFullReset().Length)
             {
                 ErrorMessage(frame);
             }
-            else if (response == "1+3")
+            else if (response == comm_drone.SetFullReset())
             {
+                serial_com.ClassUartReset();
                 GetVersion();
             }
         }
@@ -193,16 +221,16 @@ namespace GroundStationDrone
         #region Motors
         private void GetSpeed()
         {
-            SendSerialMessage("2+2", IncommingMessageGetSpeed);
+            SendSerialMessage(comm_drone.GetSpeed(), IncommingMessageGetSpeed);
         }
         private void IncommingMessageGetSpeed(byte[] frame)
         {
             string response = ConvertFrame(frame);
-            if (response.Length < 3)
+            if (response.Length < comm_drone.GetSpeed().Length)
             {
                 ErrorMessage(frame);
             }
-            else if (response.Substring(0, 3) == "2+2")
+            else if (response.Substring(0, comm_drone.GetSpeed().Length) == comm_drone.GetSpeed())
             {
                 short speed = (short)((frame[16] << 8) + frame[17]);
                 air_speed_indicator.SetAirSpeedIndicatorParameters((int)speed);
@@ -216,16 +244,16 @@ namespace GroundStationDrone
         
         private void SetSpeed( short speed )
         {
-            SendSerialMessage("2+1+" + Convert.ToChar(Convert.ToByte(speed >> 8)) + Convert.ToChar(Convert.ToByte((byte)speed )), IncommingMessageSetSpeed);
+            SendSerialMessage(comm_drone.GetSpeed() + "+" + Convert.ToChar(Convert.ToByte(speed >> 8)) + Convert.ToChar(Convert.ToByte((byte)speed)), IncommingMessageSetSpeed);
         }
         private void IncommingMessageSetSpeed(byte[] frame)
         {
             string response = ConvertFrame(frame);
-            if (response.Length < 3)
+            if (response.Length < comm_drone.GetSpeed().Length)
             {
                 ErrorMessage(frame);
             }
-            else if (response.Substring(0, 3) == "2+1")
+            else if (response.Substring(0, comm_drone.GetSpeed().Length) == comm_drone.GetSpeed())
             {
             }
         }
@@ -250,16 +278,16 @@ namespace GroundStationDrone
         #region Angles
         private void GetAngles()
         {
-            SendSerialMessage("3+2", IncommingMessageGetAngles);
+            SendSerialMessage(comm_drone.GetAngles(), IncommingMessageGetAngles);
         }
         private void IncommingMessageGetAngles(byte[] frame)
         {
             string response = ConvertFrame(frame);
-            if (response.Length < 3)
+            if (response.Length < comm_drone.GetAngles().Length)
             {
                 ErrorMessage(frame);
             }
-            else if (response.Substring(0, 3) == "3+2")
+            else if (response.Substring(0, comm_drone.GetAngles().Length) == comm_drone.GetAngles())
             {
                 short angle_roulis = (short)((frame[3] << 8) + frame[4]);
                 short angle_tangage = (short)((frame[6] << 8) + frame[7]);
@@ -280,16 +308,16 @@ namespace GroundStationDrone
         #region Sensors
         private void GetBarometer()
         {
-            SendSerialMessage("4+4", IncommingMessageGetBarometer);
+            SendSerialMessage(comm_drone.GetBarometer(), IncommingMessageGetBarometer);
         }
         private void IncommingMessageGetBarometer(byte[] frame)
         {
             string response = ConvertFrame(frame);
-            if (response.Length < 3)
+            if (response.Length < comm_drone.GetBarometer().Length)
             {
                 ErrorMessage(frame);
             }
-            else if (response.Substring(0, 3) == "4+4")
+            else if (response.Substring(0, comm_drone.GetBarometer().Length) == comm_drone.GetBarometer())
             {
                 short altitude = (short)((frame[3] << 8) + frame[4]);
                 short temperature = (short)((frame[6] << 8) + frame[7]);
@@ -309,16 +337,16 @@ namespace GroundStationDrone
 
         private void GetAccelerometer()
         {
-            SendSerialMessage("4+1", IncommingMessageGetAccelerometer);
+            SendSerialMessage(comm_drone.GetAccelerometer(), IncommingMessageGetAccelerometer);
         }
         private void IncommingMessageGetAccelerometer(byte[] frame)
         {
             string response = ConvertFrame(frame);
-            if (response.Length < 3)
+            if (response.Length < comm_drone.GetAccelerometer().Length)
             {
                 ErrorMessage(frame);
             }
-            else if (response.Substring(0, 3) == "4+1")
+            else if (response.Substring(0, comm_drone.GetAccelerometer().Length) == comm_drone.GetAccelerometer())
             {
                 short x = (short)((frame[3] << 8) + frame[4]);
                 short y = (short)((frame[6] << 8) + frame[7]);
@@ -332,16 +360,16 @@ namespace GroundStationDrone
 
         private void GetGyroscope()
         {
-            SendSerialMessage("4+2", IncommingMessageGetGyroscope);
+            SendSerialMessage(comm_drone.GetGyroscope(), IncommingMessageGetGyroscope);
         }
         private void IncommingMessageGetGyroscope(byte[] frame)
         {
             string response = ConvertFrame(frame);
-            if (response.Length < 3)
+            if (response.Length < comm_drone.GetGyroscope().Length)
             {
                 ErrorMessage(frame);
             }
-            else if (response.Substring(0, 3) == "4+2")
+            else if (response.Substring(0, comm_drone.GetGyroscope().Length) == comm_drone.GetGyroscope())
             {
                 short x = (short)((frame[3] << 8) + frame[4]);
                 short y = (short)((frame[6] << 8) + frame[7]);
@@ -355,16 +383,16 @@ namespace GroundStationDrone
 
         private void GetMagnetometer()
         {
-            SendSerialMessage("4+3", IncommingMessageGetMagnetometer);
+            SendSerialMessage(comm_drone.GetMagnetometer(), IncommingMessageGetMagnetometer);
         }
         private void IncommingMessageGetMagnetometer(byte[] frame)
         {
             string response = ConvertFrame(frame);
-            if (response.Length < 3)
+            if (response.Length < comm_drone.GetMagnetometer().Length)
             {
                 ErrorMessage(frame);
             }
-            else if (response.Substring(0, 3) == "4+3")
+            else if (response.Substring(0, comm_drone.GetMagnetometer().Length) == comm_drone.GetMagnetometer())
             {
                 short x = (short)((frame[3] << 8) + frame[4]);
                 short y = (short)((frame[6] << 8) + frame[7]);
@@ -380,21 +408,21 @@ namespace GroundStationDrone
         #region PID
         private void GetPID(string index)
         {
-            SendSerialMessage("5+2+" + index, IncommingMessageGetPIDs);
+            SendSerialMessage( comm_drone.GetPID() + "+" + index, IncommingMessageGetPIDs);
         }
         private void GetPID(int index)
         {
-            SendSerialMessage("5+2+" + index, IncommingMessageGetPIDs);
+            SendSerialMessage(comm_drone.GetPID() + "+" + index, IncommingMessageGetPIDs);
         }
         private void IncommingMessageGetPIDs(byte[] frame)
         {
             string response = ConvertFrame(frame);
-            
-            if (response.Length < 3)
+
+            if (response.Length < comm_drone.GetPID().Length)
             {
                 ErrorMessage(frame);
             }
-            else if (response.Substring(0, 3) == "5+2")
+            else if (response.Substring(0, comm_drone.GetPID().Length) == comm_drone.GetPID())
             {
                 byte pid_index = frame[4];
                 short pid_P = (short)((frame[6] << 8) + frame[7]);
@@ -423,8 +451,6 @@ namespace GroundStationDrone
                     loop_set_all = true;
                     SetAll(speed_track, 0, 0, 0);
                 }
-
-
             }
         }
         private void getPIDsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -497,7 +523,7 @@ namespace GroundStationDrone
         int time = 0;
         private void SetAll(short speed, short roulis, short tangage, short lacet)
         {
-            SendSerialMessage("6+" +
+            SendSerialMessage( comm_drone.SetAll() + "+" +
                 Convert.ToChar(Convert.ToByte(speed >> 8)) +
                 Convert.ToChar(Convert.ToByte((byte)speed)) +
                 "+" +
@@ -514,39 +540,40 @@ namespace GroundStationDrone
         private void IncommingMessageSetAll(byte[] frame)
         {
             string response = ConvertFrame(frame);
-            if (response.Length < 1)
+            if (response.Length < comm_drone.SetAll().Length)
             {
                 ErrorMessage(frame);
             }
-            else if (response.Substring(0, 1) == "6")
+            else if (response.Substring(0, comm_drone.SetAll().Length) == comm_drone.SetAll())
             {
-                short angle_roulis = (short)((frame[2] << 8) + frame[3]);
-                short angle_tangage = (short)((frame[4] << 8) + frame[5]);
-                short angle_lacet = (short)((frame[6] << 8) + frame[7]);
-                short angle_nord = (short)((frame[8] << 8) + frame[9]);
-                short altitude = (short)((frame[10] << 8) + frame[11]);
-                short speed = (short)((frame[12] << 8) + frame[13]);
-                short front_l = (short)((frame[14] << 8) + frame[15]);
-                short front_r = (short)((frame[16] << 8) + frame[17]);
-                short rear_l = (short)((frame[18] << 8) + frame[19]);
-                short rear_r = (short)((frame[20] << 8) + frame[21]);
-                short temperature = (short)((frame[22] << 8) + frame[23]);
-                Int32 pressure = (Int32)((frame[24] << 24) + (frame[25] << 16) + (frame[26] << 8) + (frame[27]));
-                short acc_x = (short)((frame[28] << 8) + frame[29]);
-                short acc_y = (short)((frame[30] << 8) + frame[31]);
-                short acc_z = (short)((frame[32] << 8) + frame[33]);
-                short gyr_x = (short)((frame[34] << 8) + frame[35]);
-                short gyr_y = (short)((frame[36] << 8) + frame[37]);
-                short gyr_z = (short)((frame[38] << 8) + frame[39]);
-                short mag_x = (short)((frame[40] << 8) + frame[41]);
-                short mag_y = (short)((frame[42] << 8) + frame[43]);
-                short mag_z = (short)((frame[44] << 8) + frame[45]);
-                Int32 loop_time = (Int32)((frame[46] << 24) + (frame[47] << 16) + (frame[48] << 8) + (frame[49]));
+                //get data from quad
+                angle_roulis = (short)((frame[2] << 8) + frame[3]);
+                angle_tangage = (short)((frame[4] << 8) + frame[5]);
+                angle_lacet = (short)((frame[6] << 8) + frame[7]);
+                angle_nord = (short)((frame[8] << 8) + frame[9]);
+                altitude = (short)((frame[10] << 8) + frame[11]);
+                speed = (short)((frame[12] << 8) + frame[13]);
+                front_l = (short)((frame[14] << 8) + frame[15]);
+                front_r = (short)((frame[16] << 8) + frame[17]);
+                rear_l = (short)((frame[18] << 8) + frame[19]);
+                rear_r = (short)((frame[20] << 8) + frame[21]);
+                temperature = (short)((frame[22] << 8) + frame[23]);
+                pressure = (Int32)((frame[24] << 24) + (frame[25] << 16) + (frame[26] << 8) + (frame[27]));
+                acc_x = (short)((frame[28] << 8) + frame[29]);
+                acc_y = (short)((frame[30] << 8) + frame[31]);
+                acc_z = (short)((frame[32] << 8) + frame[33]);
+                gyr_x = (short)((frame[34] << 8) + frame[35]);
+                gyr_y = (short)((frame[36] << 8) + frame[37]);
+                gyr_z = (short)((frame[38] << 8) + frame[39]);
+                mag_x = (short)((frame[40] << 8) + frame[41]);
+                mag_y = (short)((frame[42] << 8) + frame[43]);
+                mag_z = (short)((frame[44] << 8) + frame[45]);
+                loop_time = (Int32)((frame[46] << 24) + (frame[47] << 16) + (frame[48] << 8) + (frame[49]));
 
-
+                //set indicators
                 horizon_indicator.SetAttitudeIndicatorParameters(angle_tangage, angle_roulis);
                 turn_indicator.SetTurnCoordinatorParameters(angle_roulis / 10, angle_roulis / 10);
-                heading_indicator.SetHeadingIndicatorParameters(angle_lacet);
+                heading_indicator.SetHeadingIndicatorParameters(angle_nord);
                 altimeter_indicator.SetAlimeterParameters((int)(altitude * 3.2808399));
                 air_speed_indicator.SetAirSpeedIndicatorParameters((int)speed);
                 vario_indicator.SetVerticalSpeedIndicatorParameters(((acc_z - 16383) * 6000) / 16383);
@@ -561,6 +588,8 @@ namespace GroundStationDrone
                 points_roulis.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((angle_roulis - 1) * panel1.Height) / 180) - 1));
                 points_tangage.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((angle_tangage - 1) * panel1.Height) / 180) - 1));
                 points_lacet.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height - (int)(((angle_lacet - 1) * panel1.Height) / 360) - 1));
+                points_nord.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height - (int)(((angle_nord - 1) * panel1.Height) / 360) - 1));
+
 
                 points_acc_x.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((acc_x - 1) * panel1.Height) / (0xFFFF / 1)) - 1));
                 points_acc_y.Add(new Point((int)((time * panel1.Width / 250)), panel1.Height / 2 - (int)(((acc_y - 1) * panel1.Height) / (0xFFFF / 1)) - 1));
@@ -613,6 +642,15 @@ namespace GroundStationDrone
                         else
                         {
                             points_lacet[i - 1] = new Point(0, points_lacet[i].Y);
+                        }
+
+                        if (points_nord[i].X - points_nord[0].X >= 0)
+                        {
+                            points_nord[i - 1] = new Point(points_nord[i].X - points_nord[0].X, points_nord[i].Y);
+                        }
+                        else
+                        {
+                            points_nord[i - 1] = new Point(0, points_nord[i].Y);
                         }
 
                         //acc
@@ -751,6 +789,7 @@ namespace GroundStationDrone
                     points_roulis.RemoveRange(points_roulis.Count - 1, 1);
                     points_tangage.RemoveRange(points_tangage.Count - 1, 1);
                     points_lacet.RemoveRange(points_lacet.Count - 1, 1);
+                    points_nord.RemoveRange(points_nord.Count - 1, 1);
                     points_acc_x.RemoveRange(points_acc_x.Count - 1, 1);
                     points_acc_y.RemoveRange(points_acc_y.Count - 1, 1);
                     points_acc_z.RemoveRange(points_acc_z.Count - 1, 1);
@@ -898,6 +937,11 @@ namespace GroundStationDrone
                     g.DrawLines(new Pen(Color.Red), points_roulis.ToArray());
                     g.DrawLines(new Pen(Color.Green), points_tangage.ToArray());
                     g.DrawLines(new Pen(Color.Blue), points_lacet.ToArray());
+                    g.DrawLines(new Pen(Color.YellowGreen), points_nord.ToArray());
+                    
+                    labelMax.Text = "+180";
+                    labelMid.Text = "0";
+                    labelMin.Text = "-180";
                 }
 
                 if (labelAcc.Font.Style == FontStyle.Bold)
@@ -905,6 +949,9 @@ namespace GroundStationDrone
                     g.DrawLines(new Pen(Color.Red), points_acc_x.ToArray());
                     g.DrawLines(new Pen(Color.Green), points_acc_y.ToArray());
                     g.DrawLines(new Pen(Color.Blue), points_acc_z.ToArray());
+                    labelMax.Text = "+32767";
+                    labelMid.Text = "0";
+                    labelMin.Text = "-32767";
                 }
 
                 if (labelGyro.Font.Style == FontStyle.Bold)
@@ -912,6 +959,9 @@ namespace GroundStationDrone
                     g.DrawLines(new Pen(Color.Red), points_gyr_x.ToArray());
                     g.DrawLines(new Pen(Color.Green), points_gyr_y.ToArray());
                     g.DrawLines(new Pen(Color.Blue), points_gyr_z.ToArray());
+                    labelMax.Text = "+32767";
+                    labelMid.Text = "0";
+                    labelMin.Text = "-32767";
                 }
 
                 if (labelMag.Font.Style == FontStyle.Bold)
@@ -919,6 +969,9 @@ namespace GroundStationDrone
                     g.DrawLines(new Pen(Color.Red), points_mag_x.ToArray());
                     g.DrawLines(new Pen(Color.Green), points_mag_y.ToArray());
                     g.DrawLines(new Pen(Color.Blue), points_mag_z.ToArray());
+                    labelMax.Text = "+512";
+                    labelMid.Text = "0";
+                    labelMin.Text = "-512";
                 }
 
                 if (labelMot.Font.Style == FontStyle.Bold)
@@ -927,11 +980,17 @@ namespace GroundStationDrone
                     g.DrawLines(new Pen(Color.Green), points_mot_2.ToArray());
                     g.DrawLines(new Pen(Color.Blue), points_mot_3.ToArray());
                     g.DrawLines(new Pen(Color.YellowGreen), points_mot_4.ToArray());
+                    labelMax.Text = "1000";
+                    labelMid.Text = speed.ToString();
+                    labelMin.Text = "0";
                 }
 
                 if (labelLoop.Font.Style == FontStyle.Bold)
                 {
                     g.DrawLines(new Pen(Color.Red), points_loop.ToArray());
+                    labelMax.Text = "10000";
+                    labelMid.Text = loop_time.ToString();
+                    labelMin.Text = "0";
                 }
 
             }

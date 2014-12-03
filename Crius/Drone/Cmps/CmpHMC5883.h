@@ -14,7 +14,7 @@
 
 ////////////////////////////////////////PUBLIC DEFINES/////////////////////////////////////////
 
-#define LOCAL_MAGNETIC_DECLINAISON		0.01774
+#define LOCAL_MAGNETIC_DECLINAISON		0.01774F
 
 #define HMC5883_ADDRESS			0x1E
 

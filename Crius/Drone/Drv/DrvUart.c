@@ -80,7 +80,6 @@ void DrvUartInit( Int8U index_uart, Int32U baud_rate )
 Boolean DrvUart0ReadBuffer( Int8U *trame ,Int8U *lenght )
 {
 	Boolean o_success = FALSE;
-	static Int8U error_frame = 0U;
 	//commence par une '*'
 	if(buff_uart_0[ 0U ] == '*') 
 	{
