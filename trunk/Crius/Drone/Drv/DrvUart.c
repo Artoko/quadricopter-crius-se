@@ -10,22 +10,32 @@
 #include "DrvUart.h"
 #include "DrvEvent.h"
 
-////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
+////////////////////////////////////////PRIVATE ENUMS/////////////////////////////////////////////
+typedef enum
+{	
+	USART_STATE_IDLE,
+	USART_STATE_PAYLOAD,
+	USART_STATE_WAIT,
+	//----------------- Alaways at end -----------------------
+	E_NB_USART_STATE,
+	E_USART_STATE_NONE
+}EStateUart;
+
+////////////////////////////////////////PRIVATE STRUCTURES////////////////////////////////////////
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
-
-
 #ifdef USE_UART_0
 	//UART 0
 	//-------
 	//message stocke
 	volatile Int8U in_message_0[ BUFFER_MAX ];
 	volatile Int8U in_message_sent_0 = 0U;
-	volatile Int8U in_message_len_0 = 0U;
+	volatile EStateUart in_message_len_0 = USART_STATE_IDLE;
 	
 	//buffer de reception de message uart 0
 	volatile Int8U buff_uart_0[ BUFFER_MAX ];
 	volatile Int8U ctr_buff_uart_0 = 0U;
+	volatile Int8U state_uart_0 = 0U;
 #endif
 
 #ifdef USE_UART_1
@@ -73,6 +83,8 @@ void DrvUartInit( Int8U index_uart, Int32U baud_rate )
 		UCSR1C|= (1<<UCSZ11);  
 	}
 	#endif
+	 state_uart_0 = USART_STATE_IDLE;
+	 ctr_buff_uart_0 = 0U;
 }
 
 
@@ -80,43 +92,25 @@ void DrvUartInit( Int8U index_uart, Int32U baud_rate )
 Boolean DrvUart0ReadBuffer( Int8U *trame ,Int8U *lenght )
 {
 	Boolean o_success = FALSE;
-	//commence par une '*'
-	if(buff_uart_0[ 0U ] == '*') 
+	
+	if ( USART_STATE_WAIT == state_uart_0 )
 	{
-		//termine par une '*'
-		if( buff_uart_0[ buff_uart_0[ 1U ] - 1U ] == '*')
+		// length
+		*lenght = ctr_buff_uart_0;
+		
+		// data
+		for( Int8U loop = 0U ; loop < ctr_buff_uart_0 ; loop++ )
 		{
-			//on confirme termine par une '*'
-			if(buff_uart_0[ ctr_buff_uart_0 - 1U ] == '*')
-			{
-				*lenght = buff_uart_0[ 1U ];
-				//nb caract recu en [1] 
-				for( Int8U loop = 0U; loop < *lenght ; loop++)
-				{
-					trame[ loop ] = buff_uart_0[ loop ];
-					buff_uart_0[ loop ] = 0U;
-				}
-				ctr_buff_uart_0 = 0U;
-				o_success = TRUE;
-			}
+			trame[ loop ] = buff_uart_0[ loop ];
 		}
-		else
-		{
-			//si ca fait 2 fois qu'on arrive pas a decoder alors on arrete
-			/*if(error_frame++ == 1)
-			{
-				error_frame = 0;
-				ctr_buff_uart_0 = 0U;
-				buff_uart_0[ 0U ] = 0U;
-				buff_uart_0[ buff_uart_0[ 1U ] - 1U ] = 0U;
-				lenght[ 0U ] = 0U;
-			}*/
-		}
+		
+		// on redemarre la reception
+		state_uart_0 = USART_STATE_IDLE;
+		ctr_buff_uart_0 = 0U;
+		
+		o_success = TRUE;
 	}
-	else
-	{
-		lenght[ 0U ] = 0U;
-	}
+	
 	return o_success;
 }
 
@@ -208,17 +202,50 @@ ISR(USART0_RX_vect)
 ISR(USART0_RX_vect)
 #endif
 {
-	Int8U rcv_byte = UDR0 ;
-	if( ctr_buff_uart_0 > 0 )
+	Int8U rcv_byte = UDR0 ;	
+	switch( state_uart_0 )
 	{
-		//on enregistre les octet recus
-		buff_uart_0[ ctr_buff_uart_0 ] = rcv_byte;
-		ctr_buff_uart_0++;
-	}
-	else if( rcv_byte == '*' )
-	{
-		buff_uart_0[ 0U ] = '*';
-		ctr_buff_uart_0 = 1U;
+		case USART_STATE_IDLE :
+		{
+			// on effectue une simple vérification si il s'agit d'une '*'
+			if( rcv_byte == '*' )
+			{
+				buff_uart_0[ 0U ] = '*';
+				ctr_buff_uart_0 = 1U;
+				state_uart_0 = USART_STATE_PAYLOAD;
+			}
+		}
+		break;
+			
+		case USART_STATE_PAYLOAD :
+		{
+			if( rcv_byte == '*' )
+			{
+				buff_uart_0[ ctr_buff_uart_0 ] = '*';
+				ctr_buff_uart_0 += 1U;
+				state_uart_0 = USART_STATE_WAIT;
+			}
+			else
+			{
+				buff_uart_0[ ctr_buff_uart_0 ] = rcv_byte;
+				ctr_buff_uart_0 += 1U;
+			}
+		}
+		break;
+
+		case USART_STATE_WAIT :
+		{
+			// on attend que le message soit traiter par l'applicatif
+		}
+		break;
+
+		default:
+		{
+			// on est dans un etat inconnus !
+			// on re-initialise la reception
+			state_uart_0 = USART_STATE_IDLE;
+		}
+		break;
 	}
 }
 #endif
